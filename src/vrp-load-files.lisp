@@ -1,0 +1,26 @@
+(dolist (f (list "src/vrp-package.lisp"
+                 "src/vrp-utilities.lisp"
+                 "src/vrp-random-number-generation.lisp"
+                 "src/vrp-generic-functions.lisp"
+                 "src/vrp-class-definition-macro.lisp"
+		 "src/vrp-classes.lisp"
+		 "src/vrp-moments.lisp"
+		 "src/vrp-data.lisp"
+		 "src/vrp-neighborhood-exploration-macros.lisp"
+                 "src/vrp-neighborhood-simulation.lisp"
+                 "src/vrp-neighborhood-operations.lisp"
+                 "src/vrp-delta-cost.lisp"
+
+		 "src/neigh-configuration.lisp"
+                 "src/neigh-utilities.lisp"     
+                 "src/neigh-class-macros.lisp"
+                 "src/neigh-classes.lisp"
+                 "src/neigh-generic-functions.lisp"
+                 "src/neigh-criterion.lisp"
+                 "src/neigh-cardinality.lisp"
+                 "src/neigh-indexer.lisp"
+                 "src/neigh-compatibility.lisp"
+                 "src/neigh-exploration.lisp"
+                 "src/neigh-exploration-heuristics.lisp"))
+  (format t "Loading ~a...~%" f)
+  (load f))

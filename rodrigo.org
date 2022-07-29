@@ -1,0 +1,64 @@
+* <2022-06-15 Wed> Ideas para el código
+ 
+** vital
+ Integrar los generadores de vecindad (neigh-suite) con el grafo de evaluacion.
+
+*** definir el orden del lectura
+*** fijate del vrp-suite.org
+*** definir una nueva solucion (que puede ser la que ya existe)
+*** reescribir la evaluacion automatica
+   - él uso gagm para crear las clases :-(
+   - defclass def-vrp-class (sácalo del vrp-suite)
+   - definir una solución nueva
+   - adaptar lo que existe a esa solución (limpiar código)
+
+*** neigh-suite esta *casi* bien.
+   - usar la misma clase solución que hagas tú
+   - y las mismas operaciones que modifican la solución
+     - seleccionar cliente *coordenadas*
+     - insertar cliente *coordenadas*
+   - eliminar un poco de código repetido
+     - herencia
+     - macros
+*** heidy 
+   
+* <2022-04-23 Sat> Planilla de inscripcion de tesis
+** titulo
+Implementacion de un sistema para la solucion agil de problemas de enrutamiento de vehiculos
+** objetivos generales
+El objetivo de este proyecto es implementar un sistema que permita resolver un problema de enrutamiento de vehiculos con el menor esfuerzo humano posible.  
+
+   Para ello es necesario (objetivos especificos):
+
+   - estudiar las tesis anteriores que abordan este problema
+   - estudiar el codigo de las tesis anteriores
+   - dise�ar un sistema que permita combinarlas de manera organica
+   - implementar la propuesta realizada
+   - analizar los resultados que se obtienen al usarla
+
+** resumen tecnico
+Durante a�os, en nuestra facultad se han desarrollado varios trabajos que permiten agilizar la solución de un problema de enrutamiento de vehículos.  En este contexto, agilizar la solución significa que haya que dedicarle poco esfuerzo humano.  Cada uno de estos trabajos ha abordado una arista diferente de la automatización de la solución del problema de enrutamiento de vehículos.
+
+Con esta tesis se propone diseñar e implementar un sistema que permite unir cada uno de esos trabajos previos para comenzar a resolver problemas de enrutamiento de vehículos en poco tiempo.
+
+** cronograma
+- Enero -- Abril 2022: 
+
+ Estudio de los trabajos anteriores para la solución automática de un VRP
+
+- Abril -- Mayo 2022: 
+
+ Estudio y modificación del código las propuestas anteriores.
+
+- Mayo -- Julio 2022:
+
+ Diseño e implementación de la propuesta para la solución ágil de problemas de VRP
+
+- Agosto - Octubre:
+
+ Puesta a punto del sistema, experimentación y escritura del documento
+
+- Noviembre 2022: 
+
+ Escritura del documento y entrega
+

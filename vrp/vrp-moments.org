@@ -1,0 +1,1834 @@
+#+TITLE: VRP solver environment
+#+AUTHOR: Fernando Rodriguez Flores
+#+AUTHOR: Yoel Medero Vargas
+#+DATE 2018-08-02
+#+TODO: TODO BROKEN | DONE
+
+
+* Description
+  In this file we'll add all the methods and generic functions to implement the vrp-suite.
+
+  We'll start with the moments for Yoel's approach.  Later, I'll add the methods for the delta-cost-computation.
+  
+* Add the package to the start of the file
+  #+BEGIN_SRC lisp +n -r :results none :exports none :tangle ../src/vrp-moments.lisp
+  (in-package :vrp)
+  #+END_SRC
+
+* Logging functionality
+** description
+   In this section we implement a function to log information appropriately to a given stream.
+
+   Here we add a log function.  It should receive at least:
+    - The function where it is being called,
+    - a string describing what to log
+    - the arguments of the function
+    - the stream where to log
+
+** Adding the ;;;{{{ indicator to the file
+   #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+   ;;;{{{
+   #+END_SRC
+**   a special variable to control the output
+*** description
+    This variable indicates if we are logging the operations or not.
+    0 means not to log.  The greater the number, the greater the amount of information that will be logged.
+
+    Meaning of the values:
+    - 0 :: Don't log
+    - 1 :: Log the method name, the modifier and the string.
+    - 2 :: Log the method name, the modifier, the string and args.
+    - 3 :: As in 2, but adding the value of the parameters.
+*** code
+    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+    (defparameter *vrp-logging* 0
+      "This variable indicates if we are logging the operations or not.
+    0 means not to log.  The greater the number, the greater the amount of information that will be logged.")
+    #+END_SRC
+**   a special variable with the stream to output to
+*** description
+    This variable is the stream where all the vrp-logging information will be written.  It defaults to T.
+*** code
+    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+    (defparameter *vrp-logging-stream* t
+      "The stream where all the logging information will be written.")
+    #+END_SRC
+**   vrp-log-function
+*** description
+    This function logs to the given stream information about the methods that it is executing.  It could be heplful to debug some evaluation routines.
+
+    In this first approach I will only add the level 1 logging.
+*** code
+    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+    (defun vrp-log (method-name log-str args stream)
+      "This functions log the vrp info to the given stream."
+      (let* ((name (first method-name))
+             (modifier (second method-name))
+             (args-types (mapcar (lambda (x) (if (listp x)
+                                                 (second x)
+                                                 t))
+                                 args))
+             (args-values (mapcar (lambda (x) (if (listp x)
+                                                  (first x)
+                                                  x)) args))
+             ;; the logging functions
+             ;; level 1
+             (level1-string (format nil
+                  "VRPLOG: ~a (~a):  ~a"
+                  name
+                  (if modifier modifier :primary)
+                  log-str))
+             ;; level 2
+             (level2-string (format nil
+                  ", with instances of:~%~{     ~a~%~}~%"
+                  args-types))
+             ;; level 3
+             (level3-string (format nil
+                  ", with args:~%~{     ~a~%~}~%"
+                  args-values))
+
+             ;; final string
+             (final-string (concatenate
+                            'string
+                            level1-string
+                            (cond ((= *vrp-logging* 1) (format nil ".~%"))
+                                  ((= *vrp-logging* 2) level2-string)
+                                  ((= *vrp-logging* 3) level3-string)))))
+        ;; here we add the logging behavior
+        (if (> *vrp-logging* 0)
+            (format stream "~a" final-string))))
+    #+END_SRC
+*** tests 
+**** with level 1 and no modifiers
+     #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+     (let* ((*vrp-logging* 1))
+       (vrp-log '(unload) "unloading"
+                '((vehicle unconditionally-unload-vehicle)
+                  (client demand-client)
+                  (route route-for-simulation)
+                  (solution basic-solution)
+                  (problem distance-problem)
+                  (action log-action))
+                t))
+     #+END_SRC
+**** with level 1 and modifier
+     #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+     (let* ((*vrp-logging* 1))
+       (vrp-log '(unload :after) "unloading standard vehicle"
+                '((vehicle unconditionally-unload-vehicle)
+                  (client demand-client)
+                  (route route-for-simulation)
+                  (solution basic-solution)
+                  (problem distance-problem)
+                  (action log-action))
+                t))
+     #+END_SRC
+** Adding the ;;;}}} indicator to the file
+   #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+   ;;;}}}
+   #+END_SRC
+
+* Variable to control the inclusion of the vrp-log function
+** description
+   This is a variable used by the macro defbehavior, and when it's value is non nil, it adds calls to the function =vrp-log=.  In some tests, this function uses 30% of the running time of the minimization algorithms.  That's why I'm adding this variable that will default to nil.
+
+   I'm using a =defvar= instead of a =defparameter= because the proposed usage is to load the system, set the value to t, and reload the system.
+** code
+   #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+   (defvar *add-calls-to-vrp-log-in-defbehavior* nil
+     "A variable that controls whether or not to add calls to the function vrp-log in defbehavior.  It defaults to nil.")
+   #+END_SRC
+   
+* A macro to define moments (defbehavior)
+** description
+   The idea is to have a macro tha automatically adds the call to the vrp-log function to the generated methods.
+
+   First, we are going make the following conventions:
+
+     - the client will always be c
+     - the route will always be r
+     - the solution will always be s
+     - the problem will always be p
+     - the action will always be a
+
+   With this assumption, we could have something like:
+
+   #+BEGIN_SRC lisp +n -r :results none :exports code
+   (defbehavior visit-client (basic-client
+                              basic-vehicle
+                              basic-route
+                              basic-problem
+                              basic-action)
+     :log-str "Incrementing distance and setting previous-client"
+
+     (incf (current-distance r)
+           (distance-from (previous-client r) c))
+     (setf previous-client c))
+    #+END_SRC
+
+     that expands into
+
+    #+BEGIN_SRC lisp +n -r :results none :exports code
+    (DEFMETHOD VISIT-CLIENT ((C BASIC-CLIENT)
+                             (V BASIC-VEHICLE)
+                             (R BASIC-ROUTE)
+                             (P BASIC-PROBLEM)
+                             (A BASIC-ACTION))
+        (INCF (CURRENT-DISTANCE R)
+              (DISTANCE-FROM (PREVIOUS-CLIENT R) C))
+        (SETF (PREVIOUS-CLIENT R) C))
+    #+END_SRC
+
+    but we are going to also add a call to the log function as the first thing that happens in the method.  This means that the generated code will actually be:
+
+    #+BEGIN_SRC lisp +n -r :results none :exports code
+    (DEFMETHOD VISIT-CLIENT ((C BASIC-CLIENT)
+                             (V BASIC-VEHICLE)
+                             (R BASIC-ROUTE)
+                             (P BASIC-PROBLEM)
+                             (A BASIC-ACTION))
+      (VRP-LOG  '(VISIT-CLIENT)
+                "Incrementing distance and setting previous-client"
+                `((,C BASIC-CLIENT)
+                  (,V BASIC-VEHICLE)
+                  (,R BASIC-ROUTE)
+                  (,P BASIC-PROBLEM)
+                  (,A BASIC-ACTION))
+                A)
+        (INCF (CURRENT-DISTANCE R)
+              (DISTANCE-FROM (PREVIOUS-CLIENT R) C))
+        (SETF (PREVIOUS-CLIENT R) C))
+    #+END_SRC
+
+    To do that, we need to know the arguments passed to the macro.  As usual, we will need to parse the arguments by hand.  Let's do it.
+** code
+*** version 2 (with *add-calls-to-vrp-log-in-defbehavior*)
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defmacro defbehavior (moment &rest args)
+       (let* (;; let's check if there is a modifier
+              ;; if there is, the first element of args
+              ;; should be a symbol
+              (modifier (if (symbolp (car args)) (car args)))
+              ;; let's gather the rest of the arguments
+              ;; if there is a modifier, get the rest of the args
+              (other-args (if (symbolp (car args)) (rest args)
+                                       ;; else get all the args
+                                       (else args))))
+         ;; now let's see what's in the other-args
+         (destructuring-bind ((&rest arg-definitions) &body body)
+             other-args
+           ;; let's prepare the method arguments
+           (let* (;; first let's replace any undefined class-name with t
+                  (args-and-classes (mapcar
+                                     (lambda (x)
+                                       (if (listp
+                                            x)
+                                           x
+                                            (else
+                                             (list x t))))
+                                     arg-definitions))
+                  ;; now let's create the method name
+                  (method-name-and-modifier
+                   (if modifier `(,moment ,modifier) `(,moment))))
+             ;; let's get the log-str from the body
+             (with-elements (((log-str :log-str)) body)
+               ;; let's create the call to vrp-log
+               (let* ((call-to-vrp-log
+                       `(vrp-log
+                         ;; the first parameter is the name
+                         ;; and the modifier
+                         ',method-name-and-modifier
+                         ;; the second parameter should
+                         ;; be string
+                         ,log-str
+                         ;; now we add all the
+                         ;; arguments and it classes
+                         ,(append '(list)
+                                  (loop for (var class) in args-and-classes
+                                        collecting `(list ,var ',class)))
+                         ;; finally we need to add the stream to
+                         ;; write the info to. Right now it will be the
+                         ;; variable *vrp-logging-stream*
+                         ,*vrp-logging-stream*))
+                      ;; here is where we decide if we
+                      ;; add the call to vrp-log or not
+                      (actual-method-code
+                       (if *add-calls-to-vrp-log-in-defbehavior*
+                           `(,call-to-vrp-log
+                             ,@body)
+                           ;; else
+                           body)))
+               ;; let's create the method name and modifier (if any)
+                `(defmethod ,@method-name-and-modifier
+                     ;; now let's add the method signature
+                     ,args-and-classes
+
+                   ;; let's add the logging functionality
+              
+
+                   ;; TODO: add the abbrevs
+
+                   ;; add the body
+                   ,@actual-method-code)))))))
+     #+END_SRC
+**** tests v2
+***** testing *add-calls-to-vrp-log-in-defbehavior* nil
+      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+      (progn
+        (setf *add-calls-to-vrp-log-in-defbehavior* nil)
+        (pp-expand (defbehavior unload ((vehicle  unconditionally-unload-vehicle)
+                              (client   demand-client)
+                              (route    t)
+                              (solution t)
+                              (problem  t)
+                              (action simulate-load-action))
+           :log-str "Downloading the client's demand from the vehicle" 
+           (decf (cargo vehicle) (demand client))))
+        (setf *add-calls-to-vrp-log-in-defbehavior* nil))
+      #+END_SRC
+***** testing *add-calls-to-vrp-log-in-defbehavior* t
+      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+      (progn
+        (setf *add-calls-to-vrp-log-in-defbehavior* t)
+        (pp-expand (defbehavior unload ((vehicle  unconditionally-unload-vehicle)
+                              (client   demand-client)
+                              (route    t)
+                              (solution t)
+                              (problem  t)
+                              (action simulate-load-action))
+           :log-str "Downloading the client's demand from the vehicle" 
+           (decf (cargo vehicle) (demand client))))
+        (setf *add-calls-to-vrp-log-in-defbehavior* nil))
+      #+END_SRC
+*** +version 1 (without *add-calls-to-vrp-log-in-defbehavior*)+
+    #+BEGIN_SRC lisp +n -r :results none :exports code
+    (defmacro defbehavior (moment &rest args)
+      (let* (;; let's check if there is a modifier
+             ;; if there is, the first element of args
+             ;; should be a symbol
+             (modifier (if (symbolp (car args)) (car args)))
+             ;; let's gather the rest of the arguments
+             ;; if there is a modifier, get the rest of the args
+             (other-args (if (symbolp (car args)) (rest args)
+                                      ;; else get all the args
+                                      (else args))))
+        ;; now let's see what's in the other-args
+        (destructuring-bind ((&rest arg-definitions) &body body)
+            other-args
+          ;; let's prepare the method arguments
+          (let* (;; first let's replace any undefined class-name with t
+                 (args-and-classes (mapcar
+                                    (lambda (x)
+                                      (if (listp
+                                           x)
+                                          x
+                                           (else
+                                            (list x t))))
+                                    arg-definitions))
+                 ;; now let's create the method name
+                 (method-name-and-modifier
+                  (if modifier `(,moment ,modifier) `(,moment))))
+            ;; let's get the log-str from the body
+            (with-elements (((log-str :log-str)) body)
+              ;; let's create the method name and modifier (if any)
+              `(defmethod ,@method-name-and-modifier
+                   ;; now let's add the method signature
+                   ,args-and-classes
+
+                 ;; let's add the logging functionality
+                 (vrp-log
+                  ;; the first parameter is the name
+                  ;; and the modifier
+                  ',method-name-and-modifier
+                  ;; the second parameter should be string
+                  ,log-str
+                  ;; now we add all the arguments and it classes
+                  ,(append '(list)
+                           (loop for (var class) in args-and-classes
+                                 collecting `(list ,var ',class)))
+                  ;; finally we need to add the stream to
+                  ;; write the info to. Right now it will be the
+                  ;; variable *vrp-logging-stream*
+                  ,*vrp-logging-stream*)
+
+                 ;; TODO: add the abbrevs
+             
+                 ;; add the body
+                 ,@body))))))
+    #+END_SRC
+**** tests
+***** testing the macroexpansion
+      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+      (pp-expand (defbehavior visit-client :before ((client basic-client)
+                                                    (c2 basic-client)
+                                                    v
+                                                    (vehicle basic-vehicle)
+                                                    action)
+                   (this is the generated code)
+                   (hello world)
+                   (print t)))
+      #+END_SRC
+***** testing the macroexpansion with log-str
+      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+      (pp-expand (defbehavior visit-client :before ((client basic-client)
+                                                    (c2 basic-client)
+                                                    v
+                                                    (vehicle basic-vehicle)
+                                                    action)
+                    :log-str "testing defbehavior logging functionality"
+                   (this is the generated code)
+                   (hello world)
+                   (print t)))
+      #+END_SRC
+
+
+* TODO Moments to evaluate a solution
+** description
+   In this section we'll add all the moments required to evaluate a solution using Yoel's approach.
+
+   To simulate *any* solution of *any* VRP, we define some "moments".  This moments are generic functions, and to implement the evaluation of an specific VRP, we implement the appropriate methods.  In this section we define the generic functions and the methods.
+
+   The generic-functions will be tangled to the file vrp-moments.lisp as well as the methods.
+** generic-functions
+*** simulate-solution
+**** description
+      The generic-function that is called when we want to compute the cost of a solution using a simulation.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric simulate-solution (solution problem action)
+       (:documentation "A generic function to compute the cost of a solution."))
+     #+END_SRC
+*** finish-the-solution-simulation
+**** description
+     This generic function is usually called at the end of a solution simulation.  It could be used to penalize unfeasibilities or things like that.  In the near future I foresee that it main use will be the penalization strategies.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric finish-the-solution-simulation (solution problem action)
+       (:documentation "A generic function to be called after all the routes in the solution have been simulate."))
+     #+END_SRC
+    
+*** simulate-route
+**** description
+     A generic function to compute the cost of a route.  It depends on the route, the solution, the problem, and the action.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric simulate-route (route solution problem action)
+       (:documentation "A generic function to compute the cost of a route."))
+     #+END_SRC
+    
+*** when-route-begins
+**** description
+     A generic function to specify what to do when the route begins.  It depends on the vehicle, the route, the solution, the problem, and the action.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric when-route-begins (vehicle route solution problem action)
+       (:documentation "A generic function to compute the cost of a route."))
+     #+END_SRC
+*** move-from-to
+**** description
+     A generic function to describe what happens when a vehicle moves from one point to another.  It depends on the vehicle, the two points, the route, the solution, the problem, and the action.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric move-from-to (vehicle
+                               client1
+                               client2
+                               route
+                               solution
+                               problem
+                               action)
+       (:documentation "A generic function to be called when the vehicle moves from one client to another. Here client is anything that can be visited."))
+     #+END_SRC
+*** visit-client
+**** description
+     A generic function to describe what happens when a vehicle visits a client.  It depends on the vehicle, the client, the route, the solution, the problem, and the action.  The client can be anything that is `visitable'.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric visit-client (vehicle client route solution problem action)
+       (:documentation "A generic function to describe what happens when a vehicle visits a client in a given route."))
+     #+END_SRC
+
+*** when-route-ends
+**** description
+     A generic function to describe what to do when the route ends.  It depends on the route, the solution, the problem, and the action.  Here we assume that the route ends when all the clients have been visited.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric when-route-ends (route solution problem action)
+       (:documentation "A generic function to describe what happens after all the clients have been visited."))
+     #+END_SRC
+
+*** unload
+**** description
+     This moments describe what happens when the cargo from the vehicle is unloaded.
+**** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+     (defgeneric unload (vehicle client route solution problem action)
+       (:documentation "A generic function to unload the cargo from the vehicle."))
+     #+END_SRC
+** methods for the CVRP
+*** unload
+**** unload (:primary unconditionally-unload-vehicle, demand-client)
+***** description
+      Here we define how to unload the vehicle in the client, when the vehicle unconditionally fulfills the demand of the client.  
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior unload ((vehicle  unconditionally-unload-vehicle)
+                           (client   demand-client)
+                           (route    t)
+                           (solution t)
+                           (problem  t)
+                           (action simulate-load-action))
+        :log-str "Downloading the client's demand from the vehicle" 
+        (decf (cargo vehicle) (demand client)))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (a (simulate-load-action)))
+         (format t "Testing unload:~%")
+         (check-= 60 (cargo v1))
+         (format t "unload at client ~a~%" c1)
+         (unload v1 c1 t t t a)
+         (check-= 30 (cargo v1))
+         (format t "unload at client ~a~%" c2)
+         (unload v1 c2 t t t a)
+         (check-= 10 (cargo v1)))
+       #+END_SRC
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (a (simulate-load-action))
+              (*vrp-logging* 1))
+         (format t "~%===========================
+       Testing *logging* at unload
+       ===========================~2%")
+         (unload v1 c1 t t t a)
+         (unload v1 c2 t t t a))
+       #+END_SRC
+*** visit-client
+**** visit-client (primary method t for everything)
+***** description
+      Describe what happens when a vehicle visits a client.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior visit-client ((vehicle  t)
+                                 (client   t)
+                                 (route    t)
+                                 (solution t)
+                                 (problem  t)
+                                 (action   t))
+        :log-str "Do nothing.  Wait for the :after methods")
+      #+END_SRC
+***** tests
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((*vrp-logging* 1))
+         (format t "Testing *logging* at visit-client:~%")
+         (visit-client t t t t t t)
+         (visit-client t t t t t t))
+       #+END_SRC
+**** visit-client (:after method update previous-client)
+***** description
+      Here we set the previous client to the current client.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior visit-client :after ((vehicle  t)
+                                        (client   t)
+                                        (route    route-for-simulation)
+                                        (solution t)
+                                        (problem  t)
+                                        (action   t))
+        :log-str "Set the previous client"
+        (setf (previous-client route) client))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 30))
+              (c4 (basic-cvrp-client 4 40))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2 c3 c4)))
+              (*vrp-logging* 0))
+         (format t "===================================
+       Testing :after method visit-client:
+       ===================================~%")
+         (setf (previous-client r1) (depot r1))
+         (format t "  Check that the depot is the previous-client:~%")
+         (check-obj= d0 (previous-client r1))
+         (loop for c in (list c1 c2 c3 c4)
+               doing (visit-client t c r1 t t t)
+               doing (format t "  Check that the previous-client is updated:~%")
+               doing (check-obj= c (previous-client r1))
+               doing (format t "     previous-client: ~a~%"
+                             (previous-client r1))))
+       #+END_SRC
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 30))
+              (c4 (basic-cvrp-client 4 40))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2 c3 c4)))
+              (*vrp-logging* 1))
+         (format t "===================================
+       Testing :after method visit-client:
+       ===================================~%")
+         (format t "Applicable methods:~%   ~a~2%"
+                 (compute-applicable-methods #'visit-client
+                                             (list t c1 r1 t t t)))
+
+         (setf (previous-client r1) (depot r1))
+         (loop for c in (list c1 c2 c3 c4)
+               doing (visit-client t c r1 t t t)))
+       #+END_SRC
+**** visit-client (:after unload-vehicle t for everything)
+***** description
+      Describe what happens when an unload-vehicle visits a client.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior visit-client :after ((vehicle unload-vehicle)
+                                        (client demand-client)
+                                        (route t)
+                                        (solution t)
+                                        (problem t)
+                                        (action simulate-load-action))
+              :log-str "Dowloading demand"
+              (unload vehicle client route solution problem action))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (a (simulate-load-action))
+              (*vrp-logging* 1))
+         (format t "Testing visit-client:~%")
+         (visit-client v1 c1 t t t a)
+         (visit-client v1 c2 t t t a))
+       #+END_SRC
+*** when-route-begins
+**** when-route-begins (primary simulation-route t everything)
+***** description
+      Here we describe what happens when the route begins.  In this case we just set the previous-client of the route to the depot.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior when-route-begins (vehicle
+                                      (route route-for-simulation)
+                                      solution
+                                      problem
+                                      action)
+        :log-str "Setting the depot as the previous-client"
+        (setf (previous-client route) (depot route)))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (*vrp-logging* 0))
+         (format t "Testing when-route-begins:~%")
+         (check-nil (previous-client r1))
+         (when-route-begins v1 r1 t t t)
+         (check-non-nil (previous-client r1))
+         (check-obj= d0 (previous-client r1)))
+       #+END_SRC
+
+**** when-route-begins (:after route-distance-action)
+***** description
+      Here we initialize the route-distance-action.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior when-route-begins :after
+        (vehicle
+         route
+         solution
+         problem
+         (action route-distance-action))
+        :log-str "Initializing current-distance to 0"
+        (setf (current-distance action) 0))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (a1 (route-distance-action 1 50))
+              (*vrp-logging* 0))
+         (format t "Testing when-route-begins for route-distance-action:~%")
+         (check-= 50 (current-distance a1))
+         (when-route-begins v1 r1 t t a1)
+         (check-= 0 (current-distance a1)))
+       #+END_SRC
+
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (a1 (route-distance-action 1 50))
+              (*vrp-logging* 1))
+         (format t "Testing *logging* when-route-begins for route-distance-action:~%")
+         (when-route-begins v1 r1 t t a1))
+       #+END_SRC
+
+**** when-route-begins (:after simulate-load-action)
+***** description
+      Here we load the cargo in the vehicle.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior when-route-begins :after
+        ((vehicle cargo-vehicle)
+         route
+         solution
+         problem
+         (action simulate-load-action))
+        :log-str "Loading the vehicle"
+  
+        ;; load the vehicle with all the demands in th route
+        (setf (cargo vehicle) (loop for c in (clients route)
+                            summing (demand c))))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 30))
+              (c4 (basic-cvrp-client 4 40))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 50 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 2 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (a1 (simulate-load-action))
+              (*vrp-logging* 0))
+         (format t "~%===========================================================
+       Testing when-route-begins for simulate-load-action
+       ===========================================================~2%")
+         (format t "  Testing when-route-begins with route r1:~%")
+         (check-= 0 (cargo v1))
+         (when-route-begins v1 r1 t t a1)
+         (check-= 50 (cargo v1))
+         (format t "  Testing when-route-begins with route r2:~%")
+         (check-= 0 (cargo v2))
+         (when-route-begins v2 r2 t t a1)
+         (check-= 70 (cargo v2)))
+       #+END_SRC
+
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 30))
+              (c4 (basic-cvrp-client 4 40))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 50 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 2 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (a1 (simulate-load-action))
+              (*vrp-logging* 1))
+         (format t "~%===========================================================
+       Testing when-route-begins for simulate-load-action
+       ===========================================================~2%")
+         (format t "--- Testing when-route-begins with route r1:~%")
+         (when-route-begins v1 r1 t t a1)
+         (format t "--- Testing when-route-begins with route r2:~%")
+         (when-route-begins v2 r2 t t a1)
+
+         (format t "~%Now testing without the simulate-load-action.~%")
+  
+         (format t "--- Testing when-route-begins with route r1 [no load]:~%")
+         (when-route-begins v1 r1 t t t)
+         (format t "--- Testing when-route-begins with route r2 [no load]:~%")
+         (when-route-begins v2 r2 t t t))
+       #+END_SRC
+
+**** when-route-begins (:after basic-vehicle-capacity-action)
+***** description
+      Here we check if the cargo for the vehicle is greater than its capacity.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior when-route-begins :after
+        (vehicle
+         route
+         solution
+         problem
+         (action basic-vehicle-capacity-action))
+
+        :log-str "Checking capacity violation"
+
+        (let* ((capacity (capacity (vehicle route)))
+               (cargo (loop for c in (clients route)
+                            summing (demand c))))
+          (incf (capacity-violation action)
+                (max 0 (- cargo capacity)))))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 30))
+              (c4 (basic-cvrp-client 4 40))
+              (v1 (cvrp-vehicle 1 60 60))
+              (v2 (cvrp-vehicle 1 50 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 2 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (a1 (basic-vehicle-capacity-action 1))
+              (a2 (basic-vehicle-capacity-action 2))
+              (*vrp-logging* 0))
+         (format t "~%===========================================================
+       Testing when-route-begins for basic-vehicle-capacity-action
+       ===========================================================~2%")
+         (check-= 0 (capacity-violation a1))
+         (when-route-begins v1 r1 t t a1)
+         (check-= 0 (capacity-violation a1))
+         (format t "  Testing when-route-begins for basic-vehicle-capacity-action~%")
+         (check-= 0 (capacity-violation a2))
+         (when-route-begins v2 r2 t t a2)
+         (check-= 20 (capacity-violation a2)))
+       #+END_SRC
+
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (a1 (basic-vehicle-capacity-action 1))
+              (*vrp-logging* 1))
+         (format t "Testing *logging* when-route-begins for route-distance-action:~%")
+         (when-route-begins r1 t t a1))
+       #+END_SRC
+
+*** move-from-to
+**** move-from-to (primary method: t for everything)
+***** description
+      In this primary method we don't do anything, we wait for the :before and after methods.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior move-from-to ((vehicle     t)
+                                 (from-client t)
+                                 (to-client   t)
+                                 (route       t)
+                                 (solution    t)
+                                 (problem     t)
+                                 (action      t))
+        :log-str "Do nothing: wait for the auxiliary methods"
+        nil)
+      #+END_SRC
+***** tests
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((*vrp-logging* 1))
+         (format t "==================================
+       Testing *logging* at move-from-to:
+       ==================================~2%")
+         (move-from-to t t t t t t t)
+         (move-from-to t t t t t t t))
+       #+END_SRC
+
+**** move-from-to (:after method: to compute distance)
+***** description
+      In this method we update the distance travelled by the vehicle in this arc.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior move-from-to :after
+        ((vehicle     t)
+         (from-client t)
+         (to-client   t)
+         (route       t)
+         (solution    t)
+         (problem     distance-problem)
+         (action      route-distance-action))
+
+        :log-str "Updating distance"
+        (incf (current-distance action)
+              (get-distance-from-to from-client to-client problem)))
+      #+END_SRC
+***** tests
+****** test without logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 30))
+              (d0 (basic-depot))
+              (list (list d0 c1 c2 c3))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (problem (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (route-distance-action 1))
+              (*vrp-logging* 0))
+         (format t "================================================
+       Testing move-from-to with route-distance-action:
+       ================================================~2%")
+
+         (check-= 0 (current-distance a1))
+         (move-from-to t d0 c1 t t problem a1)
+         (check-= 1 (current-distance a1))
+
+         (setf (current-distance a1) 0)
+         (loop for previous-client in (butlast list)
+               for current-client in (rest list)
+               doing (move-from-to t previous-client current-client t t problem a1))
+         (check-= 11 (current-distance a1)))
+       #+END_SRC
+
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (a1 (basic-vehicle-capacity-action 1))
+              (*vrp-logging* 1))
+         (format t "Testing *logging* when-route-begins for route-distance-action:~%")
+         (when-route-begins r1 t t a1))
+       #+END_SRC
+*** when-route-ends
+    :PROPERTIES:
+    :CUSTOM_ID: moment:when-route-ends-for-cvrp
+    :END:
+**** when-route-ends (primary t for everything: do nothing)
+***** description
+      This is an empty primary method to wait for the auxiliary methods.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior when-route-ends (route
+                                    solution
+                                    problem
+                                    action)
+        :log-str "Do nothing, wait for the auxiliary methods"
+        nil)
+      #+END_SRC
+***** tests
+****** test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((*vrp-logging* 1))
+         (format t "========================
+       Testing when-route-ends:
+       ========================~2%")
+         (when-route-ends t t t t))
+       #+END_SRC
+
+**** when-route-ends (:after basic-route: move vehicle to depot)
+***** description
+      Here we describe what happens after the last client in the route is visited.  In the CVRP we just move the vehicle from the last client to the end depot.  In the classical CVRP the end-depot is the same as the depot, but in other problems this is not always the case, and the CVRP falls back to calling the depot.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior when-route-ends :after ((route route-for-simulation)
+                                             solution
+                                             problem
+                                             action)
+        :log-str "Moving the vehicle to the depot (if there are clients)"
+        (if (clients route)
+            (move-from-to (vehicle route)
+                          (previous-client route)
+                          (end-depot route)
+                          route
+                          solution
+                          problem
+                          action)))
+      #+END_SRC
+***** tests
+****** basic test 
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (route-distance-action 1))
+              (*vrp-logging* 1))
+         (bformat t "Testing when-route-ends for route-for-simulation")
+         (setf (previous-client r1) c2)
+         (format t "Applicable methods: ~a~%"
+                 (compute-applicable-methods #'when-route-ends
+                                             (list r1 t dp a1)))
+         (when-route-ends r1 t dp a1)
+         (check-= 2 (current-distance a1)))
+       #+END_SRC
+****** test with an empty route and end-depot
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (d1 (basic-depot 3))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation-with-end-depot
+                   :id 1
+                   :vehicle v1
+                   :depot d0
+                   :end-depot d1
+                   :clients nil))
+              (distance #2A ((0 1 2 3 4)
+                             (1 0 4 5 3)
+                             (2 4 0 6 5)
+                             (3 5 6 0 1)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 (route-distance-action 1))
+              (*vrp-logging* 1))
+         (bformat t "Testing when-route-ends for route-for-simulation")
+
+         (setf (previous-client r1) c2)
+         (format t "Applicable methods: ~a~%"
+                 (compute-applicable-methods #'when-route-ends
+                                             (list r1 t dp a1)))
+         (when-route-ends r1 t dp a1)
+         (check-= 2 (current-distance a1))
+
+         (format t "Testing an empty route~%")
+         (setf a1 (route-distance-action 0))
+         (setf (previous-client r2) (depot r2))
+         (when-route-ends r2 t dp a1)
+         (format t "total distance with empty route: ~a~%" (current-distance a1))
+         )
+       #+END_SRC
+*** simulate-route
+**** simulate-route (primary route-for-simulation, t everything else)
+***** description
+      This is where we initialize the route, visit each client and finally end the route.  After the simulation of the route all the available information will be in the action.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior simulate-route ((route    route-for-simulation)
+                                   (solution t)
+                                   (problem  t)
+                                   (action   t))
+        :log-str "Basic simulation of route"
+
+        ;; do whatever happens at the beginning of the route
+        (when-route-begins (vehicle route) route solution problem action)
+  
+        ;; move to each client and visit them
+        (loop for client in (clients route)
+              ;; move the vehicle
+              doing (move-from-to (vehicle route)
+                                  (previous-client route)
+                                  client
+                                  route
+                                  solution
+                                  problem
+                                  action)
+              ;; visit each client
+              doing (visit-client (vehicle route)
+                                  client
+                                  route
+                                  solution
+                                  problem
+                                  action))
+        ;; finish the route
+        (when-route-ends route solution problem action))
+      #+END_SRC
+***** tests
+****** test with logging and doing nothing
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 t)
+              (*vrp-logging* 1))
+         (format t "======================
+       Testing simulate-route
+       ======================~2%")
+         (simulate-route r1 t t a1))
+       #+END_SRC
+
+****** test with logging and simulating cargo
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (simulate-load-action))
+              (*vrp-logging* 1))
+         (format t "=================================
+       Testing simulate-route with loads
+       =================================~2%")
+         (simulate-route r1 t t a1))
+       #+END_SRC
+
+****** test with logging and computing-distance
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (route-distance-action 1))
+              (*vrp-logging* 1))
+         (format t "=================================
+       Testing simulate-route with loads
+       =================================~2%")
+         (simulate-route r1 t dp a1)
+
+         (format t "~%  Total distance travelled in the route: ~a~%"
+                 (current-distance a1)))
+       #+END_SRC
+
+****** test with logging and checking-feasibility
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-vehicle-capacity-action 1))
+              (*vrp-logging* 1))
+         (format t "=================================
+       Testing simulate-route with loads
+       =================================~2%")
+         (simulate-route r1 t dp a1)
+
+         (format t "--- testing capacity violations:~%")
+         (check-= 0 (capacity-violation a1))
+         (setf (demand c1) 50)
+         (let* ((*vrp-logging* 0))
+           (simulate-route r1 t dp a1))
+         (check-= 10 (capacity-violation a1)))
+       #+END_SRC
+
+****** original test with logging
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((*vrp-logging* 1))
+         (format t "========================
+       Testing when-route-ends:
+       ========================~2%")
+         (when-route-ends t t t t))
+       #+END_SRC
+
+**** simulate-route (:after basic-solution-distance-action)
+***** description
+      Here we accumulate the distance travelled in the route in the basic-solution-distance-action.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior simulate-route :after
+        ((route    t)
+         (solution t)
+         (problem  t)
+         (action   basic-solution-distance-action))
+  
+        :log-str "Updating the total-distance in the solution"
+
+        (incf (total-distance action) (current-distance action)))
+      #+END_SRC
+***** tests
+****** test with logging and doing nothing
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-solution-distance-action 0))
+              (*vrp-logging* 1))
+         (format t "============================
+       Testing simulate-route after
+       ============================~2%")
+         (simulate-route r1 t t a1))
+       #+END_SRC
+****** test without logging and checking total-distance
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-solution-distance-action 0))
+              (*vrp-logging* 1))
+         (format t "Testing simulate-route after")
+         (simulate-route r1 t dp a1)
+         (check-= 7 (total-distance a1))
+         (setf (total-distance a1) 1000)
+         (simulate-route r1 t dp a1)
+         (check-= 1007 (total-distance a1)))
+       #+END_SRC
+****** test route-for-simulation-with-end-depot
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (d1 (basic-depot 3))
+
+              (r1 (route-for-simulation-with-end-depot
+                   :id 1
+                   :vehicle v1
+                   :depot d0
+                   :end-depot d1
+                   :clients (list c1 c2)))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-solution-distance-action 0))
+              (*vrp-logging* 1))
+         (bformat t "Testing simulate-route after with end-depot")
+         (simulate-route r1 t dp a1)
+         (format t "end-depot: ~a~%" (end-depot r1))
+         (format t "total-distance: ~a~%" (total-distance a1))
+         (check-= 11 (total-distance a1))
+         (setf (total-distance a1) 1000)
+         (simulate-route r1 t dp a1)
+         (check-= 1011 (total-distance a1)))
+       #+END_SRC
+****** test route-for-simulation-with-end-depot and empty route
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (v1 (cvrp-vehicle 1 60 60))
+              (d0 (basic-depot))
+              (d1 (basic-depot 3))
+
+              (r1 (route-for-simulation-with-end-depot
+                   :id 1
+                   :vehicle v1
+                   :depot d0
+                   :end-depot d1
+                   :clients (list c1 c2)))
+              (r2 (route-for-simulation-with-end-depot
+                   :id 1
+                   :vehicle v1
+                   :depot d0
+                   :end-depot d1
+                   :clients nil))
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-solution-distance-action 0))
+              (*vrp-logging* 1))
+         (bformat t "Testing simulate-route after with end-depot")
+         (simulate-route r1 t dp a1)
+         (format t "end-depot: ~a~%" (end-depot r1))
+         (format t "total-distance: ~a~%" (total-distance a1))
+
+
+         (format t "~%Testing simulate-route after with an empty route~%")
+         (setf a1 (basic-solution-distance-action 0))
+         (format t "end-depot: ~a~%" (end-depot r2))
+         (simulate-route r2 t dp a1)
+         (format t "total-distance: ~a~%" (total-distance a1)))
+       #+END_SRC
+*** finish-the-solution-simulation
+**** finish-the-solution-simulation (primary t for everything)
+***** description
+      Here we don't do anything.  We just wait for the before and after methods.  
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior finish-the-solution-simulation ((solution t)
+                                                   (problem  t)
+                                                   (action   t))
+
+        :log-str "Do nothing. Wait for the auxiliary methods"
+        nil)
+      #+END_SRC
+***** tests
+****** test with logging and doing nothing
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+       
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 t)
+              (*vrp-logging* 1))
+         (format t "======================
+       Testing simulate-solution
+       ======================~2%")
+         (simulate-solution s1 t a1))
+       #+END_SRC
+
+**** finish-the-solution-simulation (penalize capacity violations)
+***** description
+      Here we'll penalize the violation of the capacity of the vehicles in the routes.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior finish-the-solution-simulation :after
+          ((solution t)
+           (problem  t)
+           (action   basic-capacity-penalty-action))
+
+        :log-str "Penalizing capacity violations"
+  
+        (setf (total-penalty action)
+              (* (penalty-factor action)
+                 (capacity-violation action))))
+      #+END_SRC
+***** tests
+****** test (very simple)
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((a1 (basic-capacity-penalty-action))
+              (*vrp-logging* 0))
+         (format t "======================================
+       Testing finish-the-solution-simulation
+       ======================================~2%")
+         (setf (capacity-violation a1) 10)
+         (finish-the-solution-simulation t t a1)
+         (check-= 10 (total-penalty a1))
+         (loop for violation in '(1 5 10 100)
+               for factor in '(10 20 100 1000)
+               doing (progn
+                       (setf (capacity-violation a1) violation)
+                       (setf (penalty-factor a1) factor)
+                       (finish-the-solution-simulation t t a1)
+                       (check-= (* violation factor) (total-penalty a1)))))
+       #+END_SRC
+       
+****** test with logging and penalizing capacity
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 40))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 10))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 (basic-capacity-penalty-action :penalty-factor 100))
+              (*vrp-logging* 1))
+         (format t "=========================
+       Testing simulate-solution
+       =========================~2%")
+         (simulate-solution s1 t a1)
+         (check-= 1000 (total-penalty a1)))
+       #+END_SRC
+
+*** simulate-solution
+**** simulate-solution (primary basic-solution, t everything else)
+***** description
+      Here we specify how to simulate a basic solution.  After the simulation of the route all the available information will be in the action.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior simulate-solution ((solution basic-solution)
+                                      (problem  t)
+                                      (action   t))
+
+        :log-str "Basic simulation of the solution"
+
+        ;; just simulate each of the routes
+        (loop for route in (routes solution)
+              doing (simulate-route route solution problem action))
+
+        ;; finish the solution-simulation
+        (finish-the-solution-simulation solution problem action))
+      #+END_SRC
+***** tests
+****** test with logging and doing nothing
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+              (a1 t)
+              (*vrp-logging* 1))
+         (format t "=========================
+       Testing simulate-solution
+       =========================~2%")
+         (simulate-solution s1 t a1))
+       #+END_SRC
+
+****** test with logging and simulating cargo
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 60))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))             
+
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (simulate-load-action))
+              (*vrp-logging* 1))
+         (format t "=================================
+       Testing simulate-route with loads
+       =================================~2%")
+         (simulate-solution s1 dp a1))
+       #+END_SRC
+
+****** test with logging and checking-feasibility
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 60))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))             
+
+              (distance #2A ((0 1 2 3)
+                             (1 0 4 5)
+                             (2 4 0 6)
+                             (3 5 6 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-vehicle-capacity-action 1))
+              (*vrp-logging* 1))
+         (format t "=================================
+       Testing simulate-route with loads
+       =================================~2%")
+         (simulate-solution s1 dp a1))
+       #+END_SRC
+
+****** test with logging and computing-distance
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 60))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))             
+
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                      :distance-matrix distance))
+              (a1 (basic-solution-distance-action 1))
+              (*vrp-logging* 0))
+         (format t "=================================
+       Testing simulate-route with loads
+       =================================~2%")
+         (simulate-solution s1 dp a1)
+
+         (format t "~%  Total distance travelled in the solution: ~a~%"
+                 (total-distance a1)))
+       #+END_SRC
+
+**** simulate-solution (:before basic-solution-distance-action)
+***** description
+      Here we set the total-distance of the action to 0.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior simulate-solution :before
+        ((solution t)
+         (problem  t)
+         (action   basic-solution-distance-action))
+
+        :log-str "Initializing the basic-solution-distance-action"
+
+        ;; set the total-distance to 0
+        (setf (total-distance action) 0))
+      #+END_SRC
+***** tests
+****** test with logging and doing nothing
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 (basic-solution-distance-action 100))
+              (*vrp-logging* 1))
+         (format t "=========================
+       Testing simulate-solution
+       =========================~2%")
+         (simulate-solution s1 t a1))
+       #+END_SRC
+
+****** test without logging and checking initialization
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 (basic-solution-distance-action 100))
+              (*vrp-logging* 0))
+         (format t "=========================
+       Testing simulate-solution
+       =========================~2%")
+         (check-= 100 (total-distance a1))
+         (simulate-solution s1 t a1)
+         (check-= 0 (total-distance a1)))
+       #+END_SRC
+
+**** simulate-solution (:before basic-vehicle-capacity-action)
+***** description
+      Here we set the capacity-violation of the action to 0.
+***** code
+      #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-moments.lisp
+      (defbehavior simulate-solution :before
+        ((solution t)
+         (problem  t)
+         (action   basic-vehicle-capacity-action))
+
+        :log-str "Initializing the capacity-violation of the action to 0."
+
+        ;; set the capacity-violation to 0
+        (setf (capacity-violation action) 0))
+      #+END_SRC
+***** tests
+****** test with logging and doing nothing
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 (basic-vehicle-capacity-action 100))
+              (*vrp-logging* 1))
+         (format t "=========================
+       Testing simulate-solution
+       =========================~2%")
+         (simulate-solution s1 t a1))
+       #+END_SRC
+
+****** test without logging and checking initialization
+       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+       (let* ((c1 (basic-cvrp-client 1 30))
+              (c2 (basic-cvrp-client 2 20))
+              (c3 (basic-cvrp-client 3 40))
+              (c4 (basic-cvrp-client 4 50))
+              (v1 (cvrp-vehicle 1 60 0))
+              (v2 (cvrp-vehicle 1 70 0))
+              (d0 (basic-depot))
+              (r1 (route-for-simulation :id 1 :vehicle v1
+                                        :depot d0 :clients (list c1 c2)))
+              (r2 (route-for-simulation :id 1 :vehicle v2
+                                        :depot d0 :clients (list c3 c4)))
+              (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+              (distance #2A ((0 1 2 3 5)
+                             (1 0 4 5 6)
+                             (2 4 0 6 7)
+                             (3 5 6 0 8)
+                             (5 6 7 8 0)))
+              (dp (make-instance 'distance-problem
+                                 :distance-matrix distance))
+              (a1 (basic-solution-distance-action 100))
+              (*vrp-logging* 0))
+         (format t "=========================
+       Testing simulate-solution
+       =========================~2%")
+         (check-= 100 (total-distance a1))
+         (simulate-solution s1 t a1)
+         (check-= 0 (total-distance a1)))
+       #+END_SRC
+
+*** testing the simulation of full solutions
+**** testing basic-vehicle-capacity-action
+     #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+     (let* ((c1 (basic-cvrp-client 1 30))
+            (c2 (basic-cvrp-client 2 20))
+            (c3 (basic-cvrp-client 3 40))
+            (c4 (basic-cvrp-client 4 50))
+            (v1 (cvrp-vehicle 1 60 0))
+            (v2 (cvrp-vehicle 1 70 0))
+            (d0 (basic-depot))
+            (r1 (route-for-simulation :id 1 :vehicle v1
+                                      :depot d0 :clients (list c1 c2)))
+            (r2 (route-for-simulation :id 1 :vehicle v2
+                                      :depot d0 :clients (list c3 c4)))
+            (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+            (distance #2A ((0 1 2 3 5)
+                           (1 0 4 5 6)
+                           (2 4 0 6 7)
+                           (3 5 6 0 8)
+                           (5 6 7 8 0)))
+            (dp (make-instance 'distance-problem
+                               :distance-matrix distance))
+            (a1 (basic-vehicle-capacity-action 1))
+            (*vrp-logging* 0))
+       (format t "=========================
+     Testing simulate-solution
+     =========================~2%")
+       (simulate-solution s1 t a1)
+       (check-= 20 (capacity-violation a1))
+       (loop for c      in '(50 70 80 90 100)
+             for expect in '(40 20 10  0   0)
+             for a = (basic-vehicle-capacity-action 1 0)
+             doing (progn
+                     (setf (capacity v2) c)
+                     (simulate-solution s1 t a)
+                     (check-= expect (capacity-violation a)))))
+     #+END_SRC
+
+**** testing a full cvrp solution
+     #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+     (let* ((c1 (basic-cvrp-client 1 30))
+            (c2 (basic-cvrp-client 2 20))
+            (c3 (basic-cvrp-client 3 40))
+            (c4 (basic-cvrp-client 4 50))
+            (v1 (cvrp-vehicle 1 60 0))
+            (v2 (cvrp-vehicle 1 70 0))
+            (d0 (basic-depot))
+            (r1 (route-for-simulation :id 1 :vehicle v1
+                                      :depot d0 :clients (list c1 c2)))
+            (r2 (route-for-simulation :id 1 :vehicle v2
+                                      :depot d0 :clients (list c3 c4)))
+            (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+            (distance #2A ((0 1 2 3 5)
+                           (1 0 4 5 6)
+                           (2 4 0 6 7)
+                           (3 5 6 0 8)
+                           (5 6 7 8 0)))
+            (dp (make-instance 'distance-problem
+                               :distance-matrix distance))
+            (action (basic-cvrp-action))
+            (*vrp-logging* 0))
+       (format t "=========================
+     Testing simulate-solution
+     =========================~2%")
+       (simulate-solution s1 dp action)
+       (check-= 23 (total-distance action))
+       (check-= 20 (capacity-violation action))
+       (check-= 20000 (total-penalty action)))
+     #+END_SRC
+**** testing a full cvrp with end depot solution
+     #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+     (let* ((c1 (basic-cvrp-client 1 30))
+            (c2 (basic-cvrp-client 2 20))
+            (c3 (basic-cvrp-client 3 40))
+            (c4 (basic-cvrp-client 4 50))
+            (v1 (cvrp-vehicle 1 60 0))
+            (v2 (cvrp-vehicle 1 70 0))
+            (d0 (basic-depot))
+            (d1 (basic-depot 5))
+            (r1 (route-for-simulation-with-end-depot
+                 :id 1
+                 :vehicle v1
+                 :depot d0
+                 :end-depot d1
+                 :clients (list c1 c2)))
+            (r2 (route-for-simulation-with-end-depot
+                 :id 1
+                 :vehicle v2
+                 :depot d0
+                 :end-depot d1
+                 :clients (list c3 c4)))
+            (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+            (distance #2A ((0 1 2 3 5 6)
+                           (1 0 4 5 6 7)
+                           (2 4 0 6 7 8)
+                           (3 5 6 0 8 9)
+                           (5 6 7 8 0 1)
+                           (1 4 6 4 8 0)))
+            (dp (make-instance 'distance-problem
+                               :distance-matrix distance))
+            (action (basic-cvrp-action))
+            (*vrp-logging* 0))
+  
+       (bformat t "Testing simulate-solution with end depot")
+       (format t "end-depot (route 1): ~a~%" (end-depot r1))
+       ;; test for route 1
+       (simulate-route r1 s1 dp action)
+       (format t "distance for route 1: ~a~%" (total-distance action))
+       ;; testing for route 2
+       (setf action (basic-cvrp-action))
+       (simulate-route r2 s1 dp action)
+       (format t "distance for route 2: ~a~%" (total-distance action))
+       ;; testing for the solution
+       (setf action (basic-cvrp-action))
+       (simulate-solution s1 dp action)
+       (format t "distance in solution: ~a~%" (total-distance action))
+       (check-= 25 (total-distance action))
+       (check-= 20 (capacity-violation action))
+       (check-= 20000 (total-penalty action))
+       )
+     #+END_SRC
