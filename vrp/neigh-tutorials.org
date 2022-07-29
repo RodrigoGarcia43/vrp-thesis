@@ -1007,6 +1007,8 @@
 	    ;; of neighbor solutions from its root node
 	    (cardinality (build-neighborhood-tree code s1))))
      #+END_SRC
+
+     #+RESULTS:
      
 ***** Test
       #+BEGIN_SRC lisp +n -r :results output :exports both.lisp
@@ -1026,6 +1028,8 @@
 		    (incf total)))))
 	    total))
       #+END_SRC
+
+      #+RESULTS:
 
 **** Exhaustive exploration
 ***** Code
@@ -1239,6 +1243,234 @@
 		      (print (reverse ops-list))
 		      (print current-delta-cost))))))))
      #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+     ======================================
+      Testing rehf with the :neigh system.
+     ======================================
+
+
+     (<op:ss 1 1 1 0> <op:a 1 1 0> <op:rs 0> <op:b 1 1 0>) 
+     0 
+     (<op:ss 1 1 1 0> <op:a 1 1 0> <op:rs 0> <op:b 1 2 0>) 
+     7 
+     (<op:ss 1 1 1 0> <op:a 1 1 0> <op:rs 0> <op:b 1 3 0>) 
+     -3 
+     (<op:ss 1 1 1 0> <op:a 1 1 0> <op:rs 0> <op:b 1 4 0>) 
+     -2 
+     (<op:ss 1 1 1 0> <op:a 1 1 0> <op:rs 0> <op:b 1 5 0>) 
+     4 
+     (<op:ss 1 2 1 0> <op:a 1 2 0> <op:rs 0> <op:b 1 1 0>) 
+     7 
+     (<op:ss 1 2 1 0> <op:a 1 2 0> <op:rs 0> <op:b 1 2 0>) 
+     0 
+     (<op:ss 1 2 1 0> <op:a 1 2 0> <op:rs 0> <op:b 1 3 0>) 
+     3 
+     (<op:ss 1 2 1 0> <op:a 1 2 0> <op:rs 0> <op:b 1 4 0>) 
+     -6 
+     (<op:ss 1 2 1 0> <op:a 1 2 0> <op:rs 0> <op:b 1 5 0>) 
+     5 
+     (<op:ss 1 3 1 0> <op:a 1 3 0> <op:rs 0> <op:b 1 1 0>) 
+     8 
+     (<op:ss 1 3 1 0> <op:a 1 3 0> <op:rs 0> <op:b 1 2 0>) 
+     3 
+     (<op:ss 1 3 1 0> <op:a 1 3 0> <op:rs 0> <op:b 1 3 0>) 
+     0 
+     (<op:ss 1 3 1 0> <op:a 1 3 0> <op:rs 0> <op:b 1 4 0>) 
+     7 
+     (<op:ss 1 3 1 0> <op:a 1 3 0> <op:rs 0> <op:b 1 5 0>) 
+     10 
+     (<op:ss 1 4 1 0> <op:a 1 4 0> <op:rs 0> <op:b 1 1 0>) 
+     4 
+     (<op:ss 1 4 1 0> <op:a 1 4 0> <op:rs 0> <op:b 1 2 0>) 
+     -7 
+     (<op:ss 1 4 1 0> <op:a 1 4 0> <op:rs 0> <op:b 1 3 0>) 
+     7 
+     (<op:ss 1 4 1 0> <op:a 1 4 0> <op:rs 0> <op:b 1 4 0>) 
+     0 
+     (<op:ss 1 4 1 0> <op:a 1 4 0> <op:rs 0> <op:b 1 5 0>) 
+     8 
+     (<op:ss 1 5 1 0> <op:a 1 5 0> <op:rs 0> <op:b 1 1 0>) 
+     6 
+     (<op:ss 1 5 1 0> <op:a 1 5 0> <op:rs 0> <op:b 1 2 0>) 
+     2 
+     (<op:ss 1 5 1 0> <op:a 1 5 0> <op:rs 0> <op:b 1 3 0>) 
+     1 
+     (<op:ss 1 5 1 0> <op:a 1 5 0> <op:rs 0> <op:b 1 4 0>) 
+     8 
+     (<op:ss 1 5 1 0> <op:a 1 5 0> <op:rs 0> <op:b 1 5 0>) 
+     0 
+     (<op:ss 1 1 2 0> <op:a 1 1 0> <op:a 1 1 1> <op:rs 0> <op:b 1 1 0> <op:b 1 1 1>) 
+     7 
+     (<op:ss 1 1 2 0> <op:a 1 1 0> <op:a 1 1 1> <op:rs 0> <op:b 1 2 0> <op:b 1 2 1>) 
+     -1 
+     (<op:ss 1 1 2 0> <op:a 1 1 0> <op:a 1 1 1> <op:rs 0> <op:b 1 3 0> <op:b 1 3 1>) 
+     0 
+     (<op:ss 1 1 2 0> <op:a 1 1 0> <op:a 1 1 1> <op:rs 0> <op:b 1 4 0> <op:b 1 4 1>) 
+     12 
+     (<op:ss 1 2 2 0> <op:a 1 2 0> <op:a 1 2 1> <op:rs 0> <op:b 1 1 0> <op:b 1 1 1>) 
+     -1 
+     (<op:ss 1 2 2 0> <op:a 1 2 0> <op:a 1 2 1> <op:rs 0> <op:b 1 2 0> <op:b 1 2 1>) 
+     3 
+     (<op:ss 1 2 2 0> <op:a 1 2 0> <op:a 1 2 1> <op:rs 0> <op:b 1 3 0> <op:b 1 3 1>) 
+     -11 
+     (<op:ss 1 2 2 0> <op:a 1 2 0> <op:a 1 2 1> <op:rs 0> <op:b 1 4 0> <op:b 1 4 1>) 
+     -5 
+     (<op:ss 1 3 2 0> <op:a 1 3 0> <op:a 1 3 1> <op:rs 0> <op:b 1 1 0> <op:b 1 1 1>) 
+     0 
+     (<op:ss 1 3 2 0> <op:a 1 3 0> <op:a 1 3 1> <op:rs 0> <op:b 1 2 0> <op:b 1 2 1>) 
+     -11 
+     (<op:ss 1 3 2 0> <op:a 1 3 0> <op:a 1 3 1> <op:rs 0> <op:b 1 3 0> <op:b 1 3 1>) 
+     7 
+     (<op:ss 1 3 2 0> <op:a 1 3 0> <op:a 1 3 1> <op:rs 0> <op:b 1 4 0> <op:b 1 4 1>) 
+     4 
+     (<op:ss 1 4 2 0> <op:a 1 4 0> <op:a 1 4 1> <op:rs 0> <op:b 1 1 0> <op:b 1 1 1>) 
+     10 
+     (<op:ss 1 4 2 0> <op:a 1 4 0> <op:a 1 4 1> <op:rs 0> <op:b 1 2 0> <op:b 1 2 1>) 
+     0 
+     (<op:ss 1 4 2 0> <op:a 1 4 0> <op:a 1 4 1> <op:rs 0> <op:b 1 3 0> <op:b 1 3 1>) 
+     4 
+     (<op:ss 1 4 2 0> <op:a 1 4 0> <op:a 1 4 1> <op:rs 0> <op:b 1 4 0> <op:b 1 4 1>) 
+     8 
+     (<op:ss 1 1 3 0> <op:a 1 1 0> <op:a 1 1 1> <op:a 1 1 2> <op:rs 0> <op:b 1 1 0>
+      <op:b 1 1 1> <op:b 1 1 2>) 
+     -1 
+     (<op:ss 1 1 3 0> <op:a 1 1 0> <op:a 1 1 1> <op:a 1 1 2> <op:rs 0> <op:b 1 2 0>
+      <op:b 1 2 1> <op:b 1 2 2>) 
+     1 
+     (<op:ss 1 1 3 0> <op:a 1 1 0> <op:a 1 1 1> <op:a 1 1 2> <op:rs 0> <op:b 1 3 0>
+      <op:b 1 3 1> <op:b 1 3 2>) 
+     8 
+     (<op:ss 1 2 3 0> <op:a 1 2 0> <op:a 1 2 1> <op:a 1 2 2> <op:rs 0> <op:b 1 1 0>
+      <op:b 1 1 1> <op:b 1 1 2>) 
+     1 
+     (<op:ss 1 2 3 0> <op:a 1 2 0> <op:a 1 2 1> <op:a 1 2 2> <op:rs 0> <op:b 1 2 0>
+      <op:b 1 2 1> <op:b 1 2 2>) 
+     -11 
+     (<op:ss 1 2 3 0> <op:a 1 2 0> <op:a 1 2 1> <op:a 1 2 2> <op:rs 0> <op:b 1 3 0>
+      <op:b 1 3 1> <op:b 1 3 2>) 
+     -1 
+     (<op:ss 1 3 3 0> <op:a 1 3 0> <op:a 1 3 1> <op:a 1 3 2> <op:rs 0> <op:b 1 1 0>
+      <op:b 1 1 1> <op:b 1 1 2>) 
+     9 
+     (<op:ss 1 3 3 0> <op:a 1 3 0> <op:a 1 3 1> <op:a 1 3 2> <op:rs 0> <op:b 1 2 0>
+      <op:b 1 2 1> <op:b 1 2 2>) 
+     -1 
+     (<op:ss 1 3 3 0> <op:a 1 3 0> <op:a 1 3 1> <op:a 1 3 2> <op:rs 0> <op:b 1 3 0>
+      <op:b 1 3 1> <op:b 1 3 2>) 
+     4 
+     (<op:ss 1 1 4 0> <op:a 1 1 0> <op:a 1 1 1> <op:a 1 1 2> <op:a 1 1 3> <op:rs 0>
+      <op:b 1 1 0> <op:b 1 1 1> <op:b 1 1 2> <op:b 1 1 3>) 
+     1 
+     (<op:ss 1 1 4 0> <op:a 1 1 0> <op:a 1 1 1> <op:a 1 1 2> <op:a 1 1 3> <op:rs 0>
+      <op:b 1 2 0> <op:b 1 2 1> <op:b 1 2 2> <op:b 1 2 3>) 
+     11 
+     (<op:ss 1 2 4 0> <op:a 1 2 0> <op:a 1 2 1> <op:a 1 2 2> <op:a 1 2 3> <op:rs 0>
+      <op:b 1 1 0> <op:b 1 1 1> <op:b 1 1 2> <op:b 1 1 3>) 
+     11 
+     (<op:ss 1 2 4 0> <op:a 1 2 0> <op:a 1 2 1> <op:a 1 2 2> <op:a 1 2 3> <op:rs 0>
+      <op:b 1 2 0> <op:b 1 2 1> <op:b 1 2 2> <op:b 1 2 3>) 
+     -1 
+     (<op:ss 1 1 5 0> <op:a 1 1 0> <op:a 1 1 1> <op:a 1 1 2> <op:a 1 1 3>
+      <op:a 1 1 4> <op:rs 0> <op:b 1 1 0> <op:b 1 1 1> <op:b 1 1 2> <op:b 1 1 3>
+      <op:b 1 1 4>) 
+     11 
+     (<op:ss 2 1 1 0> <op:a 2 1 0> <op:rs 0> <op:b 2 1 0>) 
+     0 
+     (<op:ss 2 1 1 0> <op:a 2 1 0> <op:rs 0> <op:b 2 2 0>) 
+     2 
+     (<op:ss 2 1 1 0> <op:a 2 1 0> <op:rs 0> <op:b 2 3 0>) 
+     0 
+     (<op:ss 2 1 1 0> <op:a 2 1 0> <op:rs 0> <op:b 2 4 0>) 
+     -1 
+     (<op:ss 2 2 1 0> <op:a 2 2 0> <op:rs 0> <op:b 2 1 0>) 
+     2 
+     (<op:ss 2 2 1 0> <op:a 2 2 0> <op:rs 0> <op:b 2 2 0>) 
+     0 
+     (<op:ss 2 2 1 0> <op:a 2 2 0> <op:rs 0> <op:b 2 3 0>) 
+     -8 
+     (<op:ss 2 2 1 0> <op:a 2 2 0> <op:rs 0> <op:b 2 4 0>) 
+     4 
+     (<op:ss 2 3 1 0> <op:a 2 3 0> <op:rs 0> <op:b 2 1 0>) 
+     -6 
+     (<op:ss 2 3 1 0> <op:a 2 3 0> <op:rs 0> <op:b 2 2 0>) 
+     -8 
+     (<op:ss 2 3 1 0> <op:a 2 3 0> <op:rs 0> <op:b 2 3 0>) 
+     0 
+     (<op:ss 2 3 1 0> <op:a 2 3 0> <op:rs 0> <op:b 2 4 0>) 
+     -10 
+     (<op:ss 2 4 1 0> <op:a 2 4 0> <op:rs 0> <op:b 2 1 0>) 
+     -2 
+     (<op:ss 2 4 1 0> <op:a 2 4 0> <op:rs 0> <op:b 2 2 0>) 
+     2 
+     (<op:ss 2 4 1 0> <op:a 2 4 0> <op:rs 0> <op:b 2 3 0>) 
+     -10 
+     (<op:ss 2 4 1 0> <op:a 2 4 0> <op:rs 0> <op:b 2 4 0>) 
+     0 
+     (<op:ss 2 1 2 0> <op:a 2 1 0> <op:a 2 1 1> <op:rs 0> <op:b 2 1 0> <op:b 2 1 1>) 
+     2 
+     (<op:ss 2 1 2 0> <op:a 2 1 0> <op:a 2 1 1> <op:rs 0> <op:b 2 2 0> <op:b 2 2 1>) 
+     0 
+     (<op:ss 2 1 2 0> <op:a 2 1 0> <op:a 2 1 1> <op:rs 0> <op:b 2 3 0> <op:b 2 3 1>) 
+     5 
+     (<op:ss 2 2 2 0> <op:a 2 2 0> <op:a 2 2 1> <op:rs 0> <op:b 2 1 0> <op:b 2 1 1>) 
+     0 
+     (<op:ss 2 2 2 0> <op:a 2 2 0> <op:a 2 2 1> <op:rs 0> <op:b 2 2 0> <op:b 2 2 1>) 
+     -8 
+     (<op:ss 2 2 2 0> <op:a 2 2 0> <op:a 2 2 1> <op:rs 0> <op:b 2 3 0> <op:b 2 3 1>) 
+     -4 
+     (<op:ss 2 3 2 0> <op:a 2 3 0> <op:a 2 3 1> <op:rs 0> <op:b 2 1 0> <op:b 2 1 1>) 
+     -2 
+     (<op:ss 2 3 2 0> <op:a 2 3 0> <op:a 2 3 1> <op:rs 0> <op:b 2 2 0> <op:b 2 2 1>) 
+     -4 
+     (<op:ss 2 3 2 0> <op:a 2 3 0> <op:a 2 3 1> <op:rs 0> <op:b 2 3 0> <op:b 2 3 1>) 
+     -10 
+     (<op:ss 2 1 3 0> <op:a 2 1 0> <op:a 2 1 1> <op:a 2 1 2> <op:rs 0> <op:b 2 1 0>
+      <op:b 2 1 1> <op:b 2 1 2>) 
+     0 
+     (<op:ss 2 1 3 0> <op:a 2 1 0> <op:a 2 1 1> <op:a 2 1 2> <op:rs 0> <op:b 2 2 0>
+      <op:b 2 2 1> <op:b 2 2 2>) 
+     -3 
+     (<op:ss 2 2 3 0> <op:a 2 2 0> <op:a 2 2 1> <op:a 2 2 2> <op:rs 0> <op:b 2 1 0>
+      <op:b 2 1 1> <op:b 2 1 2>) 
+     -3 
+     (<op:ss 2 2 3 0> <op:a 2 2 0> <op:a 2 2 1> <op:a 2 2 2> <op:rs 0> <op:b 2 2 0>
+      <op:b 2 2 1> <op:b 2 2 2>) 
+     -4 
+     (<op:ss 2 1 4 0> <op:a 2 1 0> <op:a 2 1 1> <op:a 2 1 2> <op:a 2 1 3> <op:rs 0>
+      <op:b 2 1 0> <op:b 2 1 1> <op:b 2 1 2> <op:b 2 1 3>) 
+     -3 
+     (<op:ss 3 1 1 0> <op:a 3 1 0> <op:rs 0> <op:b 3 1 0>) 
+     0 
+     (<op:ss 3 1 1 0> <op:a 3 1 0> <op:rs 0> <op:b 3 2 0>) 
+     -3 
+     (<op:ss 3 1 1 0> <op:a 3 1 0> <op:rs 0> <op:b 3 3 0>) 
+     5 
+     (<op:ss 3 2 1 0> <op:a 3 2 0> <op:rs 0> <op:b 3 1 0>) 
+     -3 
+     (<op:ss 3 2 1 0> <op:a 3 2 0> <op:rs 0> <op:b 3 2 0>) 
+     0 
+     (<op:ss 3 2 1 0> <op:a 3 2 0> <op:rs 0> <op:b 3 3 0>) 
+     1 
+     (<op:ss 3 3 1 0> <op:a 3 3 0> <op:rs 0> <op:b 3 1 0>) 
+     7 
+     (<op:ss 3 3 1 0> <op:a 3 3 0> <op:rs 0> <op:b 3 2 0>) 
+     1 
+     (<op:ss 3 3 1 0> <op:a 3 3 0> <op:rs 0> <op:b 3 3 0>) 
+     0 
+     (<op:ss 3 1 2 0> <op:a 3 1 0> <op:a 3 1 1> <op:rs 0> <op:b 3 1 0> <op:b 3 1 1>) 
+     -3 
+     (<op:ss 3 1 2 0> <op:a 3 1 0> <op:a 3 1 1> <op:rs 0> <op:b 3 2 0> <op:b 3 2 1>) 
+     0 
+     (<op:ss 3 2 2 0> <op:a 3 2 0> <op:a 3 2 1> <op:rs 0> <op:b 3 1 0> <op:b 3 1 1>) 
+     0 
+     (<op:ss 3 2 2 0> <op:a 3 2 0> <op:a 3 2 1> <op:rs 0> <op:b 3 2 0> <op:b 3 2 1>) 
+     1 
+     (<op:ss 3 1 3 0> <op:a 3 1 0> <op:a 3 1 1> <op:a 3 1 2> <op:rs 0> <op:b 3 1 0>
+      <op:b 3 1 1> <op:b 3 1 2>) 
+     0 
+     #+end_example
 
 *** Swap subroutes operation
 **** Description
@@ -1584,6 +1816,30 @@
 		     (return))
 		   (format t "~A : ~A~%" cur-sol cur-cost))))))
    #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   (<op:a 1 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 1 1 1>) : -11
+   (<op:a 1 1 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 1 1>) : 4993
+   (<op:a 1 1 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 1 1>) : -11
+   (<op:a 2 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 2 1 1>) : -25004
+   (<op:a 2 1 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 2 1 1>) : 0
+   (<op:a 3 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 3 1 1>) : -11
+   (<op:a 3 1 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 3 1 1>) : 0
+   (<op:a 1 3 0> <op:a 1 1 1> <op:b 1 2 1> <op:b 1 1 0>) : -2
+   (<op:a 1 2 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 2 1>) : -25004
+   (<op:a 1 3 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 3 1>) : -9997
+   (<op:a 2 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 2 1 1>) : 4993
+   (<op:a 3 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 3 1 1>) : -9997
+   (<op:a 1 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 1 1>) : -2
+   (<op:a 1 3 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 3 1>) : -4999
+   (<op:a 1 2 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 2 1>) : -30001
+   (<op:a 2 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 2 1 1>) : -4999
+   (<op:a 3 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 3 1 1>) : -30001
+   (<op:a 1 3 0> <op:a 1 2 1> <op:b 1 2 1> <op:b 1 2 0>) : -2
+   (<op:a 1 2 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 2 1>) : -2
+   (<op:a 1 2 0> <op:a 1 1 1> <op:b 1 1 1> <op:b 1 1 0>) : -11
+   #+end_example
 
    Example2: a bigger example with problem, solution and code defined in =neigh-data.lisp= file.
    #+BEGIN_SRC lisp +n -r :results output :exports both.lisp
