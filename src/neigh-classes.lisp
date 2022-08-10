@@ -1,12 +1,12 @@
 (in-package :vrp)
 
 (def-vrp-class counting-basic-solution ()
-	   ((num-clients) (routes))
+  ((num-clients) (routes))
 
-	   :documentation "A basic solution for counting."
-	   :constructor (new-counting-basic-solution)
-	   :print-object-string ("<counting-basic-solution ~a, ~a>" num-clients routes)
-	   :slots-for-obj= (num-clients routes))
+  :documentation "A basic solution for counting."
+  :constructor (new-counting-basic-solution)
+  :print-object-string ("<counting-basic-solution ~a, ~a>" num-clients routes)
+  :slots-for-obj= (num-clients routes))
 
 (def-vrp-class counting-op-init ()
 	   ()		
@@ -256,7 +256,7 @@
   :slots-for-clone (first-index info subtree-sols cardinality))
 
 (def-vrp-class neighborhood-region ()
-      ((numer-id :initarg :number-id)
+      ((number-id :initarg :number-id)
        (index-range :initarg :index-range)
        (cardinality :initarg :cardinality
 		    :initform 0)
@@ -271,9 +271,9 @@
 		     :initform nil))
   :documentation "A class that represents a region in the neighborhood."
   :constructor (new-neighborhood-region)
-  :print-object-string ("<neighborhood-region, numer-id: ~a, index-range: ~a, cardinality: ~a, neighborhood: ~a>" numer-id index-range cardinality neighborhood)
-  :slots-for-obj= (numer-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood)
-  :slots-for-clone (numer-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood))
+  :print-object-string ("<neighborhood-region, number-id: ~a, index-range: ~a, cardinality: ~a, neighborhood: ~a>" number-id index-range cardinality neighborhood)
+  :slots-for-obj= (number-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood)
+  :slots-for-clone (number-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood))
 
 (def-vrp-class neighborhood-tree ()
       ((problem :initarg :problem

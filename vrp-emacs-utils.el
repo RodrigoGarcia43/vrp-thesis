@@ -191,22 +191,30 @@ Return a list whose CAR is the tangled file name."
         (kill-buffer to-be-removed)))))
 
 (defvar vrp-tangle-list
-    `("vrp-suite.org"
-      "vrp-classes.org"
-      "vrp-neighborhood-exploration-macros.org"
-      "vrp-neighborhood-simulation.org"
-      "vrp-neighborhood-operations.org"
-      "vrp-delta-cost.org"
+  `("vrp-suite.org"
+    "vrp-classes.org"
+    "vrp-moments.org"
+    "vrp-data.org"
+    "vrp-neighborhood-exploration-macros.org"
+    "vrp-neighborhood-simulation.org"
+    "vrp-neighborhood-operations.org"
+    "vrp-delta-cost.org"
+    "vrp-search-strategies.org"
+    "vrp-criteria.org"
+    "vrp-algorithms.org"
 
-      "neigh-class-macros.org"
-      "neigh-classes.org"
-      "neigh-criterion.org"
-      "neigh-compatibility.org"
-      "neigh-cardinality.org"
-      "neigh-indexer.org"
-      "neigh-exploration.org"
-      "neigh-statistics.org"
-      "neigh-exploration-heuristics.org")
+    "neigh-class-macros.org"
+    "neigh-classes.org"
+    "neigh-criterion.org"
+    "neigh-compatibility.org"
+    "neigh-cardinality.org"
+    "neigh-indexer.org"
+    "neigh-exploration.org"
+    "neigh-statistics.org"
+    "neigh-exploration-heuristics.org"
+    "neigh-data.org"
+    "neigh-search-strategies.org"
+    "neigh-algorithms.org")
   "A list with all the files that should be tangled.")
 
 (defun vrp-tangle-all-files ()

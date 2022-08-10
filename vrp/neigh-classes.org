@@ -21,19 +21,19 @@
    the quantity of clients in the corresponding route.
 
    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/neigh-classes.lisp 
-	  (def-vrp-class counting-basic-solution ()
-		     ((num-clients) (routes))
+     (def-vrp-class counting-basic-solution ()
+       ((num-clients) (routes))
 
-		     :documentation "A basic solution for counting."
-		     :constructor (new-counting-basic-solution)
-		     :print-object-string ("<counting-basic-solution ~a, ~a>" num-clients routes)
-		     :slots-for-obj= (num-clients routes))
+       :documentation "A basic solution for counting."
+       :constructor (new-counting-basic-solution)
+       :print-object-string ("<counting-basic-solution ~a, ~a>" num-clients routes)
+       :slots-for-obj= (num-clients routes))
    #+END_SRC
    
    #+begin_src lisp :export both :results output
 
-   (let* ((s (new-counting-basic-solution 5 (list 2 3 5)))) 
-   (format t "counting-solution ~a" s))
+     (let* ((s (new-counting-basic-solution 5 (list 2 3 5)))) 
+       (format t "counting-solution ~a" s))
 
    #+end_src
 
@@ -483,7 +483,7 @@
 
    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/neigh-classes.lisp 
 	  (def-vrp-class neighborhood-region ()
-		((numer-id :initarg :number-id)
+		((number-id :initarg :number-id)
 		 (index-range :initarg :index-range)
 		 (cardinality :initarg :cardinality
 			      :initform 0)
@@ -498,9 +498,9 @@
 			       :initform nil))
 	    :documentation "A class that represents a region in the neighborhood."
 	    :constructor (new-neighborhood-region)
-	    :print-object-string ("<neighborhood-region, numer-id: ~a, index-range: ~a, cardinality: ~a, neighborhood: ~a>" numer-id index-range cardinality neighborhood)
-	    :slots-for-obj= (numer-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood)
-	    :slots-for-clone (numer-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood))
+	    :print-object-string ("<neighborhood-region, number-id: ~a, index-range: ~a, cardinality: ~a, neighborhood: ~a>" number-id index-range cardinality neighborhood)
+	    :slots-for-obj= (number-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood)
+	    :slots-for-clone (number-id index-range cardinality basic-region-list basic-indexes basic-keys search-state neighborhood))
 
 
    #+END_SRC

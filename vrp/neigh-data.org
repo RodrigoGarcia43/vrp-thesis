@@ -16,7 +16,7 @@
     (in-package :vrp)
   #+END_SRC
 
-
+  
 * Neighborhood criteria
   In this section we define some criterions that are going to be used to generate
   some results for this system.
@@ -1651,7 +1651,7 @@
 
 * THESIS stuff
   In this section I'll define some parameters and functions that are used to select the neighborhoods in which the results of this thesis are computed.
-
+  
 ** Define a list with each problem
    Here we define a list with 3 known CVRP problems.
 

@@ -1008,32 +1008,45 @@ The following elements are syntactic sugar, to make the code more natural to rea
 
 ** A file to load all the tangled files
    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-load-files.lisp
-   (dolist (f (list "src/vrp-package.lisp"
-                    "src/vrp-utilities.lisp"
-                    "src/vrp-random-number-generation.lisp"
-                    "src/vrp-generic-functions.lisp"
-                    "src/vrp-class-definition-macro.lisp"
-		    "src/vrp-classes.lisp"
-		    "src/vrp-moments.lisp"
-		    "src/vrp-data.lisp"
-		    "src/vrp-neighborhood-exploration-macros.lisp"
-                    "src/vrp-neighborhood-simulation.lisp"
-                    "src/vrp-neighborhood-operations.lisp"
-                    "src/vrp-delta-cost.lisp"
+     (dolist (f (list "src/vrp-package.lisp"
+		      "src/vrp-utilities.lisp"
+		      "src/vrp-random-number-generation.lisp"
+		      "src/vrp-generic-functions.lisp"
+		      "src/vrp-class-definition-macro.lisp"
+		      "src/vrp-classes.lisp"
+		      "src/vrp-moments.lisp"
+		      "src/vrp-data.lisp"
+		      "src/vrp-neighborhood-exploration-macros.lisp"
+		      "src/vrp-neighborhood-simulation.lisp"
+		      "src/vrp-neighborhood-operations.lisp"
+		      "src/vrp-delta-cost.lisp"
+		      "src/vrp-search-strategies.lisp"
+		      "src/vrp-criteria.lisp"
+		      "src/vrp-algorithms.lisp"
+		      "data/vrp-data-a-n32-k5.lisp"
+		      "data/vrp-data-a-n33-k5.lisp"
+		      "data/vrp-data-a-n33-k6.lisp"
+		      "data/vrp-data-a-n37-k5.lisp"
+		      "data/vrp-data-a-n65-k9.lisp"
+		      "data/vrp-data-a-n80-k10.lisp"
+		      "data/vrp-data-f-n135-k7.lisp"
 
-		    "src/neigh-configuration.lisp"
-                    "src/neigh-utilities.lisp"     
-                    "src/neigh-class-macros.lisp"
-                    "src/neigh-classes.lisp"
-                    "src/neigh-generic-functions.lisp"
-                    "src/neigh-criterion.lisp"
-                    "src/neigh-cardinality.lisp"
-                    "src/neigh-indexer.lisp"
-                    "src/neigh-compatibility.lisp"
-                    "src/neigh-exploration.lisp"
-                    "src/neigh-exploration-heuristics.lisp"))
-     (format t "Loading ~a...~%" f)
-     (load f))
+		      "src/neigh-configuration.lisp"
+		      "src/neigh-utilities.lisp"     
+		      "src/neigh-class-macros.lisp"
+		      "src/neigh-classes.lisp"
+		      "src/neigh-generic-functions.lisp"
+		      "src/neigh-criterion.lisp"
+		      "src/neigh-cardinality.lisp"
+		      "src/neigh-indexer.lisp"
+		      "src/neigh-compatibility.lisp"
+		      "src/neigh-exploration.lisp"
+		      "src/neigh-exploration-heuristics.lisp"
+		      "data/neigh-data.lisp"
+		      "src/neigh-strategies.lisp"
+		      "src/neigh-algorithms.lisp"))
+       (format t "Loading ~a...~%" f)
+       (load f))
    #+END_SRC
 ** Function in python to tangle really fast
    #+BEGIN_SRC python +n -r :results none :exports code :tangle ../src/vrp-py-babel-tangle.sh
@@ -1356,26 +1369,32 @@ for fn, fo in dests.items():
      A list with all the files that should be tangled
 **** code
     #+BEGIN_SRC emacs-lisp :results none :exports code :tangle ../vrp-emacs-utils.el
-    (defvar vrp-tangle-list
-        `("vrp-suite.org"
-          "vrp-classes.org"
+      (defvar vrp-tangle-list
+	`("vrp-suite.org"
+	  "vrp-classes.org"
 	  "vrp-moments.org"
 	  "vrp-data.org"
-          "vrp-neighborhood-exploration-macros.org"
-          "vrp-neighborhood-simulation.org"
-          "vrp-neighborhood-operations.org"
-          "vrp-delta-cost.org"
+	  "vrp-neighborhood-exploration-macros.org"
+	  "vrp-neighborhood-simulation.org"
+	  "vrp-neighborhood-operations.org"
+	  "vrp-delta-cost.org"
+	  "vrp-search-strategies.org"
+	  "vrp-criteria.org"
+	  "vrp-algorithms.org"
 
 	  "neigh-class-macros.org"
-          "neigh-classes.org"
-          "neigh-criterion.org"
-          "neigh-compatibility.org"
-          "neigh-cardinality.org"
-          "neigh-indexer.org"
-          "neigh-exploration.org"
-          "neigh-statistics.org"
-          "neigh-exploration-heuristics.org")
-      "A list with all the files that should be tangled.")
+	  "neigh-classes.org"
+	  "neigh-criterion.org"
+	  "neigh-compatibility.org"
+	  "neigh-cardinality.org"
+	  "neigh-indexer.org"
+	  "neigh-exploration.org"
+	  "neigh-statistics.org"
+	  "neigh-exploration-heuristics.org"
+	  "neigh-data.org"
+	  "neigh-search-strategies.org"
+	  "neigh-algorithms.org")
+	"A list with all the files that should be tangled.")
     #+END_SRC
      
 *** code (newer with py-org-babel-tangle)
