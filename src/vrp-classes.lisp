@@ -40,6 +40,14 @@
   ;; no obj= or clone because it as an abstract class
   )
 
+(def-vrp-class has-multi-depots ()
+  ((depots))
+  :documentation "Represents that routes have only one depot."
+  ;; no constructor because it as an abstract class
+  ;; no print-object because it as an abstract class
+  ;; no obj= or clone because it as an abstract class
+  )
+
 (def-vrp-class has-an-end-depot (has-one-depot)
   ((end-depot))
   :documentation "Represents that routes have an end depot."

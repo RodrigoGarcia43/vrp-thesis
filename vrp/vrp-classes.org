@@ -137,6 +137,23 @@
        )
      #+END_SRC
 *** no tests because it is an abstract class
+** has-multi-depots (functional, abstract)
+   :PROPERTIES:
+   :CUSTOM_ID: class:has-one-depot
+   :END:
+*** documentation
+    A class to represent that the route has multiple depots.  This is the class that has the slot =depots=.
+*** code
+     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-classes.lisp
+     (def-vrp-class has-multi-depots ()
+       ((depots))
+       :documentation "Represents that routes have only one depot."
+       ;; no constructor because it as an abstract class
+       ;; no print-object because it as an abstract class
+       ;; no obj= or clone because it as an abstract class
+       )
+     #+END_SRC
+*** no tests because it is an abstract class
 ** has-an-end-depot (structural, functional, abstract)
    :PROPERTIES:
    :CUSTOM_ID: class:has-an-end-depot
@@ -648,7 +665,7 @@
 
 
 * Depots
-   In this section we'll add all the classes related to the depots
+  In this section we'll add all the classes related to the depots
 ** basic-depot
 *** documentation
     A basic depot has only an id and it defaults to 0.

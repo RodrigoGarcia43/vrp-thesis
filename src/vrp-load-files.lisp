@@ -34,6 +34,11 @@
 		 "src/neigh-exploration-heuristics.lisp"
 		 "data/neigh-data.lisp"
 		 "src/neigh-strategies.lisp"
-		 "src/neigh-algorithms.lisp"))
+		 "src/neigh-algorithms.lisp"
+
+		 "src/eval-classes.lisp"
+		 "src/eval-methods.lisp"
+		 "src/eval-graph-builder.lisp"
+		 ))
   (format t "Loading ~a...~%" f)
   (load f))
