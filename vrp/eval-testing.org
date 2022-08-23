@@ -1,0 +1,15 @@
+#+TITLE: Eval Graph Builder
+#+AUTHOR: Rodrigo Garía Gómez
+#+EMAIL: rodrigo.garcia21111@gmail.com
+
+
+
+* Documentation
+Lets test the evaluation graph integrated on the system. We will, step by step, build a problem with an initial solution with the classes defined in ==vrp-suite== and use the ==eval-graph-builder= to explore the neighborhood efficiently. 
+
+* Automatic evaluations for variants
+
+In this section we will evaluate the neighbor solutions in the basic VRP, the CVRP and the MDVRP.
+All the code needed to represent those variants and the evaluation of a solution is done.
+To learn how to apply the automatic evaluation to new variants see the next section.
+

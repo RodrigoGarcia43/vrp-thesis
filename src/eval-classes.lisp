@@ -11,7 +11,7 @@
 		   :initform (make-hash-table))
    (node-list :initarg :node-list
 	      :initform ())
-   (solution-track :initarg :solution)
+   (solution-track)
    (client-buffer :initarg :client-buffer
 		  :initform ())
    (vehicle-buffer :initarg :client-buffer

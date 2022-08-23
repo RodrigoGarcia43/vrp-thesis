@@ -128,19 +128,24 @@ This method initializes the =eval-graph= class and convert the given solution in
 #+END_SRC
 
 **** test
-# #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-graph-builder-test.lisp
-# (let* ((depot (client 0))
-#        (c1 (client 1))
-#        (c2 (client 2))
-#        (r (route 1 `(,depot ,c1 ,c2 ,depot) nil))
-#        (sol (solution `(,r)))
-#        (act (action-distance 0))
-#        (graph (init-graph sol)))
-#     (format t "~a~%" graph)) 
-            
-# #+END_SRC
+#+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-graph-builder-test.lisp
+  (with-basic-clients (1 2 3 4 5 6)
+	(let* ((v1 (basic-vehicle 1))
+	       (v2 (basic-vehicle 2))
+	       (d0 (basic-depot))
+	       (r1 (basic-route :id 1 :vehicle v1 :depot d0
+				:clients (list c1 c2 c3)))
+	       (r2 (basic-route :id 2 :vehicle v2 :depot d0
+				:clients (list c4 c5 c6)))
+	       (s (basic-cvrp-solution :id 1 :routes (list r1 r2)))
+	       (graph (init-graph s)))
 
-# #+RESULTS:
+	  (format t "~a~%" graph)))
+ 
+            
+#+END_SRC
+
+#+RESULTS:
 
 ** move-node-from-to
 *** documentation
