@@ -300,7 +300,7 @@
     A client with a demand that should be satisfied.
 *** code
     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-classes.lisp
-    (def-vrp-class demand-client ()
+    (def-vrp-class demand-client (basic-client)
       ((demand))
       :documentation "A client with a demand that must be satisfied.")
     #+END_SRC
@@ -310,7 +310,7 @@
     A client that can be used in the CVRP.  It has and id and a demand.
 *** code
     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-classes.lisp
-    (def-vrp-class basic-cvrp-client (basic-client demand-client)
+    (def-vrp-class basic-cvrp-client (demand-client)
       ()
       :documentation "A basic client for the CVRP with id and demand."
       :constructor (basic-cvrp-client (id demand))
@@ -813,9 +813,9 @@
 *** code
     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-classes.lisp
     (def-vrp-class route-for-simulation (basic-route)
-      ((previous-client :initform nil))
+      ((previous-client))
       :documentation "A route with a previous-client slot.  Good for simulations."
-      :constructor (route-for-simulation (&key id vehicle depot clients))
+      :constructor (route-for-simulation (&key id vehicle depot clients (previous-client nil)))
       :slots-for-obj= (id vehicle depot clients previous-client)
       :slots-for-clone (id vehicle depot clients previous-client))
     #+END_SRC

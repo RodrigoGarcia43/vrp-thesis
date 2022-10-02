@@ -9,19 +9,17 @@
 		:initform (make-hash-table))
    (slot-to-output :initarg :slot-to-output
 		   :initform (make-hash-table))
-   (node-list :initarg :node-list
-	      :initform ())
    (solution-track)
    (client-buffer :initarg :client-buffer
-		  :initform ())
+		  :initform (make-hash-table))
    (vehicle-buffer :initarg :client-buffer
-		  :initform ())
+		  :initform (make-hash-table))
    )
   :documentation "A class that represents an evaluation graph."
   :constructor (new-eval-graph (&key solution-track))
-  :print-object-string ("<EVAL-GRAPH: ~%output: ~a ~%node-list: ~%~{~a~%~} ~%solution-track: ~a>" output node-list solution-track)
-  :slots-for-obj= (inputs output class-to-io slot-to-output node-list solution-track client-buffer vehicle-buffer)
-  :slots-for-clone (inputs output class-to-io slot-to-output node-list solution-track client-buffer vehicle-buffer))
+  :print-object-string ("<EVAL-GRAPH: ~% output: ~a  ~% inputs: ~%~{  ~a~%~} ~% client-buffer: ~a ~%~% solution-track: ~a>" output inputs client-buffer solution-track)
+  :slots-for-obj= (inputs output class-to-io slot-to-output solution-track client-buffer vehicle-buffer)
+  :slots-for-clone (inputs output class-to-io slot-to-output solution-track client-buffer vehicle-buffer))
 
 (def-vrp-class node () ()
   :documentation "Ancestor node for eval-graph")
@@ -42,7 +40,7 @@
    (second-distance-calculator :initform nil))
   :documentation "distance node in eval-graph"
   :constructor (new-input-distance-node (&key content))
-  :print-object-string ("<Distance node, first-distance-calculator: ~a, second-distance-calculator: ~a, content: ~a>" first-distance-calculator second-distance-calculator content)
+  :print-object-string ("<Cliient node ~a, ~%     first-distance-calculator: ~a, ~%     second-distance-calculator: ~a>" content first-distance-calculator second-distance-calculator)
   :slots-for-obj= (content first-distance-calculator second-distance-calculator)
   :slots-for-clone (content first-distance-calculator second-distance-calculator))
 
@@ -51,20 +49,21 @@
   :documentation "client with demand node in eval-graph"
   :constructor (new-demand-node (&key content))
   :print-object-string ("<Client node, demand: ~a>" demand-calculator)
-  :slots-for-obj= (demand-calculator)
-  :slots-for-clone (demand-calculator))
+  :slots-for-obj= (content demand-calculator)
+  :slots-for-clone (content demand-calculator))
 
 (def-vrp-class input-distance-demand-node (input-distance-node
 					  input-demand-node) 
   ()
   :documentation "client with demand node for a problem with distance in eval-graph"
   :constructor (new-input-distance-demand-node (&key content))
-  :print-object-string ("<Cliient with distance node, first-distance-calculator: ~a, second-distance-calculator: ~a, demand-calculator: ~a>" first-distance-calculator second-distance-calculator demand-calculator)
+  :print-object-string ("<Cliient node ~a, ~%     first-distance-calculator: ~a, ~%     second-distance-calculator: ~a, ~%     demand-calculator: ~a>" content first-distance-calculator second-distance-calculator demand-calculator)
   :slots-for-obj= (content first-distance-calculator second-distance-calculator demand-calculator)
   :slots-for-clone (content first-distance-calculator second-distance-calculator demand-calculator))
 
 (def-vrp-class output-node (io-node) 
-  ((output-value))
+  ((output-value)
+   (updater :initform nil))
   :documentation "output node in eval-graph"
   :constructor (new-output-node (&key output-value))   
   :print-object-string ("<Output node, value: ~a>" output-value)
@@ -72,11 +71,10 @@
   :slots-for-clone (output-value))
 
 (def-vrp-class accumulator-node (input-node output-node) 
-  ((output-copy :initform nil)
-   (updater :initform nil))
+  ((output-copy :initform nil))
   :documentation "accumulator node for partial results in eval-graph"
   :constructor (new-accumulator-node (&key content output-value))
-  :print-object-string ("Accumulator node, content: ~a, output-value: ~a>" content output-value)
+  :print-object-string ("<Accumulator, value: ~a>" output-value)
   :slots-for-obj= (content output-value)
   :slots-for-clone (content output-value))
 
@@ -89,10 +87,10 @@
   :slots-for-clone (initial-value content output-value))
 
 (def-vrp-class input-vehicle-node (input-node) 
-  ((dependent-accumulator)) ;; An initial-value accumulator
+  ((dependent-accumulator :initform nil)) ;; An initial-value accumulator
   :documentation "vehicle node in eval-graph"
   :constructor (new-input-vehicle-node (&key content))
-  :print-object-string ("Vehicle node, content: ~a, accumulator: ~a>" content dependent-accumulator)
+  :print-object-string ("<Vehicle node, content: ~a, accumulator: ~a>" content dependent-accumulator)
   :slots-for-obj= (content dependent-accumulator)
   :slots-for-clone (content dependent-accumulator))
 
@@ -100,7 +98,7 @@
   ()
   :documentation "vehicle node in eval-graph"
   :constructor (new-input-depot-node (&key content))
-  :print-object-string ("Depot node, content: ~a, demand: ~a>" content demand-calculator)
+  :print-object-string ("<Depot node, content: ~a, demand: ~a>" content demand-calculator)
   :slots-for-obj= (content demand-calculator first-distance-calculator second-distance-calculator)
   :slots-for-clone (content demand-calculator first-distance-calculator second-distance-calculator))
 
@@ -112,7 +110,7 @@
     ((from-client) (to-client) (distance-matrix))
     :documentation "increment distance node in eval-graph"
   :constructor (new-increment-distance-node (&key previous-node next-node output-action from-client to-client distance-matrix))
-    :print-object-string ("increment distance node, prev: ~a, next: ~a>" previous-node next-node)
+    :print-object-string ("<output: ~a>" output-action)
     :slots-for-obj= (previous-node next-node output-action from-client to-client distance-matrix)
     :slots-for-clone (previous-node next-node output-action from-client to-client distance-matrix))
 
@@ -120,7 +118,7 @@
   ((input-with-demand))
   :documentation "decrement capacity node in eval-graph"
   :constructor (new-decrement-capacity-node (&key previous-node next-node output-action input-with-demand))
-  :print-object-string ("decrement capacity node, prev: ~a, next: ~a, client: ~a>" previous-node next-node input-with-demand)
+  :print-object-string ("decrement-capacity: ~a>" output-action)
   :slots-for-obj= (previous-node next-node output-action input-with-demand)
   :slots-for-clone (previous-node next-node output-action input-with-demand))
 

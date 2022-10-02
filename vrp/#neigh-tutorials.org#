@@ -847,6 +847,55 @@
                (print current-delta-cost)
                (setf current-sol (funcall sol-generator))))))
    #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   =======================================
+    Testing rraac with the :neigh system.
+   =======================================
+
+
+   (<op:a 1 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 1 1 1>) 
+   -11 
+   (<op:a 1 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 1 1>) 
+   -2 
+   (<op:a 1 2 0> <op:a 1 1 1> <op:b 1 1 1> <op:b 1 1 0>) 
+   -11 
+   (<op:a 1 2 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 2 1>) 
+   -2 
+   (<op:a 1 3 0> <op:a 1 1 1> <op:b 1 2 1> <op:b 1 1 0>) 
+   -2 
+   (<op:a 1 3 0> <op:a 1 2 1> <op:b 1 2 1> <op:b 1 2 0>) 
+   -2 
+   (<op:a 1 1 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 1 1>) 
+   4993 
+   (<op:a 1 2 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 2 1>) 
+   -25004 
+   (<op:a 1 3 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 3 1>) 
+   -4999 
+   (<op:a 1 1 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 1 1>) 
+   -11 
+   (<op:a 1 2 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 2 1>) 
+   -30001 
+   (<op:a 1 3 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 3 1>) 
+   -9997 
+   (<op:a 2 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 2 1 1>) 
+   4993 
+   (<op:a 2 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 2 1 1>) 
+   -25004 
+   (<op:a 2 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 2 1 1>) 
+   -4999 
+   (<op:a 2 1 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 2 1 1>) 
+   0 
+   (<op:a 3 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 3 1 1>) 
+   -11 
+   (<op:a 3 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 3 1 1>) 
+   -30001 
+   (<op:a 3 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 3 1 1>) 
+   -9997 
+   (<op:a 3 1 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 3 1 1>) 
+   0 
+   #+end_example
    
 ** Test
     
@@ -1819,25 +1868,25 @@
 
    #+RESULTS:
    #+begin_example
-   (<op:a 1 2 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 2 1>) : -2
+   (<op:a 1 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 1 1 1>) : -11
    (<op:a 1 1 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 1 1>) : 4993
    (<op:a 1 1 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 1 1>) : -11
-   (<op:a 2 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 2 1 1>) : -4999
+   (<op:a 2 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 2 1 1>) : -25004
    (<op:a 2 1 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 2 1 1>) : 0
-   (<op:a 3 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 3 1 1>) : -30001
+   (<op:a 3 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 3 1 1>) : -11
    (<op:a 3 1 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 3 1 1>) : 0
-   (<op:a 1 3 0> <op:a 1 2 1> <op:b 1 2 1> <op:b 1 2 0>) : -2
-   (<op:a 1 3 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 3 1>) : -4999
-   (<op:a 1 2 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 2 1>) : -30001
-   (<op:a 2 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 2 1 1>) : 4993
-   (<op:a 3 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 3 1 1>) : -9997
    (<op:a 1 3 0> <op:a 1 1 1> <op:b 1 2 1> <op:b 1 1 0>) : -2
    (<op:a 1 2 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 2 1>) : -25004
    (<op:a 1 3 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 3 1>) : -9997
-   (<op:a 2 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 2 1 1>) : -25004
-   (<op:a 3 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 3 1 1>) : -11
-   (<op:a 1 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 1 1 1>) : -11
+   (<op:a 2 1 0> <op:a 1 1 1> <op:b 1 1 0> <op:b 2 1 1>) : 4993
+   (<op:a 3 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 3 1 1>) : -9997
    (<op:a 1 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 1 1>) : -2
+   (<op:a 1 3 0> <op:a 2 1 1> <op:b 2 1 0> <op:b 1 3 1>) : -4999
+   (<op:a 1 2 0> <op:a 3 1 1> <op:b 3 1 0> <op:b 1 2 1>) : -30001
+   (<op:a 2 1 0> <op:a 1 3 1> <op:b 1 3 0> <op:b 2 1 1>) : -4999
+   (<op:a 3 1 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 3 1 1>) : -30001
+   (<op:a 1 3 0> <op:a 1 2 1> <op:b 1 2 1> <op:b 1 2 0>) : -2
+   (<op:a 1 2 0> <op:a 1 2 1> <op:b 1 2 0> <op:b 1 2 1>) : -2
    (<op:a 1 2 0> <op:a 1 1 1> <op:b 1 1 1> <op:b 1 1 0>) : -11
    #+end_example
 

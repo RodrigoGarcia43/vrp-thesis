@@ -38,7 +38,6 @@
 
 		 "src/eval-classes.lisp"
 		 "src/eval-methods.lisp"
-		 "src/eval-graph-builder.lisp"
-		 ))
+		 "src/eval-graph-builder.lisp"))
   (format t "Loading ~a...~%" f)
   (load f))

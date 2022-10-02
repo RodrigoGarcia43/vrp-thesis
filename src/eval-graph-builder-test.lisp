@@ -1,47 +1,33 @@
-(let* ((depot (client 0))
-       (c1 (client 1))
-       (c2 (client 2))
-       (r (route 1 `(,depot ,c1 ,c2 ,depot) nil))
-       (sol (solution `(,r)))
-       (act (action-distance 0))
-       (graph (init-graph sol)))
-    (format t "~a~%" graph))
+(with-basic-clients (1 2 3 4 5 6)
+      (let* ((v1 (basic-vehicle 1))
+	     (v2 (basic-vehicle 2))
+	     (d0 (basic-depot))
+	     (r1 (basic-route :id 1 :vehicle v1 :depot d0
+			      :clients (list c1 c2 c3)))
+	     (r2 (basic-route :id 2 :vehicle v2 :depot d0
+			      :clients (list c4 c5 c6)))
+	     (s (basic-solution :id 1 :routes (list r1 r2)))
+	     (graph (init-graph s)))
 
-(let* ((depot (client 0))
-       (c1 (client 1))
-       (c2 (client 2))
-       (r (route 1 `(,c1 ,c2 ,depot) depot))
-       (sol (solution `(,r)))
-       (act (action-distance 0))
-       (*graph* (init-graph sol))
-       (on (output-graph-node 0))
-       (mat #2A((0 1 2) (1 0 2) (2 2 0))))
-    (progn
-        (setf (gethash 'total-distance (slot-to-output *graph*)) on)
-        (loop for r in (routes sol) do
-            (loop for c in (clients r) do
-               (progn 
-                   (move-from-to (prev-client r) c 'total-distance *graph* mat)
-                   (setf (prev-client r) c))))
-        (format t "EVALUATION (should be 5): ~a~%" (output-value on))))
+	(format t "~a~%" graph)))
 
-(let* ((depot (client 0))
-       (c1 (client 1))
-       (c2 (client 2))
-       (r (route 1 `(,c1 ,c2 ,depot) depot))
-       (sol (solution `(,r)))
-       (act (action-distance 0))
-       (*graph* (init-graph sol))
-       (mat #2A((0 1 2) (1 0 2) (2 2 0))))
+(with-basic-clients (1 2)
+  (let* ((v1 (basic-vehicle 1))
+	 (d0 (basic-depot))
+	 (r1 (basic-route :id 1 :vehicle v1 :depot d0
+			  :clients (list c1 c2 d0)))
+	 (s (basic-solution :id 1 :routes (list r1)))
+	 (out (new-output-node :output-value 0))
+	 (graph (init-graph s))
+	 (dist-mat #2A((0 1 2) (1 0 2) (2 2 0))))
     (progn
-        (defallocable 'total-distance 0 *graph*)
-        (loop for r in (routes sol) do
-            (progn
-                (defallocable 'route-distance 0 *graph*)
-                (loop for c in (clients r) do
-                   (progn 
-                       (move-from-to (prev-client r) c 'route-distance *graph* mat)
-                       (setf (prev-client r) c)))
-                (increment-with 'total-distance 'route-distance *graph*)))
-        (format t "EVALUATION (should be 5): ~a~%" (output-value 
-                                                        (gethash 'total-distance (slot-to-output *graph*))))))
+      (setf (gethash 'total-distance (slot-to-output graph)) out)
+      (loop for r in (routes s) do
+	(progn
+	  (setf prev-client d0)
+	  (loop for c in (clients r) do
+	    (progn 
+	      (move-node-from-to prev-client c 'total-distance dist-mat graph)
+	      (setf prev-client c)))))
+      (format t "EVALUATION (should be 5): ~a~%" (output-value out))
+      (format t "~a~%" graph))))

@@ -78,7 +78,6 @@
 		 (nth (1- value) elements-list)))))
    #+END_SRC
 
-
 * Classic exploration strategies
   In this section some classical strategies to explore a given set of neighbor solutions
   are defined. This strategies don't assume any property about that neighborhood.
@@ -506,7 +505,7 @@
 
 ** Combinatorial search
    This function makes a combinatorial generator of the neighborhood. At this
-   moment when a region is enrirely exahusted it doesn't returns any solutions
+   moment when a region is entirely exahusted it doesn't returns any solutions
    of this particular region. In fact, those regions are not of interest for 
    future analysis because they were completely explored in the combinatorial
    search.

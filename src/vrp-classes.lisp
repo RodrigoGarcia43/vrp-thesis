@@ -76,11 +76,11 @@
   :slots-for-obj= (id)
   :slots-for-clone (id))
 
-(def-vrp-class demand-client ()
+(def-vrp-class demand-client (basic-client)
   ((demand))
   :documentation "A client with a demand that must be satisfied.")
 
-(def-vrp-class basic-cvrp-client (basic-client demand-client)
+(def-vrp-class basic-cvrp-client (demand-client)
   ()
   :documentation "A basic client for the CVRP with id and demand."
   :constructor (basic-cvrp-client (id demand))
@@ -213,9 +213,9 @@
   :slots-for-clone (id vehicle depot clients))
 
 (def-vrp-class route-for-simulation (basic-route)
-  ((previous-client :initform nil))
+  ((previous-client))
   :documentation "A route with a previous-client slot.  Good for simulations."
-  :constructor (route-for-simulation (&key id vehicle depot clients))
+  :constructor (route-for-simulation (&key id vehicle depot clients (previous-client nil)))
   :slots-for-obj= (id vehicle depot clients previous-client)
   :slots-for-clone (id vehicle depot clients previous-client))
 

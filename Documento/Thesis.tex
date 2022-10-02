@@ -1,0 +1,65 @@
+\documentclass[11pt,oneside]{uhthesis}
+\usepackage{subfigure}
+\usepackage[linesnumbered,lined,titlenumbered,ruled]{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{mathpazo}
+\usepackage{float}
+\usepackage{braket}
+%\usepackage{subcaption}
+\setlength {\marginparwidth }{3cm}
+\usepackage{todonotes}
+% \usepackage{refcheck}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{ragged2e}
+
+%\floatstyle{ruled}
+%\restylefloat{table}
+
+\renewcommand{\tablename}{Tabla}
+%\usepackage{syntax}
+%\dontprintsemicolon
+\title{Una propuesta para la codificación de soluciones del Problema de Enrutamiento de Vehículos a un espacio continuo}
+\author{Dalianys Pérez Perera}
+\advisor{MSc. Fernando Rodríguez Flores}
+\coadvisor{	Lic. Alain Cartaya Salabarría}
+\degree{Licenciado en Ciencias de la Computación}
+\faculty{Facultad de Matemática y Computación}
+\date{Noviembre de 2021}
+\logo{Graphics/uhlogo}
+%\makenomenclature
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d}#1}}
+
+\begin{document}
+\selectlanguage{spanish}
+
+\frontmatter
+\maketitle
+
+\include{FrontMatter/Dedication}
+\include{FrontMatter/Thanks}
+\include{FrontMatter/SupervisorOpinion}
+\include{FrontMatter/Abstract}
+\include{FrontMatter/Contents}
+
+\mainmatter
+	
+\include{MainMatter/Introduction}
+\include{MainMatter/MLIntro}
+\include{MainMatter/Background}
+\include{MainMatter/Solution}
+\include{MainMatter/Results}
+
+\backmatter
+
+\include{BackMatter/Conclusions}
+\include{BackMatter/Bibliography}
+
+
+\end{document}
