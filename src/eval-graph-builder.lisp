@@ -22,11 +22,13 @@
                                   (setf (gethash to-insert visited-op) t)))))))))
 
 (defun do-suite-operations (graph ops)
-  (let ((new-ops))
-    (progn
-      (loop for op in ops 
-	    do (setf new-ops (append new-ops (convert-op op graph))))
-      (do-operations new-ops))))
+  (loop for op in ops do
+    (let* ((converted-op (convert-op op graph))
+	   (op (car converted-op))
+	   (a (car (cdr converted-op)))
+	   (b (car (cdr (cdr converted-op))))
+	   (c (car (cdr (cdr (cdr converted-op))))))
+      (do-operations (`(,op ,a ,b ,c ,graph))))))
 
 (defmacro def-var (name init-value graph)
     `(defallocable ',name ,init-value ,graph))
@@ -102,29 +104,34 @@
             (setf (updater i-node) penalizer)
             (evaluate-low-level-node penalizer))))
 
-(defmethod remove-client-from (buffer-index route-index client-index graph)
-    (let* ((target-route (car (nthcdr route-index (routes (solution-track graph)))))
-           (target-client (car (nthcdr client-index (clients target-route))))
+(defmethod remove-client-from (route-index client-index buffer-index graph)
+    (let* ((target-route (car (nthcdr route-index (append '(()) (routes (solution-track graph))))))
+           (target-client (car (nthcdr client-index (append '(()) (clients target-route)))))
            (node-to-remove (gethash target-client (class-to-io graph)))) 
         (progn
             (setf (clients target-route) (remove target-client (clients target-route)))
             (setf (gethash buffer-index (client-buffer graph)) target-client)
             (remove-node node-to-remove))))
 
-(defmethod insert-client-to (buffer-index route-index client-index graph)
-  (let* ((target-route (car (nthcdr route-index (routes (solution-track graph)))))
-	 ;;(target-client (car (nthcdr buffer-index (client-buffer graph))))
+(defmethod insert-client-to (route-index client-index buffer-index graph)
+  (let* ((target-route (car (nthcdr route-index (append '(()) (routes (solution-track graph))))))
 	 (target-client (gethash buffer-index (client-buffer graph)))
 	 (node-to-insert (gethash target-client (class-to-io graph)))
-	 (client-before-insert-to (car (nthcdr client-index (clients target-route))))
+	 (client-before-insert-to (car (nthcdr client-index (append '(()) (clients target-route)))))
 	 (node-before-insert-to (gethash client-before-insert-to (class-to-io graph))))
-    (progn
-      (remhash buffer-index (client-buffer graph))
-      ;;	(setf (client-buffer graph) (remove target-client (client-buffer graph)))
-      (if (eq client-index 0)
-	  (push target-client (clients target-route))
-	  (push target-client (cdr (nthcdr (- client-index 1) (clients target-route)))))
-      (insert-node node-before-insert-to node-to-insert))))
+
+
+    ;;      (format t "~a ~%" node-before-insert-to)
+    ;;      (format t "~a ~%~%" node-to-insert)
+
+    (remhash buffer-index (client-buffer graph))
+    (if (eq client-index 1)
+	;; if branch
+	(push target-client (clients target-route))
+	;; else branch
+	(push target-client (cdr (nthcdr (- client-index 1) (append '(()) (clients target-route))))))
+
+    (insert-node node-before-insert-to node-to-insert)))
 
 (defmethod get-value (var-symbol graph)
     (output-value (gethash var-symbol (slot-to-output graph))))

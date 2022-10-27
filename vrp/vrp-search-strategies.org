@@ -3005,7 +3005,7 @@
        )
      #+END_SRC
 
-    
+     
 * Generic-functions for the blueprint-updates
 ** description
    In this section we'll add the generic functions that will be used to generate the code for a specific neighborhood criterion.
@@ -6036,6 +6036,68 @@
 
               )))
       #+END_SRC
+
+      #+RESULTS:
+      #+begin_example
+      ====================
+       Testing delta-cost
+      ====================
+
+      With cost: 15031
+      S1:
+	  R1: (1)
+	  R2: (3, 4)
+	  R3: (5)
+	  R4: (2)
+
+      code is:
+      (LAMBDA (SOLUTION PROBLEM ACTION &OPTIONAL (INITIAL-BEST-DELTA-COST 0))
+	(DECLARE (IGNORABLE INITIAL-BEST-DELTA-COST SOLUTION PROBLEM ACTION))
+	(LET* ((*VRP-STOP-NEIGHBORHOOD-SEARCH* NIL)
+	       (OPS-LIST NIL)
+	       (CURRENT-DELTA-COST 0)
+	       (WC (MAKE-WORKING-COPY (CLONE SOLUTION)))
+	       (BEST-NEIGHBOR NIL)
+	       (BEST-DELTA-COST INITIAL-BEST-DELTA-COST)
+	       (BEST-NEIGHBOR-AS-SOLUTION NIL))
+	  (PREPARE-SOLUTION-FOR-NEIGHBORHOOD-EXPLORATION WC)
+	  (DOSELECT-ROUTE (R1 WC)
+	    (DOSELECT-CLIENT (C1 R1 WC)
+	      (DOSELECT-ROUTE (R2 WC)
+		(DOSELECT-CLIENT (C2 R2 WC)
+		  (DOSELECT-ROUTE (R3 WC)
+		    (DOINSERT-CLIENT (C1 R3 WC)
+		      (DOSELECT-ROUTE (R4 WC)
+			(DOINSERT-CLIENT (C2 R4 WC)
+			  (SETF CURRENT-DELTA-COST
+				  (DELTA-COST (REVERSE OPS-LIST) WC PROBLEM ACTION))
+			  (IF (< CURRENT-DELTA-COST BEST-DELTA-COST)
+			      (THEN
+				(SETF BEST-NEIGHBOR (CLONE OPS-LIST))
+				(SETF BEST-DELTA-COST CURRENT-DELTA-COST)))))))))))
+	  (IF BEST-NEIGHBOR
+	      (THEN
+		(APPLY-SET-OF-OPERATIONS (REVERSE BEST-NEIGHBOR) WC)
+		(SETF BEST-NEIGHBOR-AS-SOLUTION (SOLUTION WC))
+		(SETF (COST BEST-NEIGHBOR-AS-SOLUTION)
+			(+ (COST SOLUTION) BEST-DELTA-COST))))
+	  (VALUES BEST-NEIGHBOR-AS-SOLUTION)))
+      After rararbrb we found...
+      With cost 27...
+      S1:
+	  R1: (1, 3)
+	  R2: (4)
+	  R3: (2, 5)
+      testing Yoel
+      S2:
+	  R1: (1, 3)
+	  R2: (4)
+	  R3: ()
+	  R4: (2, 5)
+
+      Cost: 27
+      #+end_example
+
 **** test for jump-around-strategy
 ***** testing the function
       #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
@@ -6928,6 +6990,7 @@
            )))
    #+END_SRC
 
+   #+RESULTS:
 ** test exploration (best-improvement )
    #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp 
    (with-cvrp-problem (p1 :distances `((0 2 3 4 5 6)  ;0
@@ -7611,6 +7674,39 @@
        (format t "the generated code:~%~a~%"
                (write-neighborhood-exploration-code bp1)))
      #+END_SRC
+
+     #+RESULTS:
+     #+begin_example
+     ===========================
+      Testing write-search-code
+     ===========================
+
+     the generated code:
+     (LAMBDA (SOLUTION PROBLEM ACTION &OPTIONAL (INITIAL-BEST-DELTA-COST 0))
+       (DECLARE (IGNORABLE INITIAL-BEST-DELTA-COST SOLUTION PROBLEM ACTION))
+       (LET* ((*VRP-STOP-NEIGHBORHOOD-SEARCH* NIL)
+	      (OPS-LIST NIL)
+	      (WC (MAKE-WORKING-COPY (CLONE SOLUTION)))
+	      (SOLUTIONS-REPEATED NIL)
+	      (CURRENT-TRIE (NEW-TRIE)))
+	 (PREPARE-SOLUTION-FOR-NEIGHBORHOOD-EXPLORATION WC)
+	 (INSERT-IN-TRIE (OPS-LIST-TO-LIST-OF-CLIENTS NIL WC) CURRENT-TRIE)
+	 (DOSELECT-ROUTE (R1 WC)
+	   (DOSELECT-CLIENT (C1 R1 WC)
+	     (DOINSERT-CLIENT (C1 R1 WC)
+	       (PROGN
+		(IF (=
+		     (INSERT-IN-TRIE (OPS-LIST-TO-LIST-OF-CLIENTS OPS-LIST WC)
+				     CURRENT-TRIE)
+		     1)
+		    (THEN
+		      (PUSH
+		       (LIST (CLONE (OPS-LIST-TO-LIST-OF-CLIENTS OPS-LIST WC))
+			     (CLONE (REVERSE OPS-LIST)))
+		       SOLUTIONS-REPEATED)))))))
+	 (VALUES SOLUTIONS-REPEATED)))
+     #+end_example
+
 *** testing the execution
      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
      (with-basic-solution (s1 ((1 2 3 4 5)))
@@ -7624,11 +7720,11 @@
               ;; (actual-solutions nil)
               )
 
-         (prepare-blueprint-for-code-generation
-          code1
-          +exhaustive-search-strategy+
-          spot-repeated-clients-strat
-          bp1)
+;;         (prepare-blueprint-for-code-generation
+;;          code1
+;;          +exhaustive-search-strategy+
+;;          spot-repeated-clients-strat
+;;          bp1)
 
          (prepare-solution-for-neighborhood-exploration wc)
 
@@ -7657,6 +7753,15 @@
 
          ))
      #+END_SRC
+
+     #+RESULTS:
+     : ==========================
+     :  testing repeated clients
+     : ==========================
+     : 
+     : repeated-clients:
+     : 
+
 *** testing the execution with Gabriela
      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
      (in-package :vrp)

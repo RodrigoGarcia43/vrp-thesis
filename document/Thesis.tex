@@ -1,0 +1,64 @@
+%\documentclass[11pt,oneside]{uhthesis}
+\documentclass[11pt,oneside]{report}
+\usepackage{subfigure}
+\usepackage[linesnumbered,lined,titlenumbered,ruled]{algorithm2e}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsbsy}
+\usepackage{mathpazo}
+\usepackage{float}
+\usepackage{braket}
+\setlength {\marginparwidth }{3cm}
+% \usepackage{todonotes}
+
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+
+\usepackage{listings}
+\usepackage{color}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{ragged2e}
+
+%\floatstyle{ruled}
+%\restylefloat{table}
+
+\renewcommand{\tablename}{Tabla}
+\title{Un sistema para la resolución del Problema de Enrutamiento de Vehículos en cualquiera de sus variantes}
+\author{Rodrigo García Gómez}
+% \advisor{MSc. Fernando Rodríguez Flores}
+% \coadvisor{}
+%\degree{Licenciado en Ciencias de la Computación}
+%\faculty{Facultad de Matemática y Computación}
+\date{Noviembre de 2022}
+%\logo{Graphics/uhlogo}
+
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d}#1}}
+
+\begin{document}
+\selectlanguage{spanish}
+
+% \frontmatter
+%\maketitle
+
+%\include{FrontMatter/Dedication}
+%\include{FrontMatter/Thanks}
+%\include{FrontMatter/SupervisorOpinion}
+\include{FrontMatter/Abstract}
+%\include{FrontMatter/Contents}
+
+
+% \mainmatter
+	
+\include{MainMatter/Introduction}
+\include{MainMatter/Background}
+
+
+%\backmatter
+\include{BackMatter/Conclusions}
+\include{BackMatter/Bibliography}
+\include{BackMatter/Glossary}
+
+
+\end{document}

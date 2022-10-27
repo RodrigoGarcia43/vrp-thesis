@@ -74,7 +74,7 @@
   ((output-copy :initform nil))
   :documentation "accumulator node for partial results in eval-graph"
   :constructor (new-accumulator-node (&key content output-value))
-  :print-object-string ("<Accumulator, value: ~a>" output-value)
+  :print-object-string ("<value: ~a>" output-value)
   :slots-for-obj= (content output-value)
   :slots-for-clone (content output-value))
 
@@ -98,7 +98,7 @@
   ()
   :documentation "vehicle node in eval-graph"
   :constructor (new-input-depot-node (&key content))
-  :print-object-string ("<Depot node, content: ~a, demand: ~a>" content demand-calculator)
+  :print-object-string ("<depot node ~a, ~%     first-distance-calculator: ~a, ~%     second-distance-calculator: ~a, ~%     demand-calculator: ~a>" content first-distance-calculator second-distance-calculator demand-calculator)
   :slots-for-obj= (content demand-calculator first-distance-calculator second-distance-calculator)
   :slots-for-clone (content demand-calculator first-distance-calculator second-distance-calculator))
 

@@ -1,6 +1,5 @@
 #+TITLE: Eval Graph Builder
-#+AUTHOR: Rodrigo Garía Gómez
-#+EMAIL: rodrigo.garcia21111@gmail.com
+#+AUTHOR: Rodrigo Garía G#+EMAIL: rodrigo.garcia21111@gmail.com
 
 
 * Description 
@@ -68,6 +67,27 @@ Here we define a function to convert a set of vrp-suite operations (=op-insert-c
 	(do-operations (`(,op ,a ,b ,c ,graph))))))
 
 #+END_SRC
+
+
+
+*** undo-suite-operations
+**** documentation
+Here we define a function to convert a set of vrp-suite operations (=op-insert-client=, =op-select-client=) into reverted eval-operations (=remove-client-from=, =insert-client-to=) and then call the =do-operations= macro. It recives the evaluation graph and the list of operations 
+**** code
+#+BEGIN_SRC lisp +n -r :results none :exports none :tangle ../src/eval-graph-builder.lisp
+  (defun undo-suite-operations (graph ops)
+    (loop for op in (reverse ops) do
+      (let* ((converted-op (revert-op op graph))
+	     (op (car converted-op))
+	     (a (car (cdr converted-op)))
+	     (b (car (cdr (cdr converted-op))))
+	     (c (car (cdr (cdr (cdr converted-op))))))
+	(do-operations (`(,op ,a ,b ,c ,graph))))))
+
+#+END_SRC
+
+
+
 
 ** beautify macros
 *** documentation
@@ -271,6 +291,17 @@ routes:
 >
 #+end_example
 
+** defallocable
+**** documentation
+A method to store partial or final values. Also creates accumulator
+nodes in the tape.
+**** code
+#+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-graph-builder.lisp
+(defmethod defallocable (output-slot value-of-slot graph)
+    (let* ((new-node (new-accumulator-node :output-value value-of-slot)))
+        (progn
+            (setf (gethash output-slot (slot-to-output graph)) new-node))))
+#+END_SRC
 ** increment-with
 *** documentation
 Statement used to increment an allocable with another one.

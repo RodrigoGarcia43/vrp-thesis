@@ -20,7 +20,7 @@
 		 "data/vrp-data-a-n65-k9.lisp"
 		 "data/vrp-data-a-n80-k10.lisp"
 		 "data/vrp-data-f-n135-k7.lisp"
-
+		 
 		 "src/neigh-configuration.lisp"
 		 "src/neigh-utilities.lisp"     
 		 "src/neigh-class-macros.lisp"
@@ -35,6 +35,7 @@
 		 "data/neigh-data.lisp"
 		 "src/neigh-strategies.lisp"
 		 "src/neigh-algorithms.lisp"
+		 "src/neigh-statistics.lisp"
 
 		 "src/eval-classes.lisp"
 		 "src/eval-methods.lisp"

@@ -1045,6 +1045,8 @@ The following elements are syntactic sugar, to make the code more natural to rea
 		      "data/neigh-data.lisp"
 		      "src/neigh-strategies.lisp"
 		      "src/neigh-algorithms.lisp"
+		      "src/neigh-statistics.lisp"
+
 
 		      "src/eval-classes.lisp"
 		      "src/eval-methods.lisp"

@@ -1,5 +1,5 @@
 #+TITLE: Eval Graph Builder
-#+AUTHOR: Rodrigo Garía Gómez
+#+AUTHOR: Rodrigo GarÃ­a GÃ³mez
 #+EMAIL: rodrigo.garcia21111@gmail.com
 
 
@@ -429,7 +429,7 @@ The total distance should be 50.
   <Input node, content: <r2: <cv:2. 0/18> (<d:0>: (<c4: 3> <c5: 2> <c6: 1>
                                                    <d:0>))>>
  
- client-buffer: #<HASH-TABLE :TEST EQL :COUNT 0 {1004D1E033}> 
+ client-buffer: #<HASH-TABLE :TEST EQL :COUNT 0 {1002D2ABB3}> 
 
  solution-track: S1: (0)
 routes:

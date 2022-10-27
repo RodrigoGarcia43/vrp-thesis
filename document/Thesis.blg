@@ -1,0 +1,59 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Thesis.aux
+A level-1 auxiliary file: FrontMatter/Dedication.aux
+A level-1 auxiliary file: FrontMatter/Thanks.aux
+A level-1 auxiliary file: FrontMatter/SupervisorOpinion.aux
+A level-1 auxiliary file: FrontMatter/Abstract.aux
+A level-1 auxiliary file: MainMatter/Introduction.aux
+A level-1 auxiliary file: MainMatter/Background.aux
+A level-1 auxiliary file: BackMatter/Bibliography.aux
+The style file: plain.bst
+Database file #1: Bibliography.bib
+Warning--empty journal in Daniela
+Warning--empty journal in Heidy
+Warning--empty journal in Camila
+Warning--empty journal in Hector
+Warning--empty journal in JJ
+You've used 6 entries,
+            2118 wiz_defined-function locations,
+            536 strings with 5105 characters,
+and the built_in function-call counts, 1352 in all, are:
+= -- 128
+> -- 48
+< -- 0
++ -- 21
+- -- 14
+* -- 66
+:= -- 252
+add.period$ -- 18
+call.type$ -- 6
+change.case$ -- 25
+chr.to.int$ -- 0
+cite$ -- 11
+duplicate$ -- 61
+empty$ -- 111
+format.name$ -- 14
+if$ -- 265
+int.to.chr$ -- 0
+int.to.str$ -- 6
+missing$ -- 6
+newline$ -- 33
+num.names$ -- 12
+pop$ -- 33
+preamble$ -- 1
+purify$ -- 19
+quote$ -- 0
+skip$ -- 43
+stack$ -- 0
+substring$ -- 50
+swap$ -- 1
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 24
+warning$ -- 5
+while$ -- 14
+width$ -- 7
+write$ -- 58
+(There were 5 warnings)

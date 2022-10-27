@@ -260,7 +260,7 @@ Inserts clients and calculates delta distance
 #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
   (defmethod insert-node append ((t-node input-distance-node) 
 				 (i-node input-distance-node))
-    (if (not (typep i-node 'input-depot-node))  
+    (if (not (typep (content i-node) 'basic-depot))  
 	(let* ((target-calc (first-distance-calculator t-node))
 	       (next-client t-node)
 	       (new-calc (new-increment-distance-node
@@ -429,7 +429,7 @@ In this section, we'll define some methods used to convert instances of vrp prob
 
 * methods to convert operations
 ** Description
-Here we'll define some methods to convert from a vrp-suite-operation (like =op-select-client=) into a eval-operation (like =remove-ent-from=)
+Here we'll define some methods to convert from a vrp-suite-operation (=op-select-client=) to an eval-operation (=remove-client-from=)
 
 ** generic
 #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
@@ -453,4 +453,33 @@ Here we'll define some methods to convert from a vrp-suite-operation (like =op-s
 #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
   (defmethod convert-op ((target operation-insert-client) graph)
     `(,#'insert-client-to ,(route target) ,(pos target) ,(operand target) ,graph))
+#+END_SRC
+
+
+* methods to revert operations
+** Description
+Here we'll define some methods to convert from a vrp-suite-operation (=op-select-client=) to his inversed eval-operation (=insert-client-to=)
+
+** generic
+#+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
+ (defgeneric revert-op (target graph))
+#+END_SRC
+
+** primary
+#+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
+(defmethod revert-op (target graph) ())
+#+END_SRC
+
+** specialization
+*** op-select-client
+#+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
+  (defmethod revert-op ((target operation-select-client) graph)
+    `(,#'insert-client-to ,(route target) ,(pos target) ,(operand target) ,graph))
+#+END_SRC
+
+
+*** op-insert-client
+#+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-methods.lisp
+  (defmethod revert-op ((target operation-insert-client) graph)
+    `(,#'remove-client-from ,(route target) ,(pos target) ,(operand target) ,graph))
 #+END_SRC

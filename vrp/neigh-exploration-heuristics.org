@@ -36,7 +36,7 @@
 ** Code
 
    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/neigh-exploration-heuristics.lisp 
-     (defun exploration-exploitation-algorithm (neighborhood eval-graph &optional (file-name "data") technique)
+     (defun exploration-exploitation-algorithm (neighborhood graph &optional (file-name "data") technique)
        ;; here we set the statistical technique that we are going to use
        (when technique
 	 (setf *statistical-technique* technique))
@@ -59,13 +59,14 @@
 	      ;; table to store the processed neighbor solutions
 	      (result-table (make-hash-table :test 'equal))
 
-	      (graph eval-graph)
 
 	      ;; data for intensification status
 	      on-intensification-phase
 	      region-ordered-intensification-list
 
-
+	      result
+	      a
+	      b
 	      ;; data for computing delta cost
 	      ;; (work-cop (basic-working-copy solution))
 	      ;; (action (delta-cvrp-action))
@@ -94,60 +95,68 @@
 		     ;; before the intensification phase
 
 		     (do-suite-operations graph current-ops-list)
+		     (setf a (clone (solution-track graph)))  
 		     (when on-exploration-phase
 		       (push (output-value (output graph))
 			     (gethash (from-coordinate-list-to-region-tuple current-solution)
 				      result-table)))
+		     (setf result (output-value (output graph)))
 
+		     (undo-suite-operations graph current-ops-list) 
+		     (setf b (clone (solution-track graph)))   
 		     ;; here we return the current operation list and its delta cost evaluation
-		     (values current-ops-list (output-value (output graph))))
+		     (values current-ops-list result a b)))
 
-		     ;; else branch
-		     ;; on this branch is when the transition between exploration and intensification
-		     ;; takes places, for that reason the statistical analysis is made in this branch.
-		     (progn
-		       (setf on-exploration-phase nil)
-		       (if on-intensification-phase
-			   ;; if branch
-			   (values nil nil)
-			   ;; else branch		      
-			   (let* ((non-exhausted-regions (mapcar #'(lambda (reg) (number-id reg))
-								 (remove-if #'(lambda (reg)
-										(is-exhausted-p reg))
-									    (region-list neighborhood)))))
-			     (if (null non-exhausted-regions)
-				 ;; then we have explore the entire neighborhood
-				 (progn
-				   ;; here we make a generator that always return nil
-				   (setf exploration-gen (lambda () nil)
-					 on-intensification-phase t)
-				   (values nil nil))
-				 ;; else
-				 (progn
-				   ;; use a statistical technique to compute an order for the non-exhausted neighborhhod
-				   ;; regions		      
-				   (setf region-ordered-intensification-list
-					 (funcall *statistical-technique*
-						  neighborhood
-						  result-table
-						  non-exhausted-regions
-						  file-name))
+	       ;; else branch
+	       ;; on this branch is when the transition between exploration and intensification
+	       ;; takes places, for that reason the statistical analysis is made in this branch.
+	       (progn
+		 (setf on-exploration-phase nil)
+		 (if on-intensification-phase
+		     ;; if branch
+		     (values nil nil)
+		     ;; else branch		      
+		     (let* ((non-exhausted-regions (mapcar #'(lambda (reg) (number-id reg))
+							   (remove-if #'(lambda (reg)
+									  (is-exhausted-p reg))
+								      (region-list neighborhood)))))
+		       (if (null non-exhausted-regions)
+			   ;; then we have explore the entire neighborhood
+			   (progn
+			     ;; here we make a generator that always return nil
+			     (setf exploration-gen (lambda () nil)
+				   on-intensification-phase t)
+			     (values nil nil))
+			   ;; else
+			   (progn
+			     ;; use a statistical technique to compute an order for the non-exhausted neighborhhod
+			     ;; regions		      
+			     (setf region-ordered-intensification-list
+				   (funcall *statistical-technique*
+					    neighborhood
+					    result-table
+					    non-exhausted-regions
+					    file-name))
 
-				   ;; here we make the sequential generator with the previously computed list
-				   (setf exploration-gen (sequential-exploration neighborhood
-										 region-ordered-intensification-list
-										 (* total-to-expl *intensification-proportion*)
-										 ))
-				   ;; now we are in the intensification phase
-				   (setf on-intensification-phase t
-					 current-solution (funcall exploration-gen))
+			     ;; here we make the sequential generator with the previously computed list
+			     (setf exploration-gen (sequential-exploration neighborhood
+									   region-ordered-intensification-list
+									   (* total-to-expl *intensification-proportion*)
+									   ))
+			     ;; now we are in the intensification phase
+			     (setf on-intensification-phase t
+				   current-solution (funcall exploration-gen))
 
-				   (let* (
-					  ;; here we compute the operation list for this coordinates
-					  (current-ops-list (from-coordinates-to-operations current-solution)))
-				     (do-suite-operations graph current-ops-list)
-				     (values current-ops-list (output-value (output graph)))))))))
-		     )))))
+			     (let* (
+				    ;; here we compute the operation list for this coordinates
+				    (current-ops-list (from-coordinates-to-operations current-solution)))
+			       (do-suite-operations graph current-ops-list)
+			       (setf a (clone (solution-track graph)))  
+			       (setf result (output-value (output graph)))  
+			       (undo-suite-operations graph current-ops-list) 
+			       (setf b (clone (solution-track graph)))  
+			       (values current-ops-list result a b)))))))
+	       )))))
    #+END_SRC
    
 
