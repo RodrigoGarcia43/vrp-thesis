@@ -10,12 +10,7 @@ In this file we'll define how to build and work over an evaluation graph, using 
     (in-package :vrp)
   #+END_SRC
 
-* macros
-** documentation
-Here we define some macros to many purposes. Some of them will be used
-to define neighbourhood criteria or to make the required operations, and
-the other ones will be used to "beautify" the evaluation code
-
+* auxiliar
 ** exploration macros 
 *** documentation
 These macros will be used to make the automatic evaluation during exploration
@@ -52,6 +47,8 @@ All the exploration operations must be declared as =(do-operations <list of oper
                                   (setf (gethash to-insert visited-op) t)))))))))
 #+END_SRC
 
+
+** functions
 *** do-suite-operations
 **** documentation
 Here we define a function to convert a set of vrp-suite operations (=op-insert-client=, =op-select-client=) into eval-operations (=remove-client-from=, =insert-client-to=) and then call the =do-operations= macro. It recives the evaluation graph and the list of operations 
@@ -67,7 +64,6 @@ Here we define a function to convert a set of vrp-suite operations (=op-insert-c
 	(do-operations (`(,op ,a ,b ,c ,graph))))))
 
 #+END_SRC
-
 
 
 *** undo-suite-operations
@@ -87,6 +83,58 @@ Here we define a function to convert a set of vrp-suite operations (=op-insert-c
 #+END_SRC
 
 
+
+*** neigh-tree-solution
+**** documentation
+This function recives a solution and returns a clone that has all the depots removed from the routes.
+**** code
+#+BEGIN_SRC lisp +n -r :results none :exports none :tangle ../src/eval-graph-builder.lisp
+  (defun neigh-tree-solution (solution)
+    (let ((new-solution (clone solution)))
+(loop for r in (routes new-solution) do
+(setf (clients r) (reverse (cdr (reverse (clients r)))))
+)
+new-solution))
+
+#+END_SRC
+**** test
+**** code
+#+BEGIN_SRC lisp +n -r :results output :exports none 
+  (let* (
+   (c1 (basic-cvrp-client 1 1))
+   (c2 (basic-cvrp-client 2 7))
+   (c3 (basic-cvrp-client 3 4))
+   (c4 (basic-cvrp-client 4 3))
+   (c5 (basic-cvrp-client 5 2))
+   (c6 (basic-cvrp-client 6 1))
+
+   (v1 (cvrp-vehicle 1 9))
+   (v2 (cvrp-vehicle 2 18))
+
+   (d0 (basic-depot))
+
+   ;; Solution for the eval-graph
+   ;; remember to start and end all the routes with depot
+   ;; the starting depot is placed in the previous-client slot
+   (r1 (route-for-simulation :id 1 :vehicle v1 :depot d0
+					  :clients (list c1 c2 c3 (clone d0)) :previous-client (clone d0)))
+   (r2 (route-for-simulation :id 2 :vehicle v2 :depot d0
+					  :clients (list c4 c5 c6 (clone d0)) :previous-client (clone d0)))
+
+   (s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+   (s2 (neigh-tree-solution s1)))
+
+   (format t "~a" s2))
+
+
+#+END_SRC
+
+#+RESULTS:
+: S1: (0)
+: routes:
+:   <r1: <cv:1. 0/9> (<d:0>: (<c1: 1> <c2: 7> <c3: 4>))>
+:   <r2: <cv:2. 0/18> (<d:0>: (<c4: 3> <c5: 2> <c6: 1>))>
 
 
 ** beautify macros
@@ -352,7 +400,7 @@ To mark a certain variable defined during evaluation as the output.
 (defmethod set-output (output-slot graph)
     (setf (output graph) (gethash output-slot (slot-to-output graph))))
 #+END_SRC
-** TODO deliver
+** deliver
 *** documentation
 Delivers pruduct to a demand client
 *** code

@@ -30,6 +30,22 @@
 	   (c (car (cdr (cdr (cdr converted-op))))))
       (do-operations (`(,op ,a ,b ,c ,graph))))))
 
+(defun undo-suite-operations (graph ops)
+  (loop for op in (reverse ops) do
+    (let* ((converted-op (revert-op op graph))
+	   (op (car converted-op))
+	   (a (car (cdr converted-op)))
+	   (b (car (cdr (cdr converted-op))))
+	   (c (car (cdr (cdr (cdr converted-op))))))
+      (do-operations (`(,op ,a ,b ,c ,graph))))))
+
+(defun neigh-tree-solution (solution)
+    (let ((new-solution (clone solution)))
+(loop for r in (routes new-solution) do
+(setf (clients r) (reverse (cdr (reverse (clients r)))))
+)
+new-solution))
+
 (defmacro def-var (name init-value graph)
     `(defallocable ',name ,init-value ,graph))
 

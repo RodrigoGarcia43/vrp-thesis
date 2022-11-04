@@ -6,7 +6,7 @@
 %===================================================================================
 
 \qquad 
-Los costos por transportación pueden representar hasta el 60 porciento de los costos logísticos de una empresa. Esto implica que para empresas con capitales millonarios, una buena planeación de las rutas de transportación puede marcar una diferencia igualmente millonaria.
+Los costos por transportación pueden representar hasta el 60 porciento de los costos logísticos de una empresa. Esto implica que para empresas con capitales millonarios, una buena planeación de sus rutas de transportación puede representar un ahorro igualmente millonari.
 
 El problema de enrutamiento de vehículos (VRP por sus siglas en inglñés) es un problema de optimización combinatoria cuyo objetivo en su forma más simple es, dado un conunto de clientes, un depósito y una flota de vehículos, encontrar una asignación de rutas que optimice ciertos criterios tales como tiempo y costos de transportación.
 
@@ -16,13 +16,13 @@ El hecho de ser problemas NP-Duros implica la falta de soluciones exactas óptim
 
 El proceso de solución de una instancia arbitraria de VRP es complejo y necesita de una considerable cantidad de tiempo. Siendo un problema de gran importancia tanto académica como industrial, ha inspirado la creación de numerosas herramientas y artículos científicos. Cabe destacar la biblioteca OR-Tools, un software de código abierto útil para resolver problemas de optimización combinatoria entre los que se encuentra VRP.
 
-En la facultad de Matemática y Computación de La Universidad de La Habana este ha sido tema de estudio desde hace unos 6 años y se ha logrado resolver diversas problemáticas. En particular, la metaheurística de búsqueda local infinitamente variable (IVNS) planteada por Camila Pérez en \cite{Camila}, la generación automática de gramáticas para IVNS hecha por Daniela Gonzáles en \cite{Daniela}, la exploración de vecindades a partir de la combinación de distintas estrategias de exploración y selección hecha por Heidy Abreu en \cite{Heidy}, el Árbol de vecindad y la exploración de dos fases fueron planteados por Héctor Massón en \cite{Hector} y el Grafo de evaluación para la evaluación automática y eficiente de soluciones creado por Jose Jorge Rodríguez en \cite{JJ}. Cada una resuelve por separado un problema distinto. 
+En la facultad de Matemática y Computación de La Universidad de La Habana este ha sido tema de estudio desde hace unos 6 años y se ha logrado resolver diversas problemáticas. En particular, la metaheurística de búsqueda local infinitamente variable (IVNS) planteada por Camila Pérez en \cite{Camila}, la generación automática de gramáticas para IVNS hecha por Daniela Gonzáles en \cite{Daniela}, la exploración de vecindades a partir de la combinación de distintas estrategias de exploración y selección hecha por Heidy Abreu en \cite{Heidy}, el Árbol de vecindad con generación de soluciones y la exploración de dos fases fueron planteados por Héctor Massón en \cite{Hector} y el Grafo de evaluación para la evaluación automática y eficiente de soluciones creado por Jose Jorge Rodríguez en \cite{JJ}. Cada una resuelve por separado un problema distinto. 
 
-Hasta el momento, para resolver una instancia de VRP por búsqueda local se le debe invertir muchísimo tiempo a programar aspectos como la forma de evaluar vecinos o de explorar vecindades. A partir de la unión de las ideas anteriores es posible resolver un VRP únicamente programando la evaluación de una solución. 
+Hasta el momento, para resolver una instancia de VRP por búsqueda local se le debe invertir muchísimo tiempo a programar aspectos como la forma de evaluar vecinos o de explorar vecindades. A partir de la unión de las ideas anteriores es posible resolver un VRP únicamente programando la evaluación de una solución y eso es, precisamente, lo que se pretende implementar. 
 
 
 \subsection*{Objetivos}
-El objetivo de este trabajo es diseñar e implementar un sistema que permita usar los beneficios de años anteriores de investigación para resolver cualquier VRP a partir de las características específicas del problema y el código de evaluación de una solución.
+El objetivo general de este trabajo es diseñar e implementar un sistema que permita usar los beneficios de años anteriores de investigación para resolver (casi) cualquier instancia de VRP mediante una búsqueda local, a partir del código de evaluación de una solución.
 
 \subsubsection*{Objetivos específicos}
 
@@ -33,6 +33,7 @@ El objetivo de este trabajo es diseñar e implementar un sistema que permita usa
 	\item Analizar los resultados obtenidos. Se utiliza el sistema para resolver instancias conocidas de problemas de VRP.
 \end{enumerate}
 
+La propuesta de creación de generadores de código prefabricados planteada por Heidy Abreu facilita la exploración de vecindades combinando diferentes estrategias, con trabajo humano mínimo. Al agregar el árbol de vecindad desarrollado por Héctor Massón se puede generar soluciones vecinas de una solución una inicial de forma simple y eficiente. Utilizando además el grafo de evaluación de Jose Jorge Rodríguez, se optimiza la evaluación y obtención de costo de las soluciones. El grafo de evaluación necesita que el usuario ingrese la forma de evaluar una solución y esto, junto con la descripción del problema, es lo único que el sistema requerirá para ejecutarse.
 
 \subsection*{Organización de la tesis}
 

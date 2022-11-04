@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.10.4)  13 OCT 2022 17:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.10.4)  27 OCT 2022 22:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -392,12 +392,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 2--4
 
 
 (./MainMatter/Introduction.tex
-Overfull \hbox (1.63116pt too wide) in paragraph at lines 8--10
-\OT1/ppl/m/n/10.95 pre-sas con ca-pi-ta-les mi-llo-na-rios, una bue-na pla-nea-
-ci[]on de las ru-tas de trans-
- []
-
-
 Overfull \hbox (7.52649pt too wide) in paragraph at lines 11--12
 []\OT1/ppl/m/n/10.95 El pro-ble-ma de en-ru-ta-mien-to de veh[]^^Pcu-los (VRP p
 or sus si-glas en ingl[]n[]es)
@@ -512,14 +506,14 @@ Here is how much of TeX's memory you used:
  21258 multiletter control sequences out of 15000+600000
  550027 words of font info for 69 fonts, out of 8000000 for 9000
  85 hyphenation exceptions out of 8191
- 30i,6n,36p,906b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 30i,6n,36p,936b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf
 -dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
 urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino
 /uplri8a.pfb>
-Output written on Thesis.pdf (14 pages, 169091 bytes).
+Output written on Thesis.pdf (14 pages, 169361 bytes).
 PDF statistics:
  74 PDF objects out of 1000 (max. 8388607)
  50 compressed objects within 1 object stream

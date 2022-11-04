@@ -1020,16 +1020,7 @@ The following elements are syntactic sugar, to make the code more natural to rea
 		      "src/vrp-neighborhood-simulation.lisp"
 		      "src/vrp-neighborhood-operations.lisp"
 		      "src/vrp-delta-cost.lisp"
-		      "src/vrp-search-strategies.lisp"
-		      "src/vrp-criteria.lisp"
-		      "src/vrp-algorithms.lisp"
-		      "data/vrp-data-a-n32-k5.lisp"
-		      "data/vrp-data-a-n33-k5.lisp"
-		      "data/vrp-data-a-n33-k6.lisp"
-		      "data/vrp-data-a-n37-k5.lisp"
-		      "data/vrp-data-a-n65-k9.lisp"
-		      "data/vrp-data-a-n80-k10.lisp"
-		      "data/vrp-data-f-n135-k7.lisp"
+		      ;;		      "src/vrp-search-strategies.lisp"
 
 		      "src/neigh-configuration.lisp"
 		      "src/neigh-utilities.lisp"     
@@ -1042,15 +1033,31 @@ The following elements are syntactic sugar, to make the code more natural to rea
 		      "src/neigh-compatibility.lisp"
 		      "src/neigh-exploration.lisp"
 		      "src/neigh-exploration-heuristics.lisp"
-		      "data/neigh-data.lisp"
 		      "src/neigh-strategies.lisp"
-		      "src/neigh-algorithms.lisp"
-		      "src/neigh-statistics.lisp"
 
+		      "src/neigh-statistics.lisp"
 
 		      "src/eval-classes.lisp"
 		      "src/eval-methods.lisp"
-		      "src/eval-graph-builder.lisp"))
+		      "src/eval-graph-builder.lisp"
+
+		      "src/prefabs-classes.lisp"
+		      "src/prefabs-functions.lisp"
+		      "src/prefabs-tutorials.lisp"
+
+		      "src/vrp-criteria.lisp"
+		      "src/vrp-algorithms.lisp"
+		      "data/vrp-data-a-n32-k5.lisp"
+		      "data/vrp-data-a-n33-k5.lisp"
+		      "data/vrp-data-a-n33-k6.lisp"
+		      "data/vrp-data-a-n37-k5.lisp"
+		      "data/vrp-data-a-n65-k9.lisp"
+		      "data/vrp-data-a-n80-k10.lisp"
+		      "data/vrp-data-f-n135-k7.lisp"
+
+		      "data/neigh-data.lisp"
+		      "src/neigh-algorithms.lisp"
+))
        (format t "Loading ~a...~%" f)
        (load f))
    #+END_SRC

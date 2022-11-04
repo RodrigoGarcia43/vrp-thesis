@@ -1,6 +1,5 @@
 #+TITLE: Neighborhood Exploration
-#+AUTHOR: Hector F. Masson
-#+EMAIL: h.masson1911@gmail.com
+#+AUTHOR: Hector F. Masso#+EMAIL: h.masson1911@gmail.com
 
 
 
@@ -134,6 +133,60 @@
 			   (from-index-to-coord-list (neighborhood obj) index)
 			 (incf index))))))))
    #+END_SRC
+
+** Random exploration
+   In this section I'll define a function to explore the neighborhood in a random way.
+   This function builds a generator, that returns a coordinate list for =n= random neighboors or /nil/ if =n= solutions has been explored.
+  
+   Note: I am assuming that first-index <= last-index.
+
+   #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/neigh-exploration.lisp 
+     (defmethod random-search ((obj neighborhood-tree) n)
+       (let* ((mapper (solution-mapper (search-state obj)))
+	      (count 1)
+	      (index (+ 1 (random (cardinality obj)))))
+
+	 #'(lambda ()
+	     (if (> count n)
+		 nil
+		 ;; get the content in the index-th position of the list
+		 (multiple-value-bind (content in-use) (gethash index mapper)
+		   (incf (number-of-analysed-solutions (search-state obj)))
+		   (if in-use
+		       ;; then we are going to return the content-th solution
+		       (prog1
+			   (from-index-to-coord-list obj content)
+			 (setf index (+ 1 (random (cardinality obj))))
+			 (incf count))
+		       ;; else we are going to return the index-th solution
+		       (prog1
+			   (from-index-to-coord-list obj index)
+			 (setf index (+ 1 (random (cardinality obj))))
+			 (incf count))))))))
+
+;;     (defmethod exhaustive-search ((obj neighborhood-region))
+;;       (let* ((mapper (solution-mapper (search-state obj)))
+;;	      (first-index (car (index-range obj)))
+;;	      (last-index (cdr (index-range obj)))
+;;	      (index (+ first-index (number-of-analysed-solutions (search-state obj)))))
+;;
+;;	 #'(lambda ()
+;;	     (if (> index last-index)
+;;		 nil
+;;		 ;; get the content in the index-th position of the list
+;;		 (multiple-value-bind (content in-use) (gethash index mapper)
+;;		   (incf (number-of-analysed-solutions (search-state obj)))
+;;		   (if in-use
+;;		       ;; then we are going to return the content-th solution
+;;		       (prog1
+;;			   (from-index-to-coord-list (neighborhood obj) content)
+;;			 (incf index))
+;;		       ;; else we are going to return the index-th solution
+;;		       (prog1
+;;			   (from-index-to-coord-list (neighborhood obj) index)
+;;			 (incf index))))))))
+   #+END_SRC
+
 
 ** Uniform exploration
    In this section I'll define a function to explore the neighborhood in an uniform way.
@@ -482,7 +535,7 @@
     #+END_SRC
 
 
-
+    
 * Combinatorial exploration
   In this section I'll write some code to explore the meighborhood in a combinatorial way.
   By combinatorial I mean, with solutions belonging to each =region=.
@@ -668,6 +721,7 @@
 		    nil))))
      #+END_SRC
 
+
 **** Exhaustive exploration
 
     #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/neigh-exploration.lisp 
@@ -675,6 +729,17 @@
 	(if (null total)
 	    (exhaustive-search obj)
 	    (let* ((gen (exhaustive-search obj)))
+	      (exploration-interface gen total))))
+    #+END_SRC
+
+
+**** Random exploration
+
+    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/neigh-exploration.lisp 
+      (defun random-exploration (obj n &optional total)
+	(if (null total)
+	    (random-search obj n)
+	    (let* ((gen (random-search obj n)))
 	      (exploration-interface gen total))))
     #+END_SRC
 

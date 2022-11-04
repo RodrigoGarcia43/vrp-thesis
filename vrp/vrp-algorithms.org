@@ -1,5 +1,6 @@
 #+TITLE: VRP solver environment
 #+AUTHOR: Fernando Rodriguez Flores
+#+AUTHOR: Rodrigo Garcia Gomez
 #+DATE 2018-08-30
 #+TODO: TODO WIP BROKEN | DONE
 
@@ -5540,3 +5541,197 @@
          )))
    #+END_SRC   
    
+
+* VRP-system VNS 
+** description
+   This is an algorithm that receives a problem, a list with several criteria prefabs and an evaluation graph. It gets the best neighbor according to the current criterion and, if the best-neighbor found with that criterion is better than the current one, repeat the process.  When we find a solution that is a local minimum to that criterion, we change the criterion.  If it is a local minimum to all the criteria we have, then we assume that it is a solution for the problem.
+
+
+*** code
+   #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-algorithms.lisp
+   ;; Variable Neighboorhood Search
+   (defun vns-vrp-system
+       (problem criteria graph
+        &key max-iter (print-mod 1))
+     "Solves the VRP problem using a VNS with the given criterion starting with the given solution. We assume that the initial solution has the cost slot bound. If the result is nil, then the initial solution is an optimum for that neighboorhood."
+     (declare (ignore print-mod))
+  
+     (let* ((current-index 0)
+            (number-of-criteria (length criteria))
+            (current-criterion nil)
+            (better-solution nil)
+            (current-solution (neigh-tree-solution (solution-track graph)))
+            (neighboorhoods-used 1)
+            )
+
+       (loop while (and (< current-index number-of-criteria)
+                        (<= neighboorhoods-used max-iter))
+
+             ;; let's set the current criterion
+             do (setf current-criterion (nth current-index criteria))          
+             ;; let's explore with the current criteria
+
+             ;; for debugging purposes
+             do (format t "Debug inside VNS.  Iteration ~a, criterion ~a"
+                        neighboorhoods-used current-index)
+
+             do (setf better-solution
+                      (funcall current-criterion
+                               current-solution problem graph))
+
+             do (if better-solution
+                    (then 
+                      ;; we found a better solution
+                      ;; update the current-solution
+                      (setf current-solution better-solution)
+                      ;; set the number-of-criteria to 0
+                      (setf current-index 0))
+                    (else
+                      ;; use the next criterion
+                      (incf current-index)))
+
+             ;; ;; ;;{{{ for debugging purposes
+             ;; do (format t "Debug inside VNS.  Iteration ~a, criterion ~a"
+             ;;         neighboorhoods-used current-index)
+             do (if better-solution
+                    (format t ", cost: ~a~%" (cost better-solution))
+                    (format t ".  Best solution found.~%"))
+             ;; ;; ;; end of debug.
+
+             ;; in any case, increment the number of neighboorhoods-used
+             do (incf neighboorhoods-used)
+
+             ;; ;; ;; for debugging purposes
+             ;; (format t "At the end of the while: ~a, ~a~%"
+             ;;         current-index number-of-criteria
+             ;;         ;; (< current-index number-of-criteria)
+             ;;         ;; (<= neighboorhoods-used max-iter)
+             ;;         )
+             ;; ;; ;; end of debugging purposes ;;}}}
+
+             )
+       ;; finally return the current solution
+       ;; if it is nil, then the initial solution is an optimum
+       (list current-solution
+             neighboorhoods-used
+             (<= neighboorhoods-used max-iter))))
+       #+END_SRC
+   
+*** tests
+**** rab, rarb, rarac
+#+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
+  (progn (defparameter c1 (basic-cvrp-client 1 1))
+	 (defparameter c2 (basic-cvrp-client 2 1))
+	 (defparameter c3 (basic-cvrp-client 3 4))
+	 (defparameter c4 (basic-cvrp-client 4 3))
+	 (defparameter c5 (basic-cvrp-client 5 2))
+	 (defparameter c6 (basic-cvrp-client 6 1))
+
+	 (defparameter v1 (cvrp-vehicle 1 10))
+	 (defparameter v2 (cvrp-vehicle 2 10))
+
+	 (defparameter d0 (basic-depot))
+
+	 ;; Solution for the eval-graph
+	 ;; remember to start and end all the routes with depot
+	 ;; the starting depot is placed in the previous-client slot
+	 (defparameter r1 (route-for-simulation :id 1 :vehicle v1 :depot d0
+						:clients (list c1 c2 c3 (clone d0)) :previous-client (clone d0)))
+	 (defparameter r2 (route-for-simulation :id 2 :vehicle v2 :depot d0
+						:clients (list c4 c5 c6 (clone d0)) :previous-client (clone d0)))
+
+	 (defparameter s1 (basic-solution :id 1 :routes (list r1 r2)))
+
+	 (defparameter dist-mat #2A((0 1 2 3 4 5 6)
+				    (1 0 9 2 7 3 2)
+				    (2 9 0 2 2 2 2)
+				    (3 2 2 0 8 2 1)
+				    (4 7 2 8 0 2 9)
+				    (5 3 2 2 2 0 1)
+				    (6 2 2 1 9 1 0)))
+	 (defparameter problem (finite-fleet-cvrp-problem :id 1 :clients (list c1 c2 c3 c4 c5 c6)
+							  :depot d0 :distance-matrix dist-mat :fleet (list v1 v2) ))
+
+	 (defparameter graph (init-graph s1)))
+
+  (let* ((best-solution-found nil))
+
+    ;; let's evaluate the solution
+
+    (progn
+      (def-var total-distance 0 graph)
+      (loop for r in (routes s1) do 
+	(progn
+	  (def-var route-distance 0 graph)
+	  (def-var route-demand (capacity (vehicle r)) graph) 
+	  (loop for c in (clients r) do 
+	    (progn
+	      (increment-distance (previous-client r) c route-distance dist-mat graph)
+	      (decrement-demand c route-demand graph) 
+	      (setf (previous-client r) c)))
+	  (increment-value total-distance route-distance graph)
+	  (apply-penalty route-demand total-distance 10 graph)) 
+	(return-value total-distance graph)))
+
+    (format t "initial cost: ~a~%" (output-value (output graph)))
+    (format t "initial solution: ~a~%" (solution-track graph))
+
+
+    (progn
+      (setf rab (make-neighborhood-criterion 
+		  `((select-route r1)
+		    (select-client c1 from r1)
+		    (insert-client c1 to r1))
+		  +exhaustive-search-strategy+ 
+		  +best-improvement+))
+
+      (setf rarb (make-neighborhood-criterion 
+		  `((select-route r1)
+		    (select-client c1 from r1)
+		    (select-route r2)
+		    (insert-client c1 to r2))
+		  +exhaustive-search-strategy+ 
+		  +best-improvement+))
+
+      (setf rarac (make-neighborhood-criterion 
+		   `((select-route r1)
+		     (select-client c1 from r1)
+		     (select-route r2)
+		     (select-client c2 from r2)
+		     (swap-clients c1 c2))
+		   +exhaustive-search-strategy+ 
+		   +best-improvement+))
+
+(setf criteria (list rab rarb rarac))
+
+     (format t "~a" (vns-vrp-system problem criteria graph :max-iter 10000000000))
+    ))
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+initial cost: 28
+initial solution: S1: (0)
+routes:
+  <r1: <cv:1. 0/10> (<d:0>: (<c1: 1> <c2: 1> <c3: 4> <d:0>))>
+  <r2: <cv:2. 0/10> (<d:0>: (<c4: 3> <c5: 2> <c6: 1> <d:0>))>
+
+Debug inside VNS.  Iteration 1, criterion 0, cost: 20
+Debug inside VNS.  Iteration 2, criterion 0.  Best solution found.
+Debug inside VNS.  Iteration 3, criterion 1, cost: 17
+Debug inside VNS.  Iteration 4, criterion 0.  Best solution found.
+Debug inside VNS.  Iteration 5, criterion 1, cost: 14
+Debug inside VNS.  Iteration 6, criterion 0, cost: 33
+Debug inside VNS.  Iteration 7, criterion 0.  Best solution found.
+Debug inside VNS.  Iteration 8, criterion 1, cost: 31
+Debug inside VNS.  Iteration 9, criterion 0.  Best solution found.
+Debug inside VNS.  Iteration 10, criterion 1.  Best solution found.
+Debug inside VNS.  Iteration 11, criterion 2.  Best solution found.
+(S1: (31)
+routes:
+  <r1: <cv:1. 0/10> (<d:0>: NIL)>
+  <r2: <cv:2. 0/10> (<d:0>: (<c2: 1> <c4: 3> <c5: 2> <c6: 1> <c3: 4> <c1: 1>))>
+
+ 12 T)
+#+end_example

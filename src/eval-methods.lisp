@@ -144,7 +144,7 @@
 
 (defmethod insert-node append ((t-node input-distance-node) 
 			       (i-node input-distance-node))
-  (if (not (typep i-node 'input-depot-node))  
+  (if (not (typep (content i-node) 'basic-depot))  
       (let* ((target-calc (first-distance-calculator t-node))
 	     (next-client t-node)
 	     (new-calc (new-increment-distance-node
@@ -163,12 +163,23 @@
 
 (defmethod insert-node append ((t-node input-demand-node) 
 			       (i-node input-demand-node))
-  (let* ((new-inc (new-decrement-capacity-node 
-		   :output-action (output-action (demand-calculator t-node))
-		   :input-with-demand i-node)))
-    (progn
-      (setf (demand-calculator i-node) new-inc)
-      `((,#'evaluate-low-level-node ,new-inc)))))
+  (if (not (typep (content t-node) 'basic-depot))
+      ;; if branch
+      (let* ((new-inc (new-decrement-capacity-node 
+		       :output-action (output-action (demand-calculator t-node))
+		       :input-with-demand i-node)))
+	(progn
+	  (setf (demand-calculator i-node) new-inc)
+	  `((,#'evaluate-low-level-node ,new-inc))))
+
+      ;; else branch
+      (let* ((new-inc (new-decrement-capacity-node 
+		       :output-action (output-action (demand-calculator (from-client (first-distance-calculator t-node)))) ;; TODO find a better way to do this. Why if for wathever reason t-nod is not distance-node
+		       :input-with-demand i-node)))
+	(progn
+	  (setf (demand-calculator i-node) new-inc)
+	  `((,#'evaluate-low-level-node ,new-inc)))))
+  )
 
 (defmethod insert-node append ((t-node input-distance-node) 
                                       (i-node input-depot-node))
@@ -249,3 +260,19 @@
 (defgeneric convert-op (target graph))
 
 (defmethod convert-op (target graph) ())
+
+(defmethod convert-op ((target operation-select-client) graph)
+  `(,#'remove-client-from ,(route target) ,(pos target) ,(operand target) ,graph))
+
+(defmethod convert-op ((target operation-insert-client) graph)
+  `(,#'insert-client-to ,(route target) ,(pos target) ,(operand target) ,graph))
+
+(defgeneric revert-op (target graph))
+
+(defmethod revert-op (target graph) ())
+
+(defmethod revert-op ((target operation-select-client) graph)
+  `(,#'insert-client-to ,(route target) ,(pos target) ,(operand target) ,graph))
+
+(defmethod revert-op ((target operation-insert-client) graph)
+  `(,#'remove-client-from ,(route target) ,(pos target) ,(operand target) ,graph))

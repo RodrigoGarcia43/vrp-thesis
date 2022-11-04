@@ -44,7 +44,7 @@
        (let* (
 	      ;; data for general purpose
 	      (problem (problem neighborhood))
-	      (solution (solution neighborhood))
+	      ;;(solution (solution neighborhood))
 	      ;; (code (criterion neighborhood))
 	      (num-clients (length (clients problem)))
 	      ;; (num-routes (length (routes solution)))
@@ -105,7 +105,7 @@
 		     (undo-suite-operations graph current-ops-list) 
 		     (setf b (clone (solution-track graph)))   
 		     ;; here we return the current operation list and its delta cost evaluation
-		     (values current-ops-list result a b)))
+		     (values current-ops-list result)))
 
 	       ;; else branch
 	       ;; on this branch is when the transition between exploration and intensification
@@ -150,13 +150,12 @@
 			     (let* (
 				    ;; here we compute the operation list for this coordinates
 				    (current-ops-list (from-coordinates-to-operations current-solution)))
-			       (do-suite-operations graph current-ops-list)
-			       (setf a (clone (solution-track graph)))  
+;;			       (do-suite-operations graph current-ops-list)
+;;			       (setf a (clone (solution-track graph)))  
 			       (setf result (output-value (output graph)))  
 			       (undo-suite-operations graph current-ops-list) 
-			       (setf b (clone (solution-track graph)))  
-			       (values current-ops-list result a b)))))))
-	       )))))
+;;			       (setf b (clone (solution-track graph)))  
+			       (values current-ops-list result)))))))))))
    #+END_SRC
    
 
