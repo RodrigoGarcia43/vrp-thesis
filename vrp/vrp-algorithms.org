@@ -5721,17 +5721,12 @@ Debug inside VNS.  Iteration 1, criterion 0, cost: 20
 Debug inside VNS.  Iteration 2, criterion 0.  Best solution found.
 Debug inside VNS.  Iteration 3, criterion 1, cost: 17
 Debug inside VNS.  Iteration 4, criterion 0.  Best solution found.
-Debug inside VNS.  Iteration 5, criterion 1, cost: 14
-Debug inside VNS.  Iteration 6, criterion 0, cost: 33
-Debug inside VNS.  Iteration 7, criterion 0.  Best solution found.
-Debug inside VNS.  Iteration 8, criterion 1, cost: 31
-Debug inside VNS.  Iteration 9, criterion 0.  Best solution found.
-Debug inside VNS.  Iteration 10, criterion 1.  Best solution found.
-Debug inside VNS.  Iteration 11, criterion 2.  Best solution found.
-(S1: (31)
+Debug inside VNS.  Iteration 5, criterion 1.  Best solution found.
+Debug inside VNS.  Iteration 6, criterion 2.  Best solution found.
+(S1: (17)
 routes:
-  <r1: <cv:1. 0/10> (<d:0>: NIL)>
-  <r2: <cv:2. 0/10> (<d:0>: (<c2: 1> <c4: 3> <c5: 2> <c6: 1> <c3: 4> <c1: 1>))>
+  <r1: <cv:1. 0/10> (<d:0>: (<c3: 4> <c1: 1>))>
+  <r2: <cv:2. 0/10> (<d:0>: (<c4: 3> <c5: 2> <c6: 1> <c2: 1>))>
 
- 12 T)
+ 7 T)
 #+end_example

@@ -373,134 +373,28 @@ The total distance should be 50.
 #+RESULTS:
 : 28
 
-Now let's extract client 2 from the solution. Client 2 is the client with index 2 in the route
-with index 1 in our solution. We'll use =remove-client-from= method which takes as paramenters
-the index of the route in the solution and the index of the client in the route and the graph.
-All index are zero-based. When a client is removed from a solution it is appended to a list
-in the tape which represents the previouslly removed clients.
-
-#+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
-(do-operations (`(,#'remove-client-from 1 2 0 ,graph)))
-#+END_SRC
-
-
-The new value of the =total-distance= should be 19. Great upgrade made by removing the client with high demand.
-
 #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-tutorial.lisp
-(format t "~a~%" graph)
+(progn 
+(format t "~a~%" (solution-track graph))
+(format t "~a~%" (output-value (output graph))))
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
-<EVAL-GRAPH: 
- output: <Accumulator, value: 19>  
- inputs: 
-  <Depot node, content: <d:0>, demand: NIL>
-  <Cliient node <c1: 1>, 
-     first-distance-calculator: <output: <Accumulator, value: 6>>, 
-     second-distance-calculator: <output: <Accumulator, value: 6>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 4>>>
-  <Cliient node <c2: 7>, 
-     first-distance-calculator: <output: <Accumulator, value: 6>>, 
-     second-distance-calculator: <output: <Accumulator, value: 6>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 4>>>
-  <Cliient node <c3: 4>, 
-     first-distance-calculator: <output: <Accumulator, value: 6>>, 
-     second-distance-calculator: <output: <Accumulator, value: 6>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 4>>>
-  <Depot node, content: <d:0>, demand: NIL>
-  <Vehicle node, content: <cv:1. 0/9>, accumulator: NIL>
-  <Input node, content: <r1: <cv:1. 0/9> (<d:0>: (<c1: 1> <c3: 4> <d:0>))>>
-  <Depot node, content: <d:0>, demand: NIL>
-  <Cliient node <c4: 3>, 
-     first-distance-calculator: <output: <Accumulator, value: 13>>, 
-     second-distance-calculator: <output: <Accumulator, value: 13>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 12>>>
-  <Cliient node <c5: 2>, 
-     first-distance-calculator: <output: <Accumulator, value: 13>>, 
-     second-distance-calculator: <output: <Accumulator, value: 13>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 12>>>
-  <Cliient node <c6: 1>, 
-     first-distance-calculator: <output: <Accumulator, value: 13>>, 
-     second-distance-calculator: <output: <Accumulator, value: 13>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 12>>>
-  <Depot node, content: <d:0>, demand: NIL>
-  <Vehicle node, content: <cv:2. 0/18>, accumulator: NIL>
-  <Input node, content: <r2: <cv:2. 0/18> (<d:0>: (<c4: 3> <c5: 2> <c6: 1>
-                                                   <d:0>))>>
- 
- client-buffer: #<HASH-TABLE :TEST EQL :COUNT 1 {1003CAFE73}> 
+: S1: (0)
+: routes:
+:   <r1: <cv:1. 0/10> (<d:0>: (<c1: 1> <c2: 1> <c3: 4> <d:0>))>
+:   <r2: <cv:2. 0/10> (<d:0>: (<c4: 3> <c5: 2> <c6: 1> <d:0>))>
+: 
+: 28
 
- solution-track: S1: (0)
-routes:
-  <r1: <cv:1. 0/9> (<d:0>: (<c1: 1> <c3: 4> <d:0>))>
-  <r2: <cv:2. 0/18> (<d:0>: (<c4: 3> <c5: 2> <c6: 1> <d:0>))>
->
-#+end_example
-
-... now let's insert the client extracted just after client 4 in the
-second route.  We provide the =insert-client-to= with the index of the
-client in the clients previouslly extracted list and the coordinates
-of the client before we want to insert the new client to.
 
 #+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
-(do-operations (`(,#'insert-client-to 2 2 0 ,graph)))
+(remove-client-from 1 2 0 graph)
 #+END_SRC
 
-The new value of the =total-distance= should be 21...
-
-#+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-tutorial.lisp
-(format t "~a~%"  graph)
+#+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
+(insert-client-to 2 2 0 graph)
 #+END_SRC
-
-#+RESULTS:
-#+begin_example
-<EVAL-GRAPH: 
- output: <Accumulator, value: 21>  
- inputs: 
-  <Depot node, content: <d:0>, demand: NIL>
-  <Cliient node <c1: 1>, 
-     first-distance-calculator: <output: <Accumulator, value: 6>>, 
-     second-distance-calculator: <output: <Accumulator, value: 6>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 4>>>
-  <Cliient node <c2: 7>, 
-     first-distance-calculator: <output: <Accumulator, value: 15>>, 
-     second-distance-calculator: <output: <Accumulator, value: 15>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 5>>>
-  <Cliient node <c3: 4>, 
-     first-distance-calculator: <output: <Accumulator, value: 6>>, 
-     second-distance-calculator: <output: <Accumulator, value: 6>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 4>>>
-  <Depot node, content: <d:0>, demand: NIL>
-  <Vehicle node, content: <cv:1. 0/9>, accumulator: NIL>
-  <Input node, content: <r1: <cv:1. 0/9> (<d:0>: (<c1: 1> <c3: 4> <d:0>))>>
-  <Depot node, content: <d:0>, demand: NIL>
-  <Cliient node <c4: 3>, 
-     first-distance-calculator: <output: <Accumulator, value: 15>>, 
-     second-distance-calculator: <output: <Accumulator, value: 15>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 5>>>
-  <Cliient node <c5: 2>, 
-     first-distance-calculator: <output: <Accumulator, value: 15>>, 
-     second-distance-calculator: <output: <Accumulator, value: 15>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 5>>>
-  <Cliient node <c6: 1>, 
-     first-distance-calculator: <output: <Accumulator, value: 15>>, 
-     second-distance-calculator: <output: <Accumulator, value: 15>>, 
-     demand-calculator: decrement-capacity: <Accumulator, value: 5>>>
-  <Depot node, content: <d:0>, demand: NIL>
-  <Vehicle node, content: <cv:2. 0/18>, accumulator: NIL>
-  <Input node, content: <r2: <cv:2. 0/18> (<d:0>: (<c4: 3> <c2: 7> <c5: 2>
-                                                   <c6: 1> <d:0>))>>
- 
- client-buffer: #<HASH-TABLE :TEST EQL :COUNT 0 {1003A5FE73}> 
-
- solution-track: S1: (0)
-routes:
-  <r1: <cv:1. 0/9> (<d:0>: (<c1: 1> <c3: 4> <d:0>))>
-  <r2: <cv:2. 0/18> (<d:0>: (<c4: 3> <c2: 7> <c5: 2> <c6: 1> <d:0>))>
->
-#+end_example
-
 
 
 Now, we apply some operations with the =do-suite-operations= function
@@ -517,7 +411,7 @@ Now, we apply some operations with the =do-suite-operations= function
 : 
 
 
-#+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
+#+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-tutorial.lisp
       (do-suite-operations graph (list (op-select-client 1 1 0) 
 				       (op-select-client 1 1 1)
 				       (op-select-client 1 1 2)
@@ -526,30 +420,99 @@ Now, we apply some operations with the =do-suite-operations= function
 				       (op-insert-client 2 5 2)))
 #+END_SRC
 
+#+RESULTS:
+: Penalizee node, action: <value: 10>, accumulator: <value: 3>> 
+: Penalizee node, action: <value: 10>, accumulator: <value: 2>> 
+: Penalizee node, action: <value: 11>, accumulator: <value: 6>> 
+: Penalizee node, action: <value: 11>, accumulator: <value: 2>> 
+
 
 #+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
-      (undo-suite-operations graph (list (op-insert-client 2 5 2)))
+      (do-suite-operations graph (list (op-insert-client 2 5 2)))
 #+END_SRC
 
 
 #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-tutorial.lisp
+(progn 
 (format t "~a~%" (solution-track graph))
+(format t "~a~%" (output-value (output graph))))
 #+END_SRC
 
 #+RESULTS:
 : S1: (0)
 : routes:
 :   <r1: <cv:1. 0/10> (<d:0>: (<d:0>))>
-:   <r2: <cv:2. 0/10> (<d:0>: (<c2: 1> <c4: 3> <c5: 2> <c6: 1> <c1: 1> <d:0>))>
+:   <r2: <cv:2. 0/10> (<d:0>: (<c2: 1> <c4: 3> <c5: 2> <c6: 1> <c3: 4> <c1: 1>
+:                              <d:0>))>
 : 
+: 31
 
 
 #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-tutorial.lisp
-(format t "~a~%" (output-value (output graph)))
+(format t "~a~%" graph)
 #+END_SRC
 
 #+RESULTS:
-: 10
+#+begin_example
+<EVAL-GRAPH: 
+ output: <value: 31>  
+ inputs: 
+  <depot node <d:0>, 
+     first-distance-calculator: NIL, 
+     second-distance-calculator: <output: <value: 0>>, 
+     demand-calculator: NIL>
+  <Cliient node <c1: 1>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <Cliient node <c2: 1>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <Cliient node <c3: 4>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <depot node <d:0>, 
+     first-distance-calculator: <output: <value: 0>>, 
+     second-distance-calculator: NIL, 
+     demand-calculator: decrement-capacity: ouput: <value: 10>>>
+  <Vehicle node, content: <cv:1. 0/10>, accumulator: NIL>
+  <Input node, content: <r1: <cv:1. 0/10> (<d:0>: (<d:0>))>>
+  <depot node <d:0>, 
+     first-distance-calculator: NIL, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: NIL>
+  <Cliient node <c4: 3>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <Cliient node <c5: 2>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <Cliient node <c6: 1>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: <output: <value: 11>>, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <depot node <d:0>, 
+     first-distance-calculator: <output: <value: 11>>, 
+     second-distance-calculator: NIL, 
+     demand-calculator: decrement-capacity: ouput: <value: -2>>>
+  <Vehicle node, content: <cv:2. 0/10>, accumulator: NIL>
+  <Input node, content: <r2: <cv:2. 0/10> (<d:0>: (<c2: 1> <c4: 3> <c5: 2>
+                                                   <c6: 1> <c3: 4> <c1: 1>
+                                                   <d:0>))>>
+ 
+ client-buffer: #<HASH-TABLE :TEST EQL :COUNT 0 {1001BD41B3}> 
+
+ solution-track: S1: (0)
+routes:
+  <r1: <cv:1. 0/10> (<d:0>: (<d:0>))>
+  <r2: <cv:2. 0/10> (<d:0>: (<c2: 1> <c4: 3> <c5: 2> <c6: 1> <c3: 4> <c1: 1>
+                             <d:0>))>
+>
+#+end_example
 
 #+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
   (undo-suite-operations graph (list (op-select-client 1 2 0) 
@@ -588,15 +551,15 @@ Now, we apply some operations with the =do-suite-operations= function
   <Cliient node <c1: 1>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: <output: <value: 11>>, 
-     demand-calculator: decrement-capacity: <value: 5>>>
+     demand-calculator: decrement-capacity: <value: 2>>>
   <Cliient node <c2: 1>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: <output: <value: 11>>, 
-     demand-calculator: decrement-capacity: <value: 3>>>
+     demand-calculator: decrement-capacity: <value: 2>>>
   <Cliient node <c3: 4>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: <output: <value: 11>>, 
-     demand-calculator: decrement-capacity: <value: 5>>>
+     demand-calculator: decrement-capacity: <value: 2>>>
   <depot node <d:0>, 
      first-distance-calculator: <output: <value: 0>>, 
      second-distance-calculator: NIL, 
@@ -610,15 +573,15 @@ Now, we apply some operations with the =do-suite-operations= function
   <Cliient node <c4: 3>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: <output: <value: 11>>, 
-     demand-calculator: decrement-capacity: <value: 3>>>
+     demand-calculator: decrement-capacity: <value: 2>>>
   <Cliient node <c5: 2>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: <output: <value: 11>>, 
-     demand-calculator: decrement-capacity: <value: 3>>>
+     demand-calculator: decrement-capacity: <value: 2>>>
   <Cliient node <c6: 1>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: <output: <value: 11>>, 
-     demand-calculator: decrement-capacity: <value: 3>>>
+     demand-calculator: decrement-capacity: <value: 2>>>
   <depot node <d:0>, 
      first-distance-calculator: <output: <value: 11>>, 
      second-distance-calculator: NIL, 
@@ -628,7 +591,7 @@ Now, we apply some operations with the =do-suite-operations= function
                                                    <c6: 1> <c3: 4> <c1: 1>
                                                    <d:0>))>>
  
- client-buffer: #<HASH-TABLE :TEST EQL :COUNT 0 {1003AC6653}> 
+ client-buffer: #<HASH-TABLE :TEST EQL :COUNT 0 {1004E361B3}> 
 
  solution-track: S1: (0)
 routes:

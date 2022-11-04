@@ -61,7 +61,7 @@ Here we define a function to convert a set of vrp-suite operations (=op-insert-c
 	     (a (car (cdr converted-op)))
 	     (b (car (cdr (cdr converted-op))))
 	     (c (car (cdr (cdr (cdr converted-op))))))
-	(do-operations (`(,op ,a ,b ,c ,graph))))))
+	(funcall op a b c graph))))
 
 #+END_SRC
 
@@ -78,7 +78,7 @@ Here we define a function to convert a set of vrp-suite operations (=op-insert-c
 	     (a (car (cdr converted-op)))
 	     (b (car (cdr (cdr converted-op))))
 	     (c (car (cdr (cdr (cdr converted-op))))))
-	(do-operations (`(,op ,a ,b ,c ,graph))))))
+	(funcall op a b c graph))))
 
 #+END_SRC
 
@@ -287,7 +287,7 @@ This method sums the distance between =from-client= and =to-client= but also mak
       (progn
 	(setf (second-distance-calculator input1) d-node)
 	(setf (first-distance-calculator input2) d-node)
-	(do-operations (`(,#'evaluate-low-level-node ,d-node))))))
+	(evaluate-low-level-node d-node)))))
 #+END_SRC
 
 *** test
@@ -363,7 +363,7 @@ Statement used to increment an allocable with another one.
 		  :partial-accumulator part-node)))
       (progn
 	(setf (updater part-node) updt)
-	(do-operations (`(,#'evaluate-low-level-node ,updt))))))
+	(evaluate-low-level-node updt))))
 #+END_SRC
 
 *** test
@@ -406,14 +406,14 @@ Delivers pruduct to a demand client
 *** code
 #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/eval-graph-builder.lisp
   (defmethod deliver (c capacity-slot-accumulator graph)
-    (if (not (typep c 'basic-depot)) ; TODO: look for a better way to do this
+    ;;(if (not (typep c 'basic-depot))
 	(let* ((c-node (gethash c (class-to-io graph)))
 	       (acc (gethash capacity-slot-accumulator (slot-to-output graph)))
 	       (c-calc (new-decrement-capacity-node :output-action acc :input-with-demand c-node)))
 	  (progn
 	  
 	    (setf (demand-calculator c-node) c-calc)
-	    (evaluate-low-level-node c-calc)))))
+	    (evaluate-low-level-node c-calc))))
 
 #+END_SRC
 ** penalize
