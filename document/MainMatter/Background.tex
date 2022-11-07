@@ -69,9 +69,6 @@ Una buena herramienta para resolver problemas de VRP en la actualidad es la bibl
 
 NOTA PARA FERNANDO: Profe, no sé qué más poner aquí XD.
 
-\section{Combinación de estrategias de exploración y selección.}\label{2-Heidy} 
-TODO
-
 \section{Árbol de vecindad y exploración de dos fases}\label{2-Hector}
 La exploración de vecindades puede ser ineficiente y difícil de programar. La idea que se propone es utilizar técnicas estadísticas para analizar cuáles son las mejores regiones de las vecindades para intensificar la búsqueda en estas.
 
@@ -127,7 +124,7 @@ necesaria para cualquier procesamiento posterior sobre dicha vecindad en
 una estructura arbórea que será llamada árbol de vecindad y que constituye
 una representación de la vecindad en cuestión. En \ref{fig:neigh-tree} se muestra una representación del árbol de vecindad asociado a l criterio \textbf{mover cliente} ($rarb$). Cada nodo del árbol, representa una
 operación de vecindad y almacena toda la información necesaria para instanciar dicha operación y de esta forma, a partir del proceso que computa
-la cardinalidad de la vecindad, se pueden pasar a generar todas las soluciones de la misma.
+la cardinalidad de la vecindad, se puede pasar a generar todas las soluciones de la misma.
 
 
 % TODO: \usepackage{graphicx} required
@@ -140,13 +137,107 @@ la cardinalidad de la vecindad, se pueden pasar a generar todas las soluciones d
 
 Cada rama del árbol representa un conjunto de soluciones, por tanto, el conjunto de ramas representa una partición de la vecindad a la que está asociado dicho árbol. A los conjuntos hechos por esta partición se les denomina regiones y resultan útiles para encontrar características compartidas en grupos de vecindades. Por ejemplo, es conveniente analizar cuáles son las regiones con mejores soluciones para intensificar en estas la búsqueda de soluciones óptimas.
 
+Luego de generadas las soluciones a partir del Árbol de Vecindad, es necesario conocer sus costos. Para esto se utiliza un Grafo de Evaluación.
+
 \section{Grafo de Evaluación}\label{2-JJ}
-TODO
+Durante la exploración de las vecindades es (generalmente) necesario evaluar las soluciones que se van analizando. Ya sea para retornar inmediatamente una solución mejor a la inicial (estrategia de selección de primera mejora), para devolver la mejor solución (estrategia de selección de mejor vecino) o un vecino aleatorio entre todos los que mejoren la solución (estrategia de selección de mejor vecino aleatorio), en todos los casos hay que determinar el costo de las soluciones exploradas para analizar lo que es "mejor". Encontrar el costo de una solución es lo que se denomina como evaluar.
+
+La evaluación de soluciones es potencialmente costosa. En el caso más simple se debe sumar las distancias entre cada cliente de cada ruta y el depósito. Agregar restricciones implica análisis extra como la aplicación de penalizaciones a rutas con vehículos sobrecargados en el caso de CVRP.
+
+El Grafo de Evaluación, propuesto por Jose Jorge Rodríguez en \ref{2-JJ}, permite evaluar soluciones vecinas a una solución inicial de forma eficiente ya que garantiza que sólo se recalculan los fragmentos de las nuevas soluciones en los que estas se diferencien de la solución inicial.
+
+La estructura propuesta es una representación en forma de grafo de la evaluación de la función objetivo en una determinada solución. Sus nodos están divididos en dos tipos: Nodos de alto nivel y nodos de bajo nivel. Los nodos de bajo nivel representan operaciones (incremento, decremento) que reciben como entradas ciertos nodos de alto nivel y modifican con sus salidas otros nodos de alto nivel.
+
+Por ejemplo, en \ref{fig:eval-graph-1} se muestran los nodos de alto nivel del grafo que representa la solución:
+
+\begin{equation}
+s = [(c_1,c_2), (c_3,c_4)]
+\end{equation}
+
+Nótese que todas las rutas en el grafo comienzan y terminan con el nodo que representa al depósito. El nodo $cost$ almacena el valor del costo total de la solución.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-1}
+	\caption{Nodos de alto nivel en un grafo de evaluación que representa la solución $s1$ de VRP clásico.}
+	\label{fig:eval-graph-1}
+\end{figure}
+
+En \ref{fig:eval-graph-2} se muestra una representación del grafo completo para esta solución. Los nodos con símbolo de incremento son nodos de bajo nivel que toman como entrada dos nodos clientes (o depósito) y como salida adicionan al nodo de costo total la distancia entre ellos.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-2}
+	\caption{Grafo de evaluación que representa la solución $s1$ de VRP clásico.}
+	\label{fig:eval-graph-2}
+\end{figure}
+
+En \ref{fig:eval-graph-3} se transforma el problema en CVRP utilizando la misma solución. En este caso se agregan los nodos de alto nivel $cap$ que tienen como valor inicial la capacidad del vehículo perteneciente a cada ruta. Los nodos de decremento reciben un cliente como entrada y, como salida, disminuyen la capacidad del vehículo en una cantidad igual a la demanda del cliente. Luego, los nodos $pen$ (también de bajo nivel) reciben como entrada los nodos de capacidad y, en caso de tener estos valor negativo, como salida penalizan el costo total de la solución.
+
+ \begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-3}
+	\caption{Grafo de evaluación que representa la solución $s1$ de VRP con restricciones de capacidad.}
+	\label{fig:eval-graph-3}
+\end{figure}
+
+Todos los nodos de bajo nivel tienen asociado una función \textbf{evaluate} (para evaluar) y una función \textbf{undo} (para desevaluar) que son ejecutados cuando se agregan o remueven nodos de alto nivel. Por ejemplo, retirar un cliente $C1$ del grafo representado en \ref{fig:eval-graph-2} (VRP clásico) provoca que los dos nodos de incremento que utilizan dicho cliente como entrada se desevalúen y al mismo tiempo se crea un nuevo nodo incremento que recibe como entrada $d$ y $c2$. Luego, insertar a $c1$ al final de la ruta $r2$ implicaría desevaluar el nodo incremento que recibe como entrada a $c4$ y $d$ mientras se crean dos nodos incrementos nuevos, uno recibiendo de entrada a $c4$ y $c1$ mientras que el otro a $c1$ y $d$. El resultado de estas dos operaciones se muestra en \ref{fig:eval-graph-4} y es, precisamente, el grafo resultante de aplicar la siguiente instanciación del criterio $rarb$:
+
+\begin{itemize}
+	\item Seleccionar ruta (r1).
+	\item Seleccionar cliente (c1) en ruta (r1).
+	\item Seleccionar ruta (r2).
+	\item Insertar cliente (c1) en posición (3) en ruta (r2).
+\end{itemize}
+
+Nótese que luego de aplicar los métodos \textbf{evaluate} y \textbf{undo} correspondientes el nodo $cost$ tiene almacenado el costo de la solución resultante luego de aplicar una instancia del criterio $rarb$. Para encontrar el costo de la nueva solución sólo fue necesario analizar y modificar los nodos en que el grafo de la solución nueva se diferencia con la solución anterior y no todo el grafo. En esto se basa la evaluación "eficiente" del Grafo de Evaluación.
+
+ \begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-4}
+	\caption{Grafo de evaluación que representa la solución $s1$ de VRP clásico luego de aplicada una instancia de $rarb$}
+	\label{fig:eval-graph-4}
+\end{figure}
+
+Para construir el grafo que representa la solución inicial el usuario debe ingresar el códio de evaluación de esa primera solución. Luego, los costos el resto de las soluciones generadas son obtenidos al aplicar operaciones sobre el grafo inicializado.
+
+Para explorar una vecindad a partir de un criterio es necesario (además de generar y evaluar soluciones) decidir e implementar estrategias de exploración y de selección. A partir de combinaciones de diferentes estrategias se pueden realizar montones de exploraciones distintas.
+
+
+\section{Combinación de estrategias de exploración y selección.}\label{2-Heidy} 
+En el proceso de exploración de una vecindad se parte de una solución inicial, se generan soluciones vecinas a esta (con el Árbol de vecindad) y se evalúan para comparar y obtener mejores soluciones (Grafo de Evaluación). Al explorar, deben también tenerse en cuenta problemas tales como la cardinalidad potencialmente enorme de los vecinos o el retorno de mínimos locales. Para una vecindad muy poblada tal vez dé mejor resultado explorar no todos sus vecinos, sino una porción aleatoria de estos. Tal vez retornar siempre al mejor vecino de cada vecindad pueda provocar el encuentro de un mínimo local que se hubiera evitado seleccionando aleatoriamente cualquier solución que mejorara la inicial.
+
+Al espectro de búsqueda de vecinos en una vecindad se le denomina estrategia de exploración. Algunos ejemplos son:
+
+\begin{itemize}
+	\item Exploración exhaustiva: Se analizan todos los vecinos que puedan ser generados.
+	\item Exploración aleatoria: Se genera una cantidad fija de vecinos menor que la cardinalidad de la vecindad. La decisión de qué vecinos generar es aleatoria.
+\end{itemize}
+
+Además de decidir qué vecinos explorar, también es necesario decidir cuál retornar entre aquellos que mejoran la solución. A esta decisión se le denomina estrategia de selección. Se tiene como ejemplos:
+
+\begin{itemize}
+	\item Mejor vecino: Se retorna al mejor vecino entre todos aquellos analizados.
+	\item Primera mejora: En el momento en que se encuentra un vecino mejor que el inicial, este es retornado.
+	\item Mejora aleatoria: Se retorna un vecino aleatorio entre todos aquellos mejores que la solución inicial.
+\end{itemize}
+
+A partir de distintas combinaciones de estrategias de exploración y selección es posible realizar numerosas exploraciones distintas que obtengan diferentes resultados.
+
+La propuesta de Heidy Abreu en \cite{Heidy} permite generar funciones de exploración fabricadas a partir de un criterio, una estrategia de selección y una de exploración. Las estrategias se definen como clases que se pasan como instancias a la función generadora. La función resultante recibe el problema con una solución inicial, ejecuta la exploración y retorna una solución mejor en caso de existir dentro de la vecindad definida por el criterio. En este trabajo, el árbol de vecindad y el grafo de evaluación forman parte también de las funciones de exploración creadas. Un árbol de vecinad genera las soluciones y un grafo de evaluación de usa para evaluarlas. El grafo debe ser pasado como entrada.
+
+La creación automática de funciones de exploración con distintas combinaciones de estrategias de exploración y selección se logra aprovechando sus características comunes y estructuras similares. El código generado en todas las funciones se reparte en cinco regiones que se  unen para generar una función completa. Las regiones y el tipo de código que pertenece a cada una se explicarán en \ref{TODO}.
+
+El trabajo de generación de código y la creación de funciones a partir de estrategias diferentes se facilita mucho gracias a las características del lenguaje Common Lisp.
 
 \section{Common Lisp y sus funcionalidades}\label{2-Lisp}
 Common Lisp es un lenguaje de programación multi paradigma (soporta una combinación de paradigmas de programación tales como la programación imperativa, funcional y orientada a objetos). Facilita el desarrollo de software evolutivo e incremental, con la compilación iterativa de programas eficientes en tiempo de ejecución.
 
-NOTA PARA FERNANDO: Tampoco sé muy bien qué decir aquí. Pensaba en explicar el modo .org y cómo se van tangleando los scripts y eso, pero me parece que eso es emacs, ¿no? *emoji pensativo*. O puedo hablar de lo útil que resulta la herencia múltiple para definir las clases a partir de la combinación de varias clases abstractas y cómo se usa esto después en los métodos para ver qué especializaciones usar... Pero en esta parte me parece violación pues no he explicado nada de código *otro emoji pensativo*
+El lenguaje acepta herencia múltiple. Esta característica permite crear jerarquías con clases que implementan funcionalidades de varias clases superiores. Por ejemplo, la clase que representa la estrategia de selección de mejor vecino (\textbf{best-improvement}) hereda de una clase que indica  retorno de mejor solución (\textbf{return-best-solution}) y de otra que indica el uso de un grafo de evaluación (\textbf{use-eval-graph}).
+
+La herencia útil resulta especialmente útil para el presente trabajo cuando se combina con el sistema CLOS (Common Lisp Object System). Un mismo método puede tener numerosas implementaciones (especificaciones) que se ejecutan de acuerdo a los tipos de los parámetros proveídos como entradas. Además, también se ejecutan todas las especificaciones cuyos parámetros coincidan con los ancestros de los tipos de las entradas. Todas las especificaciones se combinan alrededor de un método primario conformando un único método con la unión de todos los códigos. El orden en que se combinan los métodos depende del orden de herencia y de los parámetros :before, :around y :after con que se definen.
+
+Como ejemplo se tiene que para generar el código de la función de exploración para la estrategia de selección de menor vecino se une el código de métodos cuyo parámetro de \text{search-strategy} tenga tipo \textbf{best-improvement}, \textbf{return-best-solution}, \textbf{use-eval-graph} y cualquier otra clase que herede de alguna de estas.
 
 
 

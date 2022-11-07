@@ -287,7 +287,7 @@ This method sums the distance between =from-client= and =to-client= but also mak
       (progn
 	(setf (second-distance-calculator input1) d-node)
 	(setf (first-distance-calculator input2) d-node)
-	(evaluate-low-level-node d-node)))))
+	(evaluate-low-level-node d-node))))
 #+END_SRC
 
 *** test

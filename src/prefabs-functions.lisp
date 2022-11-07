@@ -377,7 +377,7 @@
              (then
                (do-suite-operations graph best-neighbor)
                (setf best-neighbor-as-solution
-                     (solution-track graph))
+                     (neigh-tree-solution (solution-track graph)))
                (setf (cost best-neighbor-as-solution)
                      best-cost)))
         (code-outside-the-loop where-to-store-it)))

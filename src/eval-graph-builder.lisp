@@ -28,7 +28,7 @@
 	   (a (car (cdr converted-op)))
 	   (b (car (cdr (cdr converted-op))))
 	   (c (car (cdr (cdr (cdr converted-op))))))
-      (do-operations (`(,op ,a ,b ,c ,graph))))))
+      (funcall op a b c graph))))
 
 (defun undo-suite-operations (graph ops)
   (loop for op in (reverse ops) do
@@ -37,7 +37,7 @@
 	   (a (car (cdr converted-op)))
 	   (b (car (cdr (cdr converted-op))))
 	   (c (car (cdr (cdr (cdr converted-op))))))
-      (do-operations (`(,op ,a ,b ,c ,graph))))))
+      (funcall op a b c graph))))
 
 (defun neigh-tree-solution (solution)
     (let ((new-solution (clone solution)))
@@ -82,7 +82,7 @@ new-solution))
     (progn
       (setf (second-distance-calculator input1) d-node)
       (setf (first-distance-calculator input2) d-node)
-      (do-operations (`(,#'evaluate-low-level-node ,d-node))))))
+      (evaluate-low-level-node d-node))))
 
 (defmethod defallocable (output-slot value-of-slot graph)
     (let* ((new-node (new-accumulator-node :output-value value-of-slot)))
@@ -97,20 +97,20 @@ new-solution))
 		:partial-accumulator part-node)))
     (progn
       (setf (updater part-node) updt)
-      (do-operations (`(,#'evaluate-low-level-node ,updt))))))
+      (evaluate-low-level-node updt))))
 
 (defmethod set-output (output-slot graph)
     (setf (output graph) (gethash output-slot (slot-to-output graph))))
 
 (defmethod deliver (c capacity-slot-accumulator graph)
-  (if (not (typep c 'basic-depot)) ; TODO: look for a better way to do this
+  ;;(if (not (typep c 'basic-depot))
       (let* ((c-node (gethash c (class-to-io graph)))
 	     (acc (gethash capacity-slot-accumulator (slot-to-output graph)))
 	     (c-calc (new-decrement-capacity-node :output-action acc :input-with-demand c-node)))
 	(progn
 
 	  (setf (demand-calculator c-node) c-calc)
-	  (evaluate-low-level-node c-calc)))))
+	  (evaluate-low-level-node c-calc))))
 
 (defmethod penalize (input-slot-accum output-slot-accum p-factor graph)
     (let* ((i-node (gethash input-slot-accum (slot-to-output graph)))

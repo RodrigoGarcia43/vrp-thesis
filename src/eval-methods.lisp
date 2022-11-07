@@ -16,15 +16,16 @@
                (id (content (from-client ll-node))) 
                (id (content (to-client ll-node)))))
        (if (updater (output-action ll-node))
-           `(,#'undo-low-level-node ,(updater (output-action ll-node)))
+           (undo-low-level-node (updater (output-action ll-node)))
             nil)))
 
 (defmethod evaluate-low-level-node ((ll-node decrement-capacity-node))
-   (progn
-         (decf (output-value (output-action ll-node)) 
-               (demand (content (input-with-demand ll-node))))
-         (if (updater (output-action ll-node))
-          `(,#'undo-low-level-node ,(updater (output-action ll-node))))))
+  (progn
+    (if (not (typep (content (input-with-demand ll-node)) 'basic-depot))
+	(decf (output-value (output-action ll-node)) 
+	      (demand (content (input-with-demand ll-node)))))
+    (if (updater (output-action ll-node))
+	  (undo-low-level-node (updater (output-action ll-node))))))
 
 (defmethod evaluate-low-level-node ((ll-node increment-accumulator-node))
    (progn
@@ -53,13 +54,14 @@
                (id (content (from-client ll-node))) 
                (id (content (to-client ll-node)))))
        (if (updater (output-action ll-node))
-           `((,#'undo-low-level-node ,(updater (output-action ll-node)))))))
+           (undo-low-level-node (updater (output-action ll-node))))))
 
 (defmethod undo-low-level-node ((ll-node decrement-capacity-node))
-   (progn
-         (incf (output-value (output-action ll-node)) 
-               (demand (content (input-with-demand ll-node))))
-         nil))
+  (progn
+    (if (not (typep (content (input-with-demand ll-node)) 'basic-depot))
+	(incf (output-value (output-action ll-node)) 
+	      (demand (content (input-with-demand ll-node)))))
+    nil))
 
 (defmethod undo-low-level-node :after ((ll-node increment-accumulator-node))
     (progn 
@@ -84,7 +86,7 @@
             (setf (output-copy (partial-accumulator ll-node)) 
                   (min 0 (output-value (partial-accumulator ll-node))))
             (if (updater (output-action ll-node))
-                `((,#'undo-low-level-node ,(updater (output-action ll-node))))))))
+                (undo-low-level-node (updater (output-action ll-node)))))))
 
 (defgeneric remove-node (t-node)
     (:method-combination append))
@@ -111,30 +113,30 @@
 	    (setf (first-distance-calculator (to-client new-inc))
 		  new-inc)
 
-	    `((,#'evaluate-low-level-node ,new-inc)))))))
+	    (evaluate-low-level-node new-inc))))))
 
 (defmethod remove-node append ((t-node input-demand-node))
    (if (not (typep t-node 'input-depot-node))
      (progn
       (undo-low-level-node (demand-calculator t-node))
-      `((,#'undo-low-level-node ,(updater (output-action (demand-calculator t-node))))))))
+      (undo-low-level-node (updater (output-action (demand-calculator t-node)))))))
 
 (defmethod remove-node append ((t-node input-depot-node))
       (if (second-distance-calculator t-node)
-        `((,#'undo-low-level-node ,(new-increment-distance-node
+        (undo-low-level-node (new-increment-distance-node
                                     :previous-node (previous-node (second-distance-calculator t-node))
                                     :next-node (next-node (second-distance-calculator t-node))
                                      :output-action(output-action (second-distance-calculator t-node))
                                      :from-client (from-client (second-distance-calculator t-node))
                                      :to-client (to-client (second-distance-calculator t-node))
-                                     :distance-matrix (distance-matrix (second-distance-calculator t-node)))))
-        `((,#'undo-low-level-node ,(new-increment-distance-node
+                                     :distance-matrix (distance-matrix (second-distance-calculator t-node))))
+        (undo-low-level-node (new-increment-distance-node
                                     :previous-node (previous-node (first-distance-calculator t-node))
                                     :next-node (next-node (first-distance-calculator t-node))
                                      :output-action(output-action (first-distance-calculator t-node))
                                      :from-client (from-client (first-distance-calculator t-node))
                                      :to-client (to-client (first-distance-calculator t-node))
-                                     :distance-matrix (distance-matrix (first-distance-calculator t-node)))))))
+                                     :distance-matrix (distance-matrix (first-distance-calculator t-node))))))
 
 (defgeneric insert-node (t-node i-node)
     (:method-combination append))
@@ -158,28 +160,27 @@
 	  (setf (first-distance-calculator i-node) target-calc)
 	  (setf (second-distance-calculator i-node) new-calc)
 	  (setf (first-distance-calculator t-node) new-calc)
-	  `((,#'evaluate-low-level-node ,target-calc)
-	    (,#'evaluate-low-level-node ,new-calc))))))
+	  (evaluate-low-level-node target-calc)
+	  (evaluate-low-level-node new-calc)))))
 
 (defmethod insert-node append ((t-node input-demand-node) 
-			       (i-node input-demand-node))
-  (if (not (typep (content t-node) 'basic-depot))
-      ;; if branch
-      (let* ((new-inc (new-decrement-capacity-node 
-		       :output-action (output-action (demand-calculator t-node))
-		       :input-with-demand i-node)))
-	(progn
-	  (setf (demand-calculator i-node) new-inc)
-	  `((,#'evaluate-low-level-node ,new-inc))))
+				 (i-node input-demand-node))
+;;    (if (not (typep (content t-node) 'basic-depot))
+	;; if branch
+	(let* ((new-inc (new-decrement-capacity-node 
+			 :output-action (output-action (demand-calculator t-node))
+			 :input-with-demand i-node)))
+	  (progn
+	    (setf (demand-calculator i-node) new-inc)
+	    (evaluate-low-level-node new-inc))))
 
-      ;; else branch
-      (let* ((new-inc (new-decrement-capacity-node 
-		       :output-action (output-action (demand-calculator (from-client (first-distance-calculator t-node)))) ;; TODO find a better way to do this. Why if for wathever reason t-nod is not distance-node
-		       :input-with-demand i-node)))
-	(progn
-	  (setf (demand-calculator i-node) new-inc)
-	  `((,#'evaluate-low-level-node ,new-inc)))))
-  )
+;;	;; else branch
+;;	(let* ((new-inc (new-decrement-capacity-node 
+;;			 :output-action (output-action (demand-calculator (from-client (first-distance-calculator t-node)))) ;; TODO find a better way to do this. Why if for wathever reason t-nod is not distance-node
+;;			 :input-with-demand i-node)))
+;;	  (progn
+;;	    (setf (demand-calculator i-node) new-inc)
+;;	    (evaluate-low-level-node new-inc))))))
 
 (defmethod insert-node append ((t-node input-distance-node) 
                                       (i-node input-depot-node))
@@ -195,7 +196,7 @@
               (progn
                   (setf (first-distance-calculator i-node) calc)
                   (setf (to-client calc) i-node)))
-          `((,#'evaluate-low-level-node ,calc)))))
+          (evaluate-low-level-node calc))))
 
 (defgeneric convert-to-node (target graph))
 

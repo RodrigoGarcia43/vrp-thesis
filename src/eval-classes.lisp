@@ -118,7 +118,7 @@
   ((input-with-demand))
   :documentation "decrement capacity node in eval-graph"
   :constructor (new-decrement-capacity-node (&key previous-node next-node output-action input-with-demand))
-  :print-object-string ("decrement-capacity: ~a>" output-action)
+  :print-object-string ("decrement-capacity: ouput: ~a>" output-action)
   :slots-for-obj= (previous-node next-node output-action input-with-demand)
   :slots-for-clone (previous-node next-node output-action input-with-demand))
 
@@ -135,6 +135,6 @@
    (factor))
   :documentation "penalize node in eval-graph"
   :constructor (new-penalize-accumulator-node (&key previous-node next-node output-action partial-accumulator factor))
-  :print-object-string ("Penalizee node, prev: ~a, next: ~a>" previous-node next-node)
+  :print-object-string ("Penalizee node, action: ~a, accumulator: ~a>" output-action partial-accumulator)
   :slots-for-obj= (previous-node next-node output-action partial-accumulator factor)
   :slots-for-clone (previous-node next-node output-action partial-accumulator factor))

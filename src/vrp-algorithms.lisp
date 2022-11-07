@@ -1384,3 +1384,70 @@
     (list current-solution
           neighboorhoods-used
           (<= neighboorhoods-used max-iter))))
+
+;; Variable Neighboorhood Search
+(defun vns-vrp-system
+    (problem criteria graph
+     &key max-iter (print-mod 1))
+  "Solves the VRP problem using a VNS with the given criterion starting with the given solution. We assume that the initial solution has the cost slot bound. If the result is nil, then the initial solution is an optimum for that neighboorhood."
+  (declare (ignore print-mod))
+
+  (let* ((current-index 0)
+         (number-of-criteria (length criteria))
+         (current-criterion nil)
+         (better-solution nil)
+         (current-solution (neigh-tree-solution (solution-track graph)))
+         (neighboorhoods-used 1)
+         )
+
+    (loop while (and (< current-index number-of-criteria)
+                     (<= neighboorhoods-used max-iter))
+
+          ;; let's set the current criterion
+          do (setf current-criterion (nth current-index criteria))          
+          ;; let's explore with the current criteria
+
+          ;; for debugging purposes
+          do (format t "Debug inside VNS.  Iteration ~a, criterion ~a"
+                     neighboorhoods-used current-index)
+
+          do (setf better-solution
+                   (funcall current-criterion
+                            current-solution problem graph))
+
+          do (if better-solution
+                 (then 
+                   ;; we found a better solution
+                   ;; update the current-solution
+                   (setf current-solution better-solution)
+                   ;; set the number-of-criteria to 0
+                   (setf current-index 0))
+                 (else
+                   ;; use the next criterion
+                   (incf current-index)))
+
+          ;; ;; ;;{{{ for debugging purposes
+          ;; do (format t "Debug inside VNS.  Iteration ~a, criterion ~a"
+          ;;         neighboorhoods-used current-index)
+          do (if better-solution
+                 (format t ", cost: ~a~%" (cost better-solution))
+                 (format t ".  Best solution found.~%"))
+          ;; ;; ;; end of debug.
+
+          ;; in any case, increment the number of neighboorhoods-used
+          do (incf neighboorhoods-used)
+
+          ;; ;; ;; for debugging purposes
+          ;; (format t "At the end of the while: ~a, ~a~%"
+          ;;         current-index number-of-criteria
+          ;;         ;; (< current-index number-of-criteria)
+          ;;         ;; (<= neighboorhoods-used max-iter)
+          ;;         )
+          ;; ;; ;; end of debugging purposes ;;}}}
+
+          )
+    ;; finally return the current solution
+    ;; if it is nil, then the initial solution is an optimum
+    (list current-solution
+          neighboorhoods-used
+          (<= neighboorhoods-used max-iter))))

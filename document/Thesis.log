@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.10.4)  27 OCT 2022 22:05
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.10.4)  7 NOV 2022 01:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -322,7 +322,8 @@ LaTeX Info: Redefining \% on input line 9.
 LaTeX Info: Redefining \. on input line 10.
 LaTeX Info: Redefining \% on input line 10.
  (./MainMatter/Introduction.aux)
-(./MainMatter/Background.aux) (./BackMatter/Conclusions.aux)
+(./MainMatter/Background.aux) (./MainMatter/Solution.aux)
+(./MainMatter/Tutorial.aux) (./BackMatter/Conclusions.aux)
 (./BackMatter/Bibliography.aux) (./BackMatter/Glossary.aux))
 \openout1 = `Thesis.aux'.
 
@@ -464,21 +465,94 @@ LaTeX Warning: Reference `label' on page 6 undefined on input line 63.
 <Graphics/Neigh-Tree.png, id=36, 796.9775pt x 682.55pt>
 File: Graphics/Neigh-Tree.png Graphic file (type png)
 <use Graphics/Neigh-Tree.png>
-Package pdftex.def Info: Graphics/Neigh-Tree.png  used on input line 136.
+Package pdftex.def Info: Graphics/Neigh-Tree.png  used on input line 133.
 (pdftex.def)             Requested size: 323.9978pt x 277.47272pt.
- [9 <./Graphics/Neigh-Tree.png>]) [10]
+ [9 <./Graphics/Neigh-Tree.png>]
+<Graphics/eval-graph-1.png, id=42, 780.9175pt x 548.0475pt>
+File: Graphics/eval-graph-1.png Graphic file (type png)
+<use Graphics/eval-graph-1.png>
+Package pdftex.def Info: Graphics/eval-graph-1.png  used on input line 161.
+(pdftex.def)             Requested size: 323.9978pt x 227.37694pt.
+<Graphics/eval-graph-2.png, id=43, 796.9775pt x 536.0025pt>
+File: Graphics/eval-graph-2.png Graphic file (type png)
+<use Graphics/eval-graph-2.png>
+Package pdftex.def Info: Graphics/eval-graph-2.png  used on input line 170.
+(pdftex.def)             Requested size: 323.9978pt x 217.89769pt.
+ [10] [11 <./Graphics/eval-graph-1.png> <./Graphics/eval-graph-2.png>]
+<Graphics/eval-graph-3.png, id=52, 788.9475pt x 847.165pt>
+File: Graphics/eval-graph-3.png Graphic file (type png)
+<use Graphics/eval-graph-3.png>
+Package pdftex.def Info: Graphics/eval-graph-3.png  used on input line 179.
+(pdftex.def)             Requested size: 323.9978pt x 347.90866pt.
+<Graphics/eval-graph-4.png, id=53, 796.9775pt x 542.025pt>
+File: Graphics/eval-graph-4.png Graphic file (type png)
+<use Graphics/eval-graph-4.png>
+Package pdftex.def Info: Graphics/eval-graph-4.png  used on input line 197.
+(pdftex.def)             Requested size: 323.9978pt x 220.34598pt.
+ [12] [13 <./Graphics/eval-graph-3.png>]
+[14 <./Graphics/eval-graph-4.png>]
+
+LaTeX Warning: Reference `TODO' on page 15 undefined on input line 229.
+
+[15]
+Overfull \hbox (10.29202pt too wide) in paragraph at lines 240--241
+\OT1/ppl/m/n/10.95 de m[]eto-dos cu-yo par[]ame-tro de [] ten-ga ti-po \OT1/ppl
+/b/n/10.95 best-improvement\OT1/ppl/m/n/10.95 ,
+ []
+
+) [16]
+\openout2 = `MainMatter/Solution.aux'.
+
+ (./MainMatter/Solution.tex
+Cap\'{\i }tulo 2.
+
+LaTeX Warning: Citation `TODO' on page 17 undefined on input line 6.
+
+[17
+
+
+
+]
+Overfull \hbox (6.5273pt too wide) in paragraph at lines 27--28
+[]\OT1/ppl/m/it/10.95 Eval\OT1/ppl/m/n/10.95 : En \OT1/ppl/m/it/10.95 eval \OT1
+/ppl/m/n/10.95 se im-ple-men-ta el gra-fo de eva-lua-ci[]on con el que se eval[
+]uan
+ []
+
+[18]
+
+LaTeX Warning: Citation `TODO' on page 19 undefined on input line 46.
+
+
+Overfull \hbox (13.60165pt too wide) in paragraph at lines 50--51
+\OT1/ppl/m/n/10.95 las cla-ses abs-trac-tas: \OT1/ppl/b/n/10.95 basic-vehicle \
+OT1/ppl/m/n/10.95 (veh[]^^Pcu-lo b[]asi-co), \OT1/ppl/b/n/10.95 capacity-vehicl
+e \OT1/ppl/m/n/10.95 (veh[]^^Pcu-
+ []
+
+) [19]
+\openout2 = `MainMatter/Tutorial.aux'.
+
+ (./MainMatter/Tutorial.tex
+Cap\'{\i }tulo 3.
+) [20
+
+
+
+]
 \openout2 = `BackMatter/Conclusions.aux'.
 
- (./BackMatter/Conclusions.tex [11
+ (./BackMatter/Conclusions.tex [21
 
 
 
-]) [12
+]) [22
 
 ]
 \openout2 = `BackMatter/Bibliography.aux'.
 
- (./BackMatter/Bibliography.tex (./Thesis.bbl)) [13
+ (./BackMatter/Bibliography.tex
+(./Thesis.bbl)) [23
 
 
 
@@ -493,30 +567,32 @@ LaTeX Info: Redefining \% on input line 9.
 LaTeX Info: Redefining \. on input line 10.
 LaTeX Info: Redefining \% on input line 10.
  (./MainMatter/Introduction.aux)
-(./MainMatter/Background.aux) (./BackMatter/Conclusions.aux)
+(./MainMatter/Background.aux) (./MainMatter/Solution.aux)
+(./MainMatter/Tutorial.aux) (./BackMatter/Conclusions.aux)
 (./BackMatter/Bibliography.aux) (./BackMatter/Glossary.aux))
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 6373 strings out of 483048
- 89649 string characters out of 5962772
- 344068 words of memory out of 5000000
- 21258 multiletter control sequences out of 15000+600000
+ 6442 strings out of 483048
+ 91167 string characters out of 5962772
+ 347041 words of memory out of 5000000
+ 21309 multiletter control sequences out of 15000+600000
  550027 words of font info for 69 fonts, out of 8000000 for 9000
  85 hyphenation exceptions out of 8191
- 30i,6n,36p,936b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 30i,6n,36p,979b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/
-fonts/type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/
-urw/palatino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino
-/uplri8a.pfb>
-Output written on Thesis.pdf (14 pages, 169361 bytes).
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/pa
+latino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplri
+8a.pfb>
+Output written on Thesis.pdf (24 pages, 470074 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
- 50 compressed objects within 1 object stream
+ 117 PDF objects out of 1000 (max. 8388607)
+ 74 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

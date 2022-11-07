@@ -144,7 +144,7 @@ Let's define the specialization methods of the actions
             (setf (output-copy (partial-accumulator ll-node)) 
                   (min 0 (output-value (partial-accumulator ll-node))))
             (if (updater (output-action ll-node))
-                (undo-low-level-node ,(updater (output-action ll-node)))))))
+                (undo-low-level-node (updater (output-action ll-node)))))))
 #+END_SRC
 
 

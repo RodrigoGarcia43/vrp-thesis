@@ -1,59 +1,62 @@
 This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Thesis.aux
-A level-1 auxiliary file: FrontMatter/Dedication.aux
-A level-1 auxiliary file: FrontMatter/Thanks.aux
-A level-1 auxiliary file: FrontMatter/SupervisorOpinion.aux
 A level-1 auxiliary file: FrontMatter/Abstract.aux
 A level-1 auxiliary file: MainMatter/Introduction.aux
 A level-1 auxiliary file: MainMatter/Background.aux
+A level-1 auxiliary file: MainMatter/Solution.aux
+A level-1 auxiliary file: MainMatter/Tutorial.aux
+A level-1 auxiliary file: BackMatter/Conclusions.aux
 A level-1 auxiliary file: BackMatter/Bibliography.aux
 The style file: plain.bst
+A level-1 auxiliary file: BackMatter/Glossary.aux
 Database file #1: Bibliography.bib
+Warning--I didn't find a database entry for "TODO"
 Warning--empty journal in Daniela
 Warning--empty journal in Heidy
 Warning--empty journal in Camila
+Warning--empty journal in multi
 Warning--empty journal in Hector
 Warning--empty journal in JJ
-You've used 6 entries,
+You've used 7 entries,
             2118 wiz_defined-function locations,
-            536 strings with 5105 characters,
-and the built_in function-call counts, 1352 in all, are:
-= -- 128
-> -- 48
+            543 strings with 5207 characters,
+and the built_in function-call counts, 1557 in all, are:
+= -- 147
+> -- 55
 < -- 0
-+ -- 21
-- -- 14
-* -- 66
-:= -- 252
-add.period$ -- 18
-call.type$ -- 6
-change.case$ -- 25
++ -- 25
+- -- 16
+* -- 74
+:= -- 290
+add.period$ -- 21
+call.type$ -- 7
+change.case$ -- 29
 chr.to.int$ -- 0
-cite$ -- 11
-duplicate$ -- 61
-empty$ -- 111
-format.name$ -- 14
-if$ -- 265
+cite$ -- 13
+duplicate$ -- 71
+empty$ -- 128
+format.name$ -- 16
+if$ -- 305
 int.to.chr$ -- 0
-int.to.str$ -- 6
-missing$ -- 6
-newline$ -- 33
-num.names$ -- 12
-pop$ -- 33
+int.to.str$ -- 7
+missing$ -- 7
+newline$ -- 38
+num.names$ -- 14
+pop$ -- 39
 preamble$ -- 1
-purify$ -- 19
+purify$ -- 22
 quote$ -- 0
-skip$ -- 43
+skip$ -- 50
 stack$ -- 0
-substring$ -- 50
+substring$ -- 56
 swap$ -- 1
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 24
-warning$ -- 5
-while$ -- 14
-width$ -- 7
-write$ -- 58
-(There were 5 warnings)
+type$ -- 28
+warning$ -- 6
+while$ -- 16
+width$ -- 8
+write$ -- 67
+(There were 7 warnings)

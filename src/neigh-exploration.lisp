@@ -84,6 +84,51 @@
 		      (from-index-to-coord-list (neighborhood obj) index)
 		    (incf index))))))))
 
+(defmethod random-search ((obj neighborhood-tree) n)
+       (let* ((mapper (solution-mapper (search-state obj)))
+	      (count 1)
+	      (index (+ 1 (random (cardinality obj)))))
+
+	 #'(lambda ()
+	     (if (> count n)
+		 nil
+		 ;; get the content in the index-th position of the list
+		 (multiple-value-bind (content in-use) (gethash index mapper)
+		   (incf (number-of-analysed-solutions (search-state obj)))
+		   (if in-use
+		       ;; then we are going to return the content-th solution
+		       (prog1
+			   (from-index-to-coord-list obj content)
+			 (setf index (+ 1 (random (cardinality obj))))
+			 (incf count))
+		       ;; else we are going to return the index-th solution
+		       (prog1
+			   (from-index-to-coord-list obj index)
+			 (setf index (+ 1 (random (cardinality obj))))
+			 (incf count))))))))
+
+;;     (defmethod exhaustive-search ((obj neighborhood-region))
+;;       (let* ((mapper (solution-mapper (search-state obj)))
+;;	      (first-index (car (index-range obj)))
+;;	      (last-index (cdr (index-range obj)))
+;;	      (index (+ first-index (number-of-analysed-solutions (search-state obj)))))
+;;
+;;	 #'(lambda ()
+;;	     (if (> index last-index)
+;;		 nil
+;;		 ;; get the content in the index-th position of the list
+;;		 (multiple-value-bind (content in-use) (gethash index mapper)
+;;		   (incf (number-of-analysed-solutions (search-state obj)))
+;;		   (if in-use
+;;		       ;; then we are going to return the content-th solution
+;;		       (prog1
+;;			   (from-index-to-coord-list (neighborhood obj) content)
+;;			 (incf index))
+;;		       ;; else we are going to return the index-th solution
+;;		       (prog1
+;;			   (from-index-to-coord-list (neighborhood obj) index)
+;;			 (incf index))))))))
+
 (defmethod uniform-search ((obj neighborhood-tree))
   (let ((uniform-number-iterator (random-sample-from-range 1
                                                            (cardinality obj)
@@ -476,6 +521,12 @@
   (if (null total)
       (exhaustive-search obj)
       (let* ((gen (exhaustive-search obj)))
+	(exploration-interface gen total))))
+
+(defun random-exploration (obj n &optional total)
+  (if (null total)
+      (random-search obj n)
+      (let* ((gen (random-search obj n)))
 	(exploration-interface gen total))))
 
 (defun uniform-exploration (obj &optional total)
