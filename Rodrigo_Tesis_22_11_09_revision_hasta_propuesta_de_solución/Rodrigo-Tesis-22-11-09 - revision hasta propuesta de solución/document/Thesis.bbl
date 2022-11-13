@@ -1,0 +1,44 @@
+\begin{thebibliography}{1}
+
+\bibitem{Daniela}
+Daniela~González Beltrán.
+\newblock Generación automática de gramáticas para la obtención de
+  infinitos criterios de vecindad en el problema de enrutamiento de vehículos.
+\newblock 2019.
+
+\bibitem{Ramsin1959}
+PaoloVigo George~B Dantzig and John~H Ramser.
+\newblock The truck dispatching problem.
+\newblock {\em Management science}, 6(1):80--91, 1959.
+
+\bibitem{Heidy}
+Heidy~Abreu Fumero.
+\newblock Exploración de una vecindad para una solución de vrp combinando
+  diferentes estrategias de exploración y de selección.
+\newblock 2019.
+
+\bibitem{Camila}
+Camila~Pérez Mosquera.
+\newblock Primeras aproximaciones a la búsqueda de vecindad infinitamente
+  variable.
+\newblock 2017.
+
+\bibitem{multi}
+P~Parthanadee.
+\newblock A multi-product. multi-depot periodic distribution problem.
+\newblock 2002.
+
+\bibitem{Hector}
+Héctor Felipe~Massón Rosquete.
+\newblock Exploración de vecindades grandes en el problema de enrutamiento de
+  vehículos usando técnicas estadísticas.
+\newblock 2020.
+
+\bibitem{JJ}
+José Jorge~Rodríguez Salgado.
+\newblock Una propuesta para la evaluación automática de soluciones vecinas
+  en un problema de enrutamiento de vehículos a partir del grafo de
+  evaluación de una solución.
+\newblock 2020.
+
+\end{thebibliography}

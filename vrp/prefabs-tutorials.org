@@ -2703,12 +2703,22 @@ No better solution found in neighbor.
 	      ;; Solution for the eval-graph
 	      ;; remember to start and end all the routes with depot
 	      ;; the starting depot is placed in the previous-client slot
-	      (defparameter r1 (route-for-simulation :id 1 :vehicle v1 :depot d0
-						     :clients (list c1 c2 c3 (clone d0)) :previous-client (clone d0)))
-	      (defparameter r2 (route-for-simulation :id 2 :vehicle v2 :depot d0
-						     :clients (list c4 c5 c6 (clone d0)) :previous-client (clone d0)))
+	      (defparameter r1 (route-for-simulation 
+				:id 1
+				:vehicle v1 
+				:depot d0
+				:clients (list c1 c2 c3 (clone d0))
+				:previous-client (clone d0)))
+	      (defparameter r2 (route-for-simulation 
+				:id 2 
+				:vehicle v2
+				:depot d0
+				:clients (list c4 c5 c6 (clone d0))
+				:previous-client (clone d0)))
 
-	      (defparameter s1 (basic-solution :id 1 :routes (list r1 r2)))
+	      (defparameter s1 (basic-solution
+				:id 1 
+				:routes (list r1 r2)))
 
 	      (defparameter dist-mat #2A((0 1 2 3 4 5 6)
 					 (1 0 20 2 1 3 2)
@@ -2717,8 +2727,11 @@ No better solution found in neighbor.
 					 (4 1 2 1 0 2 3)
 					 (5 3 2 2 2 0 1)
 					 (6 2 2 1 3 1 0)))
-	      (defparameter problem (finite-fleet-cvrp-problem :id 1 :clients (list c1 c2 c3 c4 c5 c6)
-							       :depot d0 :distance-matrix dist-mat :fleet (list v1 v2) ))
+	      (defparameter problem (finite-fleet-cvrp-problem :id 1 
+							       :clients (list c1 c2 c3 c4 c5 c6)
+							       :depot d0 
+							       :distance-matrix dist-mat 
+							       :fleet (list v1 v2) ))
 
 	      (defparameter graph (init-graph s1)))
 
@@ -2731,17 +2744,17 @@ No better solution found in neighbor.
 	 (progn
 	   (def-var total-distance 0 graph)
 	   (loop for r in (routes s1) do 
-	     (progn
-	       (def-var route-distance 0 graph)
-	       (def-var route-demand (capacity (vehicle r)) graph) 
-	       (loop for c in (clients r) do 
-		 (progn
-		   (increment-distance (previous-client r) c route-distance dist-mat graph)
-		   (decrement-demand c route-demand graph) 
-		   (setf (previous-client r) c)))
-	       (increment-value total-distance route-distance graph)
-	       (apply-penalty route-demand total-distance 10 graph)) 
-	     (return-value total-distance graph)))
+		(progn
+		  (def-var route-distance 0 graph)
+		  (def-var route-demand (capacity (vehicle r)) graph) 
+		  (loop for c in (clients r) do 
+		       (progn
+			 (increment-distance (previous-client r) c route-distance dist-mat graph)
+			 (decrement-demand c route-demand graph) 
+			 (setf (previous-client r) c)))
+		  (increment-value total-distance route-distance graph)
+		  (apply-penalty route-demand total-distance 10 graph)) 
+		(return-value total-distance graph)))
 
 	 (format t "initial cost: ~a~%" (output-value (output graph)))
 	 (format t "initial solution: ~a~%" (solution-track graph))
@@ -2777,15 +2790,17 @@ No better solution found in neighbor.
 
 	 ;; (setf rarb (make-neighborhood-exploration-function bp))
 	 ;; let's get the best neighbor
-	 (setf best-neighbor (funcall rarb (neigh-tree-solution (solution-track graph)) problem graph))
+	 (setf best-neighbor (funcall rarb (neigh-tree-solution (solution-track graph)) 
+				      problem
+				      graph))
 
 	 (if best-neighbor
 	     (then
-	       (format t "After rarb we found...~%")
-	       (format t "With cost ~a...~%" (cost best-neighbor))
-	       (pp-solution best-neighbor t))
+	      (format t "After rarb we found...~%")
+	      (format t "With cost ~a...~%" (cost best-neighbor))
+	      (pp-solution best-neighbor t))
 	     (else
-	       (format t "No best neighbor found :-[."))))
+	      (format t "No best neighbor found :-[."))))
 
        ))
 

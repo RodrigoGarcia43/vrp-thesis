@@ -1841,7 +1841,7 @@
                   (format t "Initial solution was optimum!~%")))))
       #+END_SRC
 
-
+      
 * Classical VNS
 ** description
    In this section, I'm going to add a Variable Neighboorhood Search.  This is an algorithm that receives a solution and a list with several criteria.  It gets the best neighbor according to the current criterion and, if the best-neighbor found with that criterion is better than the current one, repeat the process.  When we find a solution that is a local minimum to that criterion, we change the criterion.  If it is a local minimum to all the criteria we have, then we assume that it is a solution for the problem.

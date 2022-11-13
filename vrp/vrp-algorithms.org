@@ -5546,8 +5546,8 @@
 ** description
    This is an algorithm that receives a problem, a list with several criteria prefabs and an evaluation graph. It gets the best neighbor according to the current criterion and, if the best-neighbor found with that criterion is better than the current one, repeat the process.  When we find a solution that is a local minimum to that criterion, we change the criterion.  If it is a local minimum to all the criteria we have, then we assume that it is a solution for the problem.
 
-
-*** code
+   
+** code
    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-algorithms.lisp
    ;; Variable Neighboorhood Search
    (defun vns-vrp-system
@@ -5617,7 +5617,7 @@
              (<= neighboorhoods-used max-iter))))
        #+END_SRC
    
-*** tests
+** tests
 **** rab, rarb, rarac
 #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp
   (progn (defparameter c1 (basic-cvrp-client 1 1))
@@ -5654,24 +5654,22 @@
 
 	 (defparameter graph (init-graph s1)))
 
-  (let* ((best-solution-found nil))
-
     ;; let's evaluate the solution
 
     (progn
       (def-var total-distance 0 graph)
       (loop for r in (routes s1) do 
-	(progn
-	  (def-var route-distance 0 graph)
-	  (def-var route-demand (capacity (vehicle r)) graph) 
-	  (loop for c in (clients r) do 
-	    (progn
-	      (increment-distance (previous-client r) c route-distance dist-mat graph)
-	      (decrement-demand c route-demand graph) 
-	      (setf (previous-client r) c)))
-	  (increment-value total-distance route-distance graph)
-	  (apply-penalty route-demand total-distance 10 graph)) 
-	(return-value total-distance graph)))
+	   (progn
+	     (def-var route-distance 0 graph)
+	     (def-var route-demand (capacity (vehicle r)) graph) 
+	     (loop for c in (clients r) do 
+		  (progn
+		    (increment-distance (previous-client r) c route-distance dist-mat graph)
+		    (decrement-demand c route-demand graph) 
+		    (setf (previous-client r) c)))
+	     (increment-value total-distance route-distance graph)
+	     (apply-penalty route-demand total-distance 10 graph)) 
+	   (return-value total-distance graph)))
 
     (format t "initial cost: ~a~%" (output-value (output graph)))
     (format t "initial solution: ~a~%" (solution-track graph))
@@ -5679,11 +5677,11 @@
 
     (progn
       (setf rab (make-neighborhood-criterion 
-		  `((select-route r1)
-		    (select-client c1 from r1)
-		    (insert-client c1 to r1))
-		  +exhaustive-search-strategy+ 
-		  +best-improvement+))
+		 `((select-route r1)
+		   (select-client c1 from r1)
+		   (insert-client c1 to r1))
+		 +exhaustive-search-strategy+ 
+		 +best-improvement+))
 
       (setf rarb (make-neighborhood-criterion 
 		  `((select-route r1)
@@ -5702,10 +5700,9 @@
 		   +exhaustive-search-strategy+ 
 		   +best-improvement+))
 
-(setf criteria (list rab rarb rarac))
+      (setf criteria (list rab rarb rarac))
 
-     (format t "~a" (vns-vrp-system problem criteria graph :max-iter 10000000000))
-    ))
+      (format t "~a" (vns-vrp-system problem criteria graph :max-iter 10000000000)))
 
 #+END_SRC
 

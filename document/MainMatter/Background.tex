@@ -56,7 +56,7 @@ Los algoritmos basados en búsquda local son aquellos en que se define una soluc
 
 Los criterios de vecindad dependen también de la variante del problema sobre la que se trabaje. Por ejemplo, el criterio de \textbf{"Cambiar vehículo"} no tiene sentido para el problema $P_1$ pues en este todos los vehículos son iguales.
 
-Estas operaciones pueden ser obtenidas a partir de un subconjunto de operaciones más simples a las que se denomina operaciones elementales. Entre las operaciones elementales se encuentran: \textbf{selección de ruta}, \textbf{selección de cliente} e \textbf{inserción de cliente}.
+Estas operaciones pueden ser obtenidas a partir de un subconjunto de operaciones más simples a las que se denomina operaciones elementales. Entre las operaciones elementales se encuentran: \textbf{selección de ruta}, \textbf{selección de cliente} e \textbf{inserción de cliente} que comunmente se representan con los símbolos \textit{r}, \textit{a} y \textit{b} respectivamente. 
 
 Por ejemplo, \textbf{intercambiar dos clientes de posición} puede ser realizado a partir de dos \textbf{selección de ruta}, dos \textbf{selección de cliente} y dos \textbf{inserción de cliente}.
 
@@ -67,12 +67,10 @@ A partir de un criterio y una solución inicial se pueden generar nuevas solucio
 \section{Vías de solución existentes}\label{2-Libr}
 Una buena herramienta para resolver problemas de VRP en la actualidad es la biblioteca OR-Tools (Google Optimization Tools). Un software de código abierto útil para problemas de optimización combinatoria entre los que se encuentra el Problema de Enrutamiento.
 
-NOTA PARA FERNANDO: Profe, no sé qué más poner aquí XD.
-
-\section{Árbol de vecindad y exploración de dos fases}\label{2-Hector}
+\section{Árbol de vecindad}\label{2-Hector}
 La exploración de vecindades puede ser ineficiente y difícil de programar. La idea que se propone es utilizar técnicas estadísticas para analizar cuáles son las mejores regiones de las vecindades para intensificar la búsqueda en estas.
 
-Buscando aplicar dichas técnicas estadísticas es necesario saber la cardinalidad de las vecindades y separarlas en regiones. Para lograr esto de forma eficiente (sin iterar por todos los elementos de una vecindad) se propone la creación de un Árbol de vecindad. El Árbol de vecindad utiliza oun concepro de $solucion$ diferente al explicado en \ref{2-Sol}. Previamente se definió una solución de VRP en su forma más trivial como una lista de caminos conformados a su vez por la lista de clientes que se visitan en cada uno, por ejemplo:
+Buscando aplicar dichas técnicas estadísticas es necesario saber la cardinalidad de las vecindades y separarlas en regiones. Para lograr esto de forma eficiente (sin iterar por todos los elementos de una vecindad) se propone la creación de un Árbol de vecindad. El Árbol de vecindad utiliza un concepto de $solucion$ diferente al explicado en \ref{2-Sol}. Previamente se definió una solución de VRP en su forma más trivial como una lista de caminos conformados a su vez por la lista de clientes que se visitan en cada uno, por ejemplo:
 
 \begin{equation}
 s_1 = [(c_2,c_3), (c_1,c_4,c_5), (c_6)]
@@ -87,44 +85,29 @@ sc_1 = [2, 3, 1]
 Teniendo una solución inicial, todas las soluciones de una vecindad pueden ser obtenidas aplicando sobre esta el criterio de vecindad en cuestión, con todos sus valores posibles. A la asignación de valores de un criterio de vecindad sobre una solución se le llamará una instanciación de dicho criterio. Por ejemplo, dado el criterio \textbf{mover cliente} dado por: 
 
 \begin{itemize}
-	\item Seleccionar ruta (r).
-	\item Seleccionar cliente en ruta (a).
-	\item Seleccionar ruta (r).
-	\item Insertar cliente en ruta (b).
+	\item Seleccionar ruta (r1).
+	\item Seleccionar cliente (c1) de ruta (r1).
+	\item Seleccionar ruta (r2).
+	\item Insertar cliente (c1) en ruta (r2).
 \end{itemize}
-Las letras $r$, $a$ y $b$ son los símbolos representativos de cada operación.
 
 Un ejemplo de instanciación de este criterio sobre la solución $s_1$ se presenta como:
 
 \begin{itemize}
 	\item $r_1 = 1$ $\rightarrow$ $r_1$ es la ruta de la que el cliente $c_1$ es extraído.
-	\item $c_1$.position = 1 $\rightarrow$ $c_1$ es el primer cliente de la ruta.
-	\item $r_2 = 1$ $\rightarrow$ $r_2$ es la ruta de la que el cliente $c_1$ será insertado.
-	\item $c_1$.position = 2 $\rightarrow$ $c_1$ es insertado en la posición 2 de la ruta seleccionada.
+	\item $c_1$ = 1 $\rightarrow$ $c_1$ es el primer cliente de la ruta.
+	\item $r_2 = 2$ $\rightarrow$ $r_2$ es la ruta en la que el cliente $c_1$ será insertado.
+	\item $c_1$ = 2 $\rightarrow$ $c_1$ es insertado en la posición 2 de la ruta seleccionada.
 \end{itemize}
 
 A cada vecino de un criterio se le puede hacer corresponder una instanciación del mismo y por tanto, encontrar la cardinalidad de una vecindad es similar a encontrar el número de instanciaciones posibles del criterio asociado.
 
 Al generar las distintas instanciaciones de un criterio de vecindad para
-una solución dada se cumple que muchas de estas comparten una secuencia común de operaciones instanciadas. La estrategia propuesta se basa en
-agrupar aquellos criterios instanciados para los cuales dicha secuencia común comience en la primera operación de los mismos, pues de esta forma
-el resto de las operaciones de tales criterios instanciados no se ven afectadas, y contar para cada una de estas el número de posibles secuencias de operaciones instanciadas que unidas con la secuencia común forman un
-criterio instanciado.
+una solución dada se cumple que muchas de estas comparten una secuencia común de operaciones instanciadas. La estrategia propuesta se basa en agrupar aquellos criterios instanciados para los cuales dicha secuencia común comience en la primera operación de los mismos, pues de esta forma el resto de las operaciones de tales criterios instanciados no se ven afectadas, y contar para cada una de estas el número de posibles secuencias de operaciones instanciadas que unidas con la secuencia común forman un criterio instanciado.
 
-Al computar la cardinalidad de una vecindad del VRP, se utiliza una
-estrategia recursiva que consiste en contar para una operación el número
-de secuencias de operaciones instanciadas que se pueden formar con el
-resto de las operaciones del criterio, así como combinar las mismas con
-las posibles instanciaciones de la operación actual aprovechando que para
-las operaciones modificadoras estas secuencias son comunes a todas las
-posibles instanciaciones de las mismas.
+Al computar la cardinalidad de una vecindad del VRP, se utiliza una estrategia recursiva que consiste en contar para una operación el número de secuencias de operaciones instanciadas que se pueden formar con el resto de las operaciones del criterio, así como combinar las mismas con las posibles instanciaciones de la operación actual aprovechando que para las operaciones modificadoras estas secuencias son comunes a todas las posibles instanciaciones de las mismas.
 
-Es posible utilizar este algoritmo, para almacenar toda la información
-necesaria para cualquier procesamiento posterior sobre dicha vecindad en
-una estructura arbórea que será llamada árbol de vecindad y que constituye
-una representación de la vecindad en cuestión. En \ref{fig:neigh-tree} se muestra una representación del árbol de vecindad asociado a l criterio \textbf{mover cliente} ($rarb$). Cada nodo del árbol, representa una
-operación de vecindad y almacena toda la información necesaria para instanciar dicha operación y de esta forma, a partir del proceso que computa
-la cardinalidad de la vecindad, se puede pasar a generar todas las soluciones de la misma.
+Es posible utilizar este algoritmo, para almacenar toda la información necesaria para cualquier procesamiento posterior sobre dicha vecindad en una estructura arbórea que será llamada árbol de vecindad y que constituye una representación de la vecindad en cuestión. En \ref{fig:neigh-tree} se muestra una representación del árbol de vecindad asociado a l criterio \textbf{mover cliente} ($rarb$). Cada nodo del árbol, representa una operación de vecindad y almacena toda la información necesaria para instanciar dicha operación y de esta forma, a partir del proceso que computa la cardinalidad de la vecindad, se puede pasar a generar todas las soluciones de la misma.
 
 
 % TODO: \usepackage{graphicx} required
@@ -231,7 +214,7 @@ La creación automática de funciones de exploración con distintas combinacione
 El trabajo de generación de código y la creación de funciones a partir de estrategias diferentes se facilita mucho gracias a las características del lenguaje Common Lisp.
 
 \section{Common Lisp y sus funcionalidades}\label{2-Lisp}
-Common Lisp es un lenguaje de programación multi paradigma (soporta una combinación de paradigmas de programación tales como la programación imperativa, funcional y orientada a objetos). Facilita el desarrollo de software evolutivo e incremental, con la compilación iterativa de programas eficientes en tiempo de ejecución.
+Common Lisp es un lenguaje de programación multi-paradigma (soporta una combinación de paradigmas de programación tales como la programación imperativa, funcional y orientada a objetos). Facilita el desarrollo de software evolutivo e incremental, con la compilación iterativa de programas eficientes en tiempo de ejecución.
 
 El lenguaje acepta herencia múltiple. Esta característica permite crear jerarquías con clases que implementan funcionalidades de varias clases superiores. Por ejemplo, la clase que representa la estrategia de selección de mejor vecino (\textbf{best-improvement}) hereda de una clase que indica  retorno de mejor solución (\textbf{return-best-solution}) y de otra que indica el uso de un grafo de evaluación (\textbf{use-eval-graph}).
 

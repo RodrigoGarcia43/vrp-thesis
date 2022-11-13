@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.10.4)  7 NOV 2022 01:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2022.10.4)  9 NOV 2022 19:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -311,6 +311,12 @@ Package: everysel 2011/10/28 v1.2 EverySelectfont Package (MS)
 \RaggedRightParindent=\skip91
 \JustifyingParindent=\skip92
 )
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2019/09/10 1.8c listings language file
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstlang2.sty
+File: lstlang2.sty 2019/09/10 1.8c listings language file
+)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
 File: l3backend-pdfmode.def 2020-02-03 L3 backend support: PDF mode
 \l__kernel_color_stack_int=\count280
@@ -323,32 +329,33 @@ LaTeX Info: Redefining \. on input line 10.
 LaTeX Info: Redefining \% on input line 10.
  (./MainMatter/Introduction.aux)
 (./MainMatter/Background.aux) (./MainMatter/Solution.aux)
-(./MainMatter/Tutorial.aux) (./BackMatter/Conclusions.aux)
-(./BackMatter/Bibliography.aux) (./BackMatter/Glossary.aux))
+(./MainMatter/Tutorial.aux) (./MainMatter/Extension.aux)
+(./BackMatter/Conclusions.aux) (./BackMatter/Bibliography.aux)
+(./BackMatter/Glossary.aux))
 \openout1 = `Thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
-LaTeX Font Info:    ... okay on input line 39.
-LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 3
-9.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Trying to load font information for OT1+ppl on input line 6
+1.
 
 (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
 )
-LaTeX Info: Redefining \. on input line 39.
-LaTeX Info: Redefining \% on input line 39.
+LaTeX Info: Redefining \. on input line 61.
+LaTeX Info: Redefining \% on input line 61.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -375,9 +382,9 @@ e
 \c@lstlisting=\count287
 
 ABD: EverySelectfont initializing macros
-LaTeX Info: Redefining \selectfont on input line 39.
-LaTeX Info: Redefining \. on input line 40.
-LaTeX Info: Redefining \% on input line 40.
+LaTeX Info: Redefining \selectfont on input line 61.
+LaTeX Info: Redefining \. on input line 62.
+LaTeX Info: Redefining \% on input line 62.
 \openout2 = `FrontMatter/Abstract.aux'.
 
  (./FrontMatter/Abstract.tex
@@ -393,9 +400,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 2--4
 
 
 (./MainMatter/Introduction.tex
-Overfull \hbox (7.52649pt too wide) in paragraph at lines 11--12
+Overfull \hbox (1.15366pt too wide) in paragraph at lines 11--12
 []\OT1/ppl/m/n/10.95 El pro-ble-ma de en-ru-ta-mien-to de veh[]^^Pcu-los (VRP p
-or sus si-glas en ingl[]n[]es)
+or sus si-glas en ingl[]es)
  []
 
 [1
@@ -465,37 +472,37 @@ LaTeX Warning: Reference `label' on page 6 undefined on input line 63.
 <Graphics/Neigh-Tree.png, id=36, 796.9775pt x 682.55pt>
 File: Graphics/Neigh-Tree.png Graphic file (type png)
 <use Graphics/Neigh-Tree.png>
-Package pdftex.def Info: Graphics/Neigh-Tree.png  used on input line 133.
+Package pdftex.def Info: Graphics/Neigh-Tree.png  used on input line 116.
 (pdftex.def)             Requested size: 323.9978pt x 277.47272pt.
  [9 <./Graphics/Neigh-Tree.png>]
 <Graphics/eval-graph-1.png, id=42, 780.9175pt x 548.0475pt>
 File: Graphics/eval-graph-1.png Graphic file (type png)
 <use Graphics/eval-graph-1.png>
-Package pdftex.def Info: Graphics/eval-graph-1.png  used on input line 161.
+Package pdftex.def Info: Graphics/eval-graph-1.png  used on input line 144.
 (pdftex.def)             Requested size: 323.9978pt x 227.37694pt.
 <Graphics/eval-graph-2.png, id=43, 796.9775pt x 536.0025pt>
 File: Graphics/eval-graph-2.png Graphic file (type png)
 <use Graphics/eval-graph-2.png>
-Package pdftex.def Info: Graphics/eval-graph-2.png  used on input line 170.
+Package pdftex.def Info: Graphics/eval-graph-2.png  used on input line 153.
 (pdftex.def)             Requested size: 323.9978pt x 217.89769pt.
  [10] [11 <./Graphics/eval-graph-1.png> <./Graphics/eval-graph-2.png>]
 <Graphics/eval-graph-3.png, id=52, 788.9475pt x 847.165pt>
 File: Graphics/eval-graph-3.png Graphic file (type png)
 <use Graphics/eval-graph-3.png>
-Package pdftex.def Info: Graphics/eval-graph-3.png  used on input line 179.
+Package pdftex.def Info: Graphics/eval-graph-3.png  used on input line 162.
 (pdftex.def)             Requested size: 323.9978pt x 347.90866pt.
 <Graphics/eval-graph-4.png, id=53, 796.9775pt x 542.025pt>
 File: Graphics/eval-graph-4.png Graphic file (type png)
 <use Graphics/eval-graph-4.png>
-Package pdftex.def Info: Graphics/eval-graph-4.png  used on input line 197.
+Package pdftex.def Info: Graphics/eval-graph-4.png  used on input line 180.
 (pdftex.def)             Requested size: 323.9978pt x 220.34598pt.
  [12] [13 <./Graphics/eval-graph-3.png>]
 [14 <./Graphics/eval-graph-4.png>]
 
-LaTeX Warning: Reference `TODO' on page 15 undefined on input line 229.
+LaTeX Warning: Reference `TODO' on page 15 undefined on input line 212.
 
 [15]
-Overfull \hbox (10.29202pt too wide) in paragraph at lines 240--241
+Overfull \hbox (10.29202pt too wide) in paragraph at lines 223--224
 \OT1/ppl/m/n/10.95 de m[]eto-dos cu-yo par[]ame-tro de [] ten-ga ti-po \OT1/ppl
 /b/n/10.95 best-improvement\OT1/ppl/m/n/10.95 ,
  []
@@ -506,14 +513,14 @@ Overfull \hbox (10.29202pt too wide) in paragraph at lines 240--241
  (./MainMatter/Solution.tex
 Cap\'{\i }tulo 2.
 
-LaTeX Warning: Citation `TODO' on page 17 undefined on input line 6.
+LaTeX Warning: Citation `TODO' on page 17 undefined on input line 18.
 
 [17
 
 
 
 ]
-Overfull \hbox (6.5273pt too wide) in paragraph at lines 27--28
+Overfull \hbox (6.5273pt too wide) in paragraph at lines 39--40
 []\OT1/ppl/m/it/10.95 Eval\OT1/ppl/m/n/10.95 : En \OT1/ppl/m/it/10.95 eval \OT1
 /ppl/m/n/10.95 se im-ple-men-ta el gra-fo de eva-lua-ci[]on con el que se eval[
 ]uan
@@ -521,38 +528,107 @@ Overfull \hbox (6.5273pt too wide) in paragraph at lines 27--28
 
 [18]
 
-LaTeX Warning: Citation `TODO' on page 19 undefined on input line 46.
+LaTeX Warning: Citation `TODO' on page 19 undefined on input line 60.
 
 
-Overfull \hbox (13.60165pt too wide) in paragraph at lines 50--51
+Overfull \hbox (13.60165pt too wide) in paragraph at lines 64--65
 \OT1/ppl/m/n/10.95 las cla-ses abs-trac-tas: \OT1/ppl/b/n/10.95 basic-vehicle \
 OT1/ppl/m/n/10.95 (veh[]^^Pcu-lo b[]asi-co), \OT1/ppl/b/n/10.95 capacity-vehicl
 e \OT1/ppl/m/n/10.95 (veh[]^^Pcu-
  []
 
-) [19]
+[19]
+Overfull \hbox (6.52591pt too wide) in paragraph at lines 80--81
+\OT1/ppl/b/n/10.95 exploration\OT1/ppl/m/n/10.95 ) de-vuel-ven, a par-tir de un
+ []arbol de ve-cin-dad una fun-ci[]on $\OML/zplm/m/it/10.95 lambda$
+ []
+
+[20] [21] [22] [23]
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
+
+ []
+
+
+Overfull \hbox (2.12613pt too wide) in paragraph at lines 166--167
+[]\OT1/ppl/b/n/10.95 random-improvement-with-candidates-selection-strategy\OT1/
+ppl/m/n/10.95 : Se-lec-ci[]on
+ []
+
+[24]) [25]
 \openout2 = `MainMatter/Tutorial.aux'.
 
  (./MainMatter/Tutorial.tex
 Cap\'{\i }tulo 3.
-) [20
+[26
 
 
 
-]
+] [27] [28]
+
+LaTeX Warning: Citation `TODO' on page 29 undefined on input line 103.
+
+[29]
+Overfull \hbox (2.4024pt too wide) in paragraph at lines 136--137
+[]\OT1/ppl/m/n/10.95 En es-te pun-to es po-si-ble in-vo-car la fun-ci[]on de me
+-taheur[]^^Psti-ca de B[]usque-
+ []
+
+[30] [31] [32]) [33]
+\openout2 = `MainMatter/Extension.aux'.
+
+ (./MainMatter/Extension.tex
+Cap\'{\i }tulo 4.
+
+LaTeX Warning: Citation `TODO' on page 34 undefined on input line 12.
+
+
+Overfull \hbox (5.096pt too wide) in paragraph at lines 12--13
+[]\OT1/ppl/m/n/10.95 A con-ti-nua-ci[]on se ejem-pli-fi-car[]a c[]omo crear la 
+cla-se \OT1/ppl/b/n/10.95 basic-time-windows-
+ []
+
+[34
+
+
+
+] [35] [36]
+Overfull \hbox (6.35257pt too wide) in paragraph at lines 104--105
+[]\OT1/ppl/b/n/10.95 has-restricted-candidates-for-best-neighbor\OT1/ppl/m/n/10
+.95 : Tie-ne un com-por-ta-mien-
+ []
+
+[37]
+Overfull \hbox (16.16682pt too wide) in paragraph at lines 107--108
+[]\OT1/ppl/m/n/10.95 Luego de-ben im-ple-men-tar-se las es-pe-cia-li-za-cio-nes
+ de los m[]eto-dos \OT1/ppl/b/n/10.95 generate-
+ []
+
+
+Overfull \hbox (2.3429pt too wide) in paragraph at lines 111--112
+\OT1/ppl/m/n/10.95 res-tric-ci[]on es-ta-ble-ci-da y en ca-so po-si-ti-vo, se a
+gre-ga es-ta a la lis-ta \OT1/ppl/b/n/10.95 candidates-
+ []
+
+
+Overfull \hbox (25.3104pt too wide) in paragraph at lines 113--114
+[]\OT1/ppl/m/n/10.95 Finalmente, fue-ra del ci-clo se es-co-ge alea-to-ria-men-
+te un ve-cino de \OT1/ppl/b/n/10.95 candidates-
+ []
+
+) [38]
 \openout2 = `BackMatter/Conclusions.aux'.
 
- (./BackMatter/Conclusions.tex [21
+ (./BackMatter/Conclusions.tex [39
 
 
 
-]) [22
+]) [40
 
 ]
 \openout2 = `BackMatter/Bibliography.aux'.
 
  (./BackMatter/Bibliography.tex
-(./Thesis.bbl)) [23
+(./Thesis.bbl)) [41
 
 
 
@@ -568,31 +644,33 @@ LaTeX Info: Redefining \. on input line 10.
 LaTeX Info: Redefining \% on input line 10.
  (./MainMatter/Introduction.aux)
 (./MainMatter/Background.aux) (./MainMatter/Solution.aux)
-(./MainMatter/Tutorial.aux) (./BackMatter/Conclusions.aux)
-(./BackMatter/Bibliography.aux) (./BackMatter/Glossary.aux))
+(./MainMatter/Tutorial.aux) (./MainMatter/Extension.aux)
+(./BackMatter/Conclusions.aux) (./BackMatter/Bibliography.aux)
+(./BackMatter/Glossary.aux))
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 6442 strings out of 483048
- 91167 string characters out of 5962772
- 347041 words of memory out of 5000000
- 21309 multiletter control sequences out of 15000+600000
- 550027 words of font info for 69 fonts, out of 8000000 for 9000
+ 7160 strings out of 483048
+ 98791 string characters out of 5962772
+ 568769 words of memory out of 5000000
+ 22004 multiletter control sequences out of 15000+600000
+ 554943 words of font info for 81 fonts, out of 8000000 for 9000
  85 hyphenation exceptions out of 8191
- 30i,6n,36p,979b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 30i,6n,40p,1013b,1625s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/texliv
 e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/pa
-latino/uplr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplri
-8a.pfb>
-Output written on Thesis.pdf (24 pages, 470074 bytes).
+type1/public/amsfonts/cm/cmtt10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
+urw/palatino/uplb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino
+/uplbi8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb
+></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
+Output written on Thesis.pdf (42 pages, 530668 bytes).
 PDF statistics:
- 117 PDF objects out of 1000 (max. 8388607)
- 74 compressed objects within 1 object stream
+ 185 PDF objects out of 1000 (max. 8388607)
+ 121 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 
