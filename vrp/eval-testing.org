@@ -411,7 +411,7 @@ Now, we apply some operations with the =do-suite-operations= function
 : 
 
 
-#+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/eval-tutorial.lisp
+#+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
       (do-suite-operations graph (list (op-select-client 1 1 0) 
 				       (op-select-client 1 1 1)
 				       (op-select-client 1 1 2)
@@ -419,13 +419,6 @@ Now, we apply some operations with the =do-suite-operations= function
 				       (op-insert-client 2 1 1)
 				       (op-insert-client 2 5 2)))
 #+END_SRC
-
-#+RESULTS:
-: Penalizee node, action: <value: 10>, accumulator: <value: 3>> 
-: Penalizee node, action: <value: 10>, accumulator: <value: 2>> 
-: Penalizee node, action: <value: 11>, accumulator: <value: 6>> 
-: Penalizee node, action: <value: 11>, accumulator: <value: 2>> 
-
 
 #+BEGIN_SRC lisp +n -r :results none :exports both :tangle ../src/eval-tutorial.lisp
       (do-suite-operations graph (list (op-insert-client 2 5 2)))

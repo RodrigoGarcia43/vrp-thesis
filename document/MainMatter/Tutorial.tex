@@ -1,21 +1,12 @@
 \chapter{Método de uso}\label{chapter:Tutorial}
 
-Este capítulo explica los pasos que debe seguir un cliente para resolver variantes de VRP utilizando el sistema desarrollado.
+Este capítulo explica los pasos que debe seguir un usuario para resolver variantes de VRP utilizando el sistema que se implementó en este trabajo. Esto se hará a través de un ejemplo de resolución de un problema CVRP arbitrario. Para esto se define el problema en \ref{4-problem}, se define la solución y se construye el grafo de evaluación en \ref{4-solution} y se generan las funciones de exploración en \ref{4-generator}. En \ref{4-union} se presenta el código completo.
 
-\section{Inicialización}
-El presente sistema está diseñado para ser ejecutado en Emacs, un editor de texto con una gran cantidad de funciones. Desde Emacs se carga el archivo \textit{vrp-emacs.el} ubicado en la raíz del sistema. Este archivo define varias funciones útiles.
+\section{Definición del problema}\label{4-problem}
 
-Ejecutar la función \textbf{tangle-all-files} exportará todos los bloques de código de los archivos formato .org ubicados en \textit{vrp} a sus respectivos archivos formato .lisp dentro de \textit{src}. Ambas direcciones se ubican en la raíz del sistema.
+El primer paso para resolver un VRP usando este sistema, es definirlo usando las clases que lo representan a él y a sus características. Esto se mostrará a través de un ejemplo de resolución de un CVRP con seis clientes. En este caso, se debe crear un objeto de tipo \textbf{basic-cvrp-client} (cliente con demanda) por cada cliente, uno de tipo \textbf{basic-depot} (depósito) y una matriz de distancias de tamaño $6x6$. 
 
-Teniendo los archivos exportados, la función \textbf{load-system} inicializará un buffer de slime, importará todas las funciones del sistema y establecerá :vrp como el package actual.
-
-Una vez levantado el sistema es posible ejecutar todas las funciones del sistema.
-
-\section{Ejecución}\label{3-problem}
-
-Para definir el problema que se quiere resolver se debe instanciar las clases que representan sus características. Estas clases fueron definidas en \textbf{vrp-core} y explicadas en \ref{2-core}. Por ejemplo, para definir una instancia de CVRP se necesita crear un objeto de tipo \textbf{basic-cvrp-client} (cliente con demanda) por cada cliente del problema, un objeto de tipo \textbf{cvrp-vehicle} (vehículo con capacidad), uno de tipo \textbf{basic-depot} (depósito) y una matriz de distancias de tamaño $nxn$ siendo $n$ el número de clientes. 
-
-En el ejemplo siguiente muestra la creación de una instancia de CVR con 6 clientes y dos vehículos.
+El siguiente código se usa para definir el problema.
 
  \begin{lstlisting}
 (defparameter c1 (basic-cvrp-client 1 1))
@@ -25,42 +16,43 @@ En el ejemplo siguiente muestra la creación de una instancia de CVR con 6 clien
 (defparameter c5 (basic-cvrp-client 5 2))
 (defparameter c6 (basic-cvrp-client 6 1))
 
-(defparameter v1 (cvrp-vehicle 1 20))
-(defparameter v2 (cvrp-vehicle 2 20))
-	
 (defparameter d0 (basic-depot))
 
 (defparameter dist-mat #2A((0 1 2 3 4 5 6)
-		  								(1 0 5 2 1 3 2)
-		  								(2 5 0 2 2 2 2)
-		  								(3 2 2 0 1 2 1)
-		  								(4 1 2 1 0 2 3)
-		  								(5 3 2 2 2 0 1)
-		  								(6 2 2 1 3 1 0)))
-		  								
-(defparameter problem (finite-fleet-cvrp-problem 
+										(1 0 5 2 1 3 2)
+										(2 5 0 2 2 2 2)
+										(3 2 2 0 1 2 1)
+										(4 1 2 1 0 2 3)
+										(5 3 2 2 2 0 1)
+										(6 2 2 1 3 1 0)))
+
+(defparameter problem (basic-cvrp-problem 
 										:id 1 
 										:clients (list c1 c2 c3 c4 c5 c6)
 										:depot d0 
 										:distance-matrix dist-mat 
-										:fleet (list v1 v2)))
+										:capacity 20))
 \end{lstlisting}
 
-En las líneas 1 a 6 se definen los clientes, estos reciben dos parámetros, \textit{id} y \textit{demanda} respectivamente. Los vehículos se definen en las líneas 8 y 9, reciben también dos parámetros \textit{id} y \textit{capacidad} respectivamente. Luego se declara el depísito (línea 11), matriz de distancias (línea 13) y se crea la instancia del problema (línea 21).
+En las líneas 1 a 6 se definen los clientes, estos reciben dos parámetros, \textit{id} y \textit{demanda} respectivamente. Los vehículos se definen en las líneas 8 y 9, reciben también dos parámetros \textit{id} y \textit{capacidad} respectivamente. Luego se declara el depósito (línea 11), la matriz de distancias (línea 13) y se crea la instancia del problema (línea 21).
 
-Una vez definido el problema, debe crearse también una solución inicial. Esta será utilizada para construir e inicializar el grafo. También será la solución inicial del algoritmo de búsqueda local a partir de la cual se generarán vecinos en busca de mejoras. En el caso de CVRP una solución está formada por una lista de rutas. El siguiente código muestra un ejemplo de solución inicial.
+Una vez se definió el problema, se debe crear una solución inicial como se muestra en la siguiente sección.
+
+\section{Solución inicial y Grafo de Evaluación}\label{4-solution}
+
+La solución inicial se utiliza para construir e inicializar el grafo. En el caso de CVRP una solución está formada por una lista de rutas que son instancias de la clase \textbf{route-for-simulation}. El siguiente código muestra cómo se crea una solución:
 
 
 \begin{lstlisting}
 (defparameter r1 (route-for-simulation 
 							:id 1
-							:vehicle v1 
+							:vehicle (cvrp-vehicle 1 20) 
 							:depot d0
 							:clients (list c1 c2 c3 (clone d0))
 							:previous-client (clone d0)))
 (defparameter r2 (route-for-simulation 
 							:id 2 
-							:vehicle v2
+							:vehicle (cvrp-vehicle 2 20)
 							:depot d0
 							:clients (list c4 c5 c6 (clone d0))
 							:previous-client (clone d0)))
@@ -70,64 +62,84 @@ Una vez definido el problema, debe crearse también una solución inicial. Esta 
 							:routes (list r1 r2)))
 \end{lstlisting}
 
-Las rutas son definidas como instancias de la clase \textbf{rute-for-simulation} (líneas 1 y 7). Esta clase es descendiente de la clase \textbf{basic-route} y la extiende con el slot \textit{previous-client}. Este slot comienza guardando una referencia al depósito a partir de la cual se crea el primer nodo de la ruta en el grafo de evaluación y es útil para facilitar la escritura del código de evaluación de la solución. Nótese que las rutas del grafo de evaluación comienzan y terminan en el depósito, este debe ser clonado en cada posición de la ruta para crear un nodo distinto en cada una.
+Las rutas se definen como instancias de la clase \textbf{rute-for-simulation} (líneas 1 y 7). Esta clase hereda de la clase \textbf{basic-route} y la extiende con la propiedad \textit{previous-client}. Esta propiedad se inicializa con una referencia al depósito a partir de la cual se crea el primer nodo de la ruta en el grafo de evaluación y simplifica la implementación del código de evaluación de la solución. Nótese que las rutas del grafo de evaluación comienzan y terminan en el depósito que se debe clonar para tener, en cada posición, nodos distintos.
 
-Una vez construida la solución inicial de debe inicializar el grafo ejecutando la función \textbf{init-graph}.
+Luego se debe inicializar el grafo con la función \textbf{init-graph}.
 
 \begin{lstlisting}
 (defparameter graph (init-graph s1))
 \end{lstlisting}
 
-En este punto se dispone de un grafo inicializado que debe terminar de ser construido ejecutando el código de evluación. El siguiente es el código de evaluación de una solución de CVRP:
+Una vez que el grafo está inicializado, se le deben agregar las operaciones y nodos que mantienen valores. Esto se consigue mediante el código de evaluación de la solución inicial.
 
 \begin{lstlisting}
-(progn
-	(def-var total-distance 0 graph)
-	(loop for r in (routes s1) do 
-		(progn
-			(def-var route-distance 0 graph)
-			(def-var route-demand (capacity (vehicle r)) graph) 
-			(loop for c in (clients r) do 
-				(progn
-					(increment-distance (previous-client r) c route-distance dist-mat graph)
-					(decrement-demand c route-demand graph) 
-					(setf (previous-client r) c)))
-				(increment-value total-distance route-distance graph)
-				(apply-penalty route-demand total-distance 10 graph)) 
-		(return-value total-distance graph)))
-
+(def-var total-distance 0 graph)
+(loop for r in (routes s1) do
+	(def-var route-distance 0 graph)
+	(def-var route-demand (capacity (vehicle r)) graph) 
+	(loop for c in (clients r) do 
+		(increment-distance (previous-client r) c route-distance dist-mat graph)
+		(decrement-demand c route-demand graph) 
+		(setf (previous-client r) c)
+	(increment-value total-distance route-distance graph)
+	(apply-penalty route-demand total-distance 10 graph)
+(return-value total-distance graph))
 \end{lstlisting}
 
-En la línea \textit{1} se usa def-var para inicializar la variable que almacenará el costo total de la solución. Luego se analizan las rutas de la solución. Por cada ruta se define una variable nueva que almacena su costo (línea \textit{5}) y otra que almacena la capacidad restante de su vehículo. Entonces se analizan los clientes de la ruta actual. Se incrementa el costo de la ruta en una cantidad igual a la distancia del cliente actual y el cliente previo (el cliente previo inicial de la ruta es el depósito), y se disminuye la capacidad del vehículo en una cantidad igual a la demanda del cliente (líneas \textit{9} y \textit{10}). Después de analizada cada ruta se aumenta el costo total de la solución en una cantidad igual a los costos de las mismas y se aplica penalización en caso de que un vehículo haya alcanzado una capacidad restante negativa (líneas \textit{12} y \textit{13}). Finalmente se retorna la distancia total.
+En la línea 1 se usa \textbf{def-var} para inicializar la variable que almacena el costo total de la solución. Luego se analizan las rutas de la solución. Por cada ruta se define una variable nueva que almacena su costo (línea 3) y otra que almacena la capacidad restante de su vehículo (línea 4). Entonces se analizan los clientes de la ruta actual. Se incrementa el costo de la ruta en una cantidad igual a la distancia del cliente actual y el cliente previo (el cliente previo inicial de la ruta es el depósito), y se disminuye la capacidad del vehículo en una cantidad igual a la demanda del cliente (líneas 6 y 7 respectivamente). Después de analizar cada ruta se aumenta el costo total de la solución en una cantidad igual a los costos de las mismas y se aplica penalización en caso de que un vehículo haya alcanzado una capacidad restante negativa (líneas 9 y 10). Finalmente se retorna la distancia total.
 
-En \textbf{vrp-core} están implementados algunos algoritmos de búsqueda local. Estos utilizan funciones de exploración con árbol de vecindad y grafo de evaluación para realizar sus búsquedas. Por ejemplo, la función de Búsqueda de Vecindad Variable \cite{TODO} (VNS) recibe la instancia del problema, una lista de funciones de exploración (una por cada criterio a aplicar), el Grafo de Evaluación y el número máximo de iteraciones a realizar.
+La siguiente sección ejemplifica cómo se generan las funciones de exploración a partir de criterios de vecindad y estrategias de exploración y selección.
 
-Antes de ejecutar la función de VNS se debe generar las funciones de exploración de acuerdo a los criterios que vayan a ser utilizados. Por ejemplo, a continuación se define una lista de funciones de exploración para los criterios \textit{rab}, \textit{rarb} y \textit{rarac}. En todos los casos se hace una búsqueda exhaustiva con selección de mejor vecino.
+\section{Generación de funciones de exploración}\label{4-generator}
+
+Una vez que se tiene el grafo de evaluación de una solución inicial, para resolver el problema con una búsqueda local se debe definir cómo explorar la vecindad.
+
+Las estrategias de exploración y selección se definen como clases cuyas instancias se pasan como parámetros a la función generadora. Se utilizan métodos que reciben estas instancias y generan código a partir de especializaciones de los tipos de los argumentos recibidos.
+
+A continuación se presentan algunas clases que representan estrategias de exploración y selección:\\
+
+\textit{Exploración:}
+\begin{itemize}
+	\item \textbf{exhaustive-neighborhood-search-strategy}: Exploración exhaustiva.
+	\item \textbf{random-neighborhood-search-strategy}: Exploración aleatoria.
+\end{itemize}
+
+\textit{Selección:}
+\begin{itemize}
+	\item \textbf{best-improvement-search-strategy}: Selección de mejor solución.
+	\item \textbf{first-improvement-search-strategy}: Selección de primera mejora.
+	\item \textbf{random-improvement-with-candidates-selection-strategy}: Selección aleatoria de una mejora entre los elementos de una lista con las mejoras encontradas.
+	\item \textbf{random-improvement-selection-strategy}: Selección aleatoria de una mejora en base a una probabilidad.
+\end{itemize}
+
+Durante la definición de cada clase se crea un parámetro global que almacena una instancia de su respectiva clase. Por ejemplo, el parámetro \textbf{+exhaustive-search-strategy+} tiene como valor asociado una instancia de \textbf{exhaustive-neighborhood-search-strategy}.
+
+A continuación se define una lista de funciones de exploración para los criterios \textit{mover un cliente dentro de su ruta}, \textit{mover un cliente a cualquier ruta en cualquier posición} e \textit{intercambiar dos clientes de posición}. En todos los casos se hace una búsqueda exhaustiva con selección de mejor vecino.
 
 \begin{lstlisting}
 (setf rab (make-neighborhood-criterion 
-					`((select-route r1)
-					(select-client c1 from r1)
-					(insert-client c1 to r1))
-					+exhaustive-search-strategy+ 
-					+best-improvement+))
+						`((select-route r1)
+						(select-client c1 from r1)
+						(insert-client c1 to r1))
+						+exhaustive-search-strategy+ 
+						+best-improvement+))
 
 (setf rarb (make-neighborhood-criterion 
-					`((select-route r1)
-					(select-client c1 from r1)
-					(select-route r2)
-					(insert-client c1 to r2))
-					+exhaustive-search-strategy+ 
-					+best-improvement+))
+						`((select-route r1)
+						(select-client c1 from r1)
+						(select-route r2)
+						(insert-client c1 to r2))
+						+exhaustive-search-strategy+ 
+						+best-improvement+))
 
 (setf rarac (make-neighborhood-criterion 
-					`((select-route r1)
-					(select-client c1 from r1)
-					(select-route r2)
-					(select-client c2 from r2)
-					(swap-clients c1 c2))
-					+exhaustive-search-strategy+ 
-					+best-improvement+))
+						`((select-route r1)
+						(select-client c1 from r1)
+						(select-route r2)
+						(select-client c2 from r2)
+						(swap-clients c1 c2))
+						+exhaustive-search-strategy+ 
+						+best-improvement+))
 
 (setf criteria (list rab rarb rarac))
 
@@ -136,13 +148,14 @@ Antes de ejecutar la función de VNS se debe generar las funciones de exploraci�
 En este punto es posible invocar la función de metaheurística de Búsqueda de Vecindad Variable y obtener una solución.
 
 \begin{lstlisting}
-(setf result (vns-vrp-system problem criteria graph :max-iter 1000000))
+(setf result (vns-vrp-system problem criteria graph :max-iter 1000))
 \end{lstlisting}
 
-El código completo se muestra a continuación:
+La siguiente sección muestra el código completo que soluciona un CVRP con datos ficticios.
+
+\section{Código completo}\label{4-union}
 
 \begin{lstlisting}
-(progn 
 (defparameter c1 (basic-cvrp-client 1 1))
 (defparameter c2 (basic-cvrp-client 2 1))
 (defparameter c3 (basic-cvrp-client 3 4))
@@ -150,8 +163,6 @@ El código completo se muestra a continuación:
 (defparameter c5 (basic-cvrp-client 5 2))
 (defparameter c6 (basic-cvrp-client 6 1))
 
-(defparameter v1 (cvrp-vehicle 1 20))
-(defparameter v2 (cvrp-vehicle 2 20))
 
 (defparameter d0 (basic-depot))
 
@@ -164,81 +175,77 @@ El código completo se muestra a continuación:
 										(6 2 2 1 3 1 0)))
 
 (defparameter problem (finite-fleet-cvrp-problem 
-									:id 1 
-									:clients (list c1 c2 c3 c4 c5 c6)
-									:depot d0 
-									:distance-matrix dist-mat 
-									:fleet (list v1 v2)))
+										:id 1 
+										:clients (list c1 c2 c3 c4 c5 c6)
+										:depot d0 
+										:distance-matrix dist-mat 
+										:capacity 20))
 
 (defparameter r1 (route-for-simulation 
-							:id 1
-							:vehicle v1 
-							:depot d0
-							:clients (list c1 c2 c3 (clone d0))
-							:previous-client (clone d0)))
+									:id 1
+									:vehicle (cvrp-vehicle 1 20) 
+									:depot d0
+									:clients (list c1 c2 c3 (clone d0))
+									:previous-client (clone d0)))
 (defparameter r2 (route-for-simulation 
-							:id 2 
-							:vehicle v2
-							:depot d0
-							:clients (list c4 c5 c6 (clone d0))
-							:previous-client (clone d0)))
+									:id 2 
+									:vehicle (cvrp-vehicle 2 20)
+									:depot d0
+									:clients (list c4 c5 c6 (clone d0))
+									:previous-client (clone d0)))
 
 (defparameter s1 (basic-solution
-							:id 1 
-							:routes (list r1 r2)))
+									:id 1 
+									:routes (list r1 r2)))
 
 (defparameter graph (init-graph s1))
 
-(progn
-	(def-var total-distance 0 graph)
-	(loop for r in (routes s1) do 
-		(progn
-			(def-var route-distance 0 graph)
-			(def-var route-demand (capacity (vehicle r)) graph) 
-			(loop for c in (clients r) do 
-				(progn
-					(increment-distance (previous-client r) c route-distance dist-mat graph)
-					(decrement-demand c route-demand graph) 
-					(setf (previous-client r) c)))
-			(increment-value total-distance route-distance graph)
-			(apply-penalty route-demand total-distance 10 graph)) 
-		(return-value total-distance graph)))
+
+(def-var total-distance 0 graph)
+(loop for r in (routes s1) do
+	(def-var route-distance 0 graph)
+	(def-var route-demand (capacity (vehicle r)) graph) 
+	(loop for c in (clients r) do
+		(increment-distance (previous-client r) c route-distance dist-mat graph)
+		(decrement-demand c route-demand graph) 
+		(setf (previous-client r) c))
+	(increment-value total-distance route-distance graph)
+	(apply-penalty route-demand total-distance 10 graph) 
+(return-value total-distance graph))
 
 
-
-(progn
 (setf rab (make-neighborhood-criterion 
-					`((select-route r1)
-					(select-client c1 from r1)
-					(insert-client c1 to r1))
-					+exhaustive-search-strategy+ 
-					+best-improvement+))
+								`((select-route r1)
+								(select-client c1 from r1)
+								(insert-client c1 to r1))
+								+exhaustive-search-strategy+ 
+								+best-improvement+))
 
 (setf rarb (make-neighborhood-criterion 
-					`((select-route r1)
-					(select-client c1 from r1)
-					(select-route r2)
-					(insert-client c1 to r2))
-					+exhaustive-search-strategy+ 
-					+best-improvement+))
+								`((select-route r1)
+								(select-client c1 from r1)
+								(select-route r2)
+								(insert-client c1 to r2))
+								+exhaustive-search-strategy+ 
+								+best-improvement+))
 
 (setf rarac (make-neighborhood-criterion 
-					`((select-route r1)
-					(select-client c1 from r1)
-					(select-route r2)
-					(select-client c2 from r2)
-					(swap-clients c1 c2))
-					+exhaustive-search-strategy+ 
-					+best-improvement+))
+								`((select-route r1)
+								(select-client c1 from r1)
+								(select-route r2)
+								(select-client c2 from r2)
+								(swap-clients c1 c2))
+								+exhaustive-search-strategy+ 
+								+best-improvement+))
 
 (setf criteria (list rab rarb rarac))
 
-(setf result (vns-vrp-system problem criteria graph :max-iter 10000000000)))
+(setf result (vns-vrp-system problem criteria graph :max-iter 10000000000))
 \end{lstlisting}
 
-Se ha logrado resolver una variante de VRP utilizando las funciones creadas al unir generación de funciones de exploración con Árbol de Vecindad y Grafo de Evaluación, sin embargo, la cantidad de variaciones que pueden ser creadas es practicamente ilimitada. El presente sistema puede ser fácilmente extendido para acomodarse a las necesidades del usuario y resolver (casi) cualquier variante de VRP.
+Para resolver otra variante de VRP utilizando el sistema que se implementó en el presente trabajo basta con definir las características del problema y el código de evaluación de la solución inicial. Además, cualquier problema que se defina puede ser explorado con cualquier criterio de vecindad sin importar la cantidad de operaciones que tenga y con cualesquiera combinaciones de estrategias de exploración y selección.
 
-
+En este capítulo se explicó paso a paso el método de uso del sistema. Sin embargo, este sistema no es capaz de resolver todas las variantes de VRP existentes. El siguiente capítulo explica cómo extenderlo para resolver problemas que actualmente no se pueden representar.
 
 
 

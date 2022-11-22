@@ -2788,6 +2788,8 @@ No better solution found in neighbor.
 		     +exhaustive-search-strategy+ 
 		     +best-improvement+))
 
+
+
 	 ;; (setf rarb (make-neighborhood-exploration-function bp))
 	 ;; let's get the best neighbor
 	 (setf best-neighbor (funcall rarb (neigh-tree-solution (solution-track graph)) 
@@ -2833,8 +2835,7 @@ the generated code:
          (CURRENT-COST (OUTPUT-VALUE (OUTPUT GRAPH)))
          (BEST-NEIGHBOR NIL)
          (BEST-COST CURRENT-COST)
-         (BEST-NEIGHBOR-AS-SOLUTION NIL)
-         (EXPL-TYPE 'EXHAUSTIVE-EXPLORATION))
+         (BEST-NEIGHBOR-AS-SOLUTION NIL))
     (LOOP WHILE CURRENT-SOLUTION
           DO (SETF OPS-LIST
                      (FROM-COORDINATES-TO-OPERATIONS

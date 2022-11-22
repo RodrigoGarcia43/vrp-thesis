@@ -1,18 +1,16 @@
 %===================================================================================
 % Chapter: Conclusiones
 %===================================================================================
-\chapter*{Conclusiones}\label{chapter:conclusions}
+\chapter*{Conclusiones y Recomendaciones}\label{chapter:conclusions}
 \addcontentsline{toc}{chapter}{Conclusiones}
-%==================================================================================
+En este trabajo se implementó un sistema mediante el cual un usuario es capaz de resolver variantes de VRP sólo definiendo los datos del problema y programando cómo se evalúa una solución inicial. Para lograr esto se unieron los resultados de tesis anteriores \cite{Hector}\cite{JJ}\cite{Heidy} que resolvían problemas aislados. En este trabajo se combinan las ventajas de cada una de estas tesis.
 
-%===================================================================================
+Con el sistema propuesto es posible evaluar cualquier solución vecina de forma automática usando el Grafo de Evaluación, se puede explorar vecindades de cualquier forma con el Árbol de Vecindad y se puede generar funciones de exploración a partir de cualquier criterio de vecindad y cualquier combinación de estrategias de exploración y selección. Por tanto, es posible resolver Problemas de Enrutamiento de Vehículos con muy poco tiempo de trabajo humano. Sólo debe definir los datos del problema y cómo se evalúa una solución.
 
+Siendo esta una primera aproximación, queda como recomendación hacer las pruebas pertinentes para comprobar la eficacia del sistema resolviendo problemas reales. Además, recomienda incorporar la extensión necesaria para resolver nuevas variantes.
 
+Se recomienda también agregar al sistema nuevas características tales como la metaheurística de Búsqueda de vecindad infinitamente variable \cite{Heidy}.
 
-% Chapter: Recomendaciones
-%===================================================================================
-\chapter*{Recomendaciones}\label{chapter:recomendaciones}
-\addcontentsline{toc}{chapter}{Recomendaciones}
-%===================================================================================
+Por último, se recomienda modificar la implementación del Árbol de Vecindad en aras de aumentar su extensibilidad y también resolver las limitaciones del Grafo de Evaluación.
 
 

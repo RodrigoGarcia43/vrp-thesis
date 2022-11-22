@@ -7,57 +7,57 @@ A level-1 auxiliary file: MainMatter/Background.aux
 A level-1 auxiliary file: MainMatter/Solution.aux
 A level-1 auxiliary file: MainMatter/Tutorial.aux
 A level-1 auxiliary file: MainMatter/Extension.aux
+A level-1 auxiliary file: MainMatter/Results.aux
 A level-1 auxiliary file: BackMatter/Conclusions.aux
 A level-1 auxiliary file: BackMatter/Bibliography.aux
 The style file: plain.bst
 A level-1 auxiliary file: BackMatter/Glossary.aux
 Database file #1: Bibliography.bib
 Warning--I didn't find a database entry for "TODO"
+Warning--I didn't find a database entry for "Ramsin1959"
 Warning--empty journal in Daniela
-Warning--empty journal in Heidy
-Warning--empty journal in Camila
 Warning--empty journal in multi
 Warning--empty journal in Hector
 Warning--empty journal in JJ
-You've used 7 entries,
+You've used 15 entries,
             2118 wiz_defined-function locations,
-            544 strings with 5231 characters,
-and the built_in function-call counts, 1557 in all, are:
-= -- 147
-> -- 55
+            595 strings with 6630 characters,
+and the built_in function-call counts, 3841 in all, are:
+= -- 386
+> -- 162
 < -- 0
-+ -- 25
-- -- 16
-* -- 74
-:= -- 290
-add.period$ -- 21
-call.type$ -- 7
-change.case$ -- 29
++ -- 69
+- -- 50
+* -- 236
+:= -- 705
+add.period$ -- 45
+call.type$ -- 15
+change.case$ -- 69
 chr.to.int$ -- 0
-cite$ -- 13
-duplicate$ -- 71
-empty$ -- 128
-format.name$ -- 16
-if$ -- 305
+cite$ -- 19
+duplicate$ -- 148
+empty$ -- 290
+format.name$ -- 50
+if$ -- 759
 int.to.chr$ -- 0
-int.to.str$ -- 7
-missing$ -- 7
-newline$ -- 38
-num.names$ -- 14
-pop$ -- 39
+int.to.str$ -- 15
+missing$ -- 11
+newline$ -- 78
+num.names$ -- 30
+pop$ -- 61
 preamble$ -- 1
-purify$ -- 22
+purify$ -- 55
 quote$ -- 0
-skip$ -- 50
+skip$ -- 106
 stack$ -- 0
-substring$ -- 56
-swap$ -- 1
+substring$ -- 192
+swap$ -- 8
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 28
-warning$ -- 6
-while$ -- 16
-width$ -- 8
-write$ -- 67
-(There were 7 warnings)
+type$ -- 60
+warning$ -- 4
+while$ -- 40
+width$ -- 17
+write$ -- 160
+(There were 6 warnings)

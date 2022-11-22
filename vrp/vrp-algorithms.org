@@ -5595,7 +5595,7 @@
              ;;         neighboorhoods-used current-index)
              do (if better-solution
                     (format t ", cost: ~a~%" (cost better-solution))
-                    (format t ".  Best solution found.~%"))
+                    (format t ".   Best solution found.~%"))
              ;; ;; ;; end of debug.
 
              ;; in any case, increment the number of neighboorhoods-used
@@ -5700,7 +5700,31 @@
 		   +exhaustive-search-strategy+ 
 		   +best-improvement+))
 
-      (setf criteria (list rab rarb rarac))
+  (setf ref (make-neighborhood-criterion 
+	     `((select-route r1)
+	       (select-subroute z1 from r1)
+	       (insert-subroute z1 into r1))
+	     +exhaustive-search-strategy+ 
+	     +best-improvement+))
+
+    (setf rereg (make-neighborhood-criterion 
+		 `((select-route r1)
+		   (select-subroute c1 from r1)
+		   (select-route r2)
+		   (select-subroute c2 from r2)
+		   (swap-subroutes c1 c2))
+	  +exhaustive-search-strategy+ 
+	  +best-improvement+))
+
+  (setf rerf (make-neighborhood-criterion 
+	      `((select-route r1)
+		(select-subroute c1 from r1)
+		(select-route r2)
+		(insert-subroute c1 into r2))
+	      +exhaustive-search-strategy+ 
+	      +best-improvement+))
+
+      (setf criteria (list rab rarb rarac ref rerf))
 
       (format t "~a" (vns-vrp-system problem criteria graph :max-iter 10000000000)))
 
@@ -5715,15 +5739,17 @@ routes:
   <r2: <cv:2. 0/10> (<d:0>: (<c4: 3> <c5: 2> <c6: 1> <d:0>))>
 
 Debug inside VNS.  Iteration 1, criterion 0, cost: 20
-Debug inside VNS.  Iteration 2, criterion 0.  Best solution found.
+Debug inside VNS.  Iteration 2, criterion 0Best solution found.
 Debug inside VNS.  Iteration 3, criterion 1, cost: 17
-Debug inside VNS.  Iteration 4, criterion 0.  Best solution found.
-Debug inside VNS.  Iteration 5, criterion 1.  Best solution found.
-Debug inside VNS.  Iteration 6, criterion 2.  Best solution found.
+Debug inside VNS.  Iteration 4, criterion 0Best solution found.
+Debug inside VNS.  Iteration 5, criterion 1Best solution found.
+Debug inside VNS.  Iteration 6, criterion 2Best solution found.
+Debug inside VNS.  Iteration 7, criterion 3Best solution found.
+Debug inside VNS.  Iteration 8, criterion 4Best solution found.
 (S1: (17)
 routes:
   <r1: <cv:1. 0/10> (<d:0>: (<c3: 4> <c1: 1>))>
   <r2: <cv:2. 0/10> (<d:0>: (<c4: 3> <c5: 2> <c6: 1> <c2: 1>))>
 
- 7 T)
+ 9 T)
 #+end_example

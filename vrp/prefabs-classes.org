@@ -277,6 +277,7 @@
           :slots-for-clone ())
       #+END_SRC
 
+
 *** random-improvement (without candidates)
 **** description
       In this selection strategy, when we find a better neighbor we return it according to a probability.  In this case there is no need to have a list of candidates.

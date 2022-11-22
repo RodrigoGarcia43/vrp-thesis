@@ -1431,7 +1431,7 @@
           ;;         neighboorhoods-used current-index)
           do (if better-solution
                  (format t ", cost: ~a~%" (cost better-solution))
-                 (format t ".  Best solution found.~%"))
+                 (format t "Best solution found.~%"))
           ;; ;; ;; end of debug.
 
           ;; in any case, increment the number of neighboorhoods-used

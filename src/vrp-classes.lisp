@@ -80,10 +80,22 @@
   ((demand))
   :documentation "A client with a demand that must be satisfied.")
 
+(def-vrp-class limited-client (demand-client)
+  ()
+  :documentation "")
+
 (def-vrp-class basic-cvrp-client (demand-client)
   ()
   :documentation "A basic client for the CVRP with id and demand."
   :constructor (basic-cvrp-client (id demand))
+  :print-object-string ("<c~a: ~a>" id demand)
+  :slots-for-obj= (id demand)
+  :slots-for-clone (id demand))
+
+(def-vrp-class size-limited-cvrp-client (limited-client)
+  ()
+  :documentation "A size-limited client for the CVRP with id and demand and route-limit."
+  :constructor (size-limited-cvrp-client (id demand))
   :print-object-string ("<c~a: ~a>" id demand)
   :slots-for-obj= (id demand)
   :slots-for-clone (id demand))

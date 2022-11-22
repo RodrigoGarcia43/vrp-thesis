@@ -603,24 +603,27 @@ Here we define what is the conditional inside the main loop. neigh-generator, th
      In this case, we get the ops-list from the current-solution, apply the operations over the eval-graph, store the solution cost, undo the operations and generate the new current-solution.
 **** code
       #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/prefabs-functions.lisp 
-	(defmethod generate-code-inside-loop :after
-	    (description
-	     strategy
-	     (other-strategies use-eval-graph)
-	     (where-to-store-it basic-neighborhood-strategy-blueprint))
+		(defmethod generate-code-inside-loop :after
+		    (description
+		     strategy
+		     (other-strategies use-eval-graph)
+		     (where-to-store-it basic-neighborhood-strategy-blueprint))
 
 
 
-	  (push `(setf ops-list (from-coordinates-to-operations current-solution))
-		(code-inside-the-loop where-to-store-it))
-	  (push `(do-suite-operations graph ops-list) 
-		(code-inside-the-loop where-to-store-it))
-	  (push `(setf current-cost (output-value (output graph)))
-		(code-inside-the-loop where-to-store-it))
-	  (push `(undo-suite-operations graph ops-list)
-		(code-inside-the-loop where-to-store-it))
-	  (push `(setf current-solution (funcall sol-generator))
-		(code-inside-the-loop where-to-store-it)))
+		  (push `(setf ops-list (from-coordinates-to-operations current-solution))
+			(code-inside-the-loop where-to-store-it))
+;		  (push `(format t "~a ~%" ops-list)
+;			(code-inside-the-loop where-to-store-it))
+	  
+		  (push `(do-suite-operations graph ops-list) 
+			(code-inside-the-loop where-to-store-it))
+		  (push `(setf current-cost (output-value (output graph)))
+			(code-inside-the-loop where-to-store-it))
+		  (push `(undo-suite-operations graph ops-list)
+			(code-inside-the-loop where-to-store-it))
+		  (push `(setf current-solution (funcall sol-generator))
+			(code-inside-the-loop where-to-store-it)))
       #+END_SRC
 **** test
      #+BEGIN_SRC lisp +n -r :results output :exports both :tangle ../src/vrp-tests.lisp

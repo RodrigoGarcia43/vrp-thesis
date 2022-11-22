@@ -305,6 +305,16 @@
       :documentation "A client with a demand that must be satisfied.")
     #+END_SRC
 *** no tests because it is an abstract class
+** limited-client (structural abstract)
+*** documentation
+    TODO
+*** code
+    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-classes.lisp
+    (def-vrp-class limited-client (demand-client)
+      ()
+      :documentation "")
+    #+END_SRC
+*** no tests because it is an abstract class
 ** basic-cvrp-client (actual class)
 *** documentation
     A client that can be used in the CVRP.  It has and id and a demand.
@@ -368,6 +378,21 @@
        pass ... Check NIL:        (OBJ= C2 C4)
        pass ... Check NIL:        (OBJ= C3 C5)
     #+end_example
+
+    
+** size-limited-cvrp-client (actual class)
+*** documentation
+    TODO
+*** code
+    #+BEGIN_SRC lisp +n -r :results none :exports code :tangle ../src/vrp-classes.lisp
+    (def-vrp-class size-limited-cvrp-client (limited-client)
+      ()
+      :documentation "A size-limited client for the CVRP with id and demand and route-limit."
+      :constructor (size-limited-cvrp-client (id demand))
+      :print-object-string ("<c~a: ~a>" id demand)
+      :slots-for-obj= (id demand)
+      :slots-for-clone (id demand))
+    #+END_SRC
 
 ** multi-product-demand-client (structural abstract)
 *** documentation

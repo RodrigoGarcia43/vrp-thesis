@@ -6,49 +6,41 @@
 %===================================================================================
 
 \qquad 
-Los costos por transportación pueden representar hasta el 60 porciento de los costos logísticos de una empresa. Esto implica que para empresas con capitales millonarios, una buena planeación de sus rutas de transportación puede representar un ahorro igualmente millonario.
+Los costos por transportación pueden representar más de la mitad de los costos logísticos de una empresa \cite{factoid}. Esto implica que para empresas con capitales millonarios, una buena planeación de sus rutas de transportación puede representar un ahorro igualmente millonario.
 
-El problema de enrutamiento de vehículos (VRP por sus siglas en inglés) es un problema de optimización combinatoria cuyo objetivo en su forma más simple es, dado un conunto de clientes, un depósito y una flota de vehículos, encontrar una asignación de rutas que optimice ciertos criterios tales como tiempo y costos de transportación.
+El problema de enrutamiento de vehículos (VRP por sus siglas en inglés) es un problema de optimización combinatoria cuyo objetivo en su forma más simple es, dado un conjunto de clientes, un depósito y una flota de vehículos, encontrar una asignación de rutas que optimice ciertos criterios tales como tiempo y costos de transportación.
 
-Existen además numerosas variaciones del problema clásico tales como el Problema de Enrutamiento de Vehículos con restricciones de capacidad (CVRP), el Problema de Enrutamiento de Vehículos con ventanas de tiempo (VRPTW) y el Problema de Enrutamiento de Vehículos con recogida y entrega (VRPPD). Cada variante tiene especificaciones propias, por lo que resulta difícil la creación de un método de solución universal para la familia de problemas VRP.
+En la literatura se reportan múltiples variantes para este problema como el Problema de Enrutamiento de Vehículos con restricciones de capacidad (CVRP) \cite{CVRP}, el Problema de Enrutamiento de Vehículos con ventanas de tiempo y el Problema de Enrutamiento de Vehículos con recogida y entrega (VRPPD) \cite{2002vehicle}, por citar sólo algunos de las más estudiadas. Cada variante tiene restricciones propias, por lo que resulta difícil la creación de un método de solución universal para cualquier VRP.
 
-El hecho de ser problemas NP-Duros implica la falta de soluciones exactas óptimas para instancias no pequeñas, por tanto, se utilizan técnicas no exactas como heurísticas y metaheurísticas que han sido objeto de estudio por décadas.
+Estos problemas son NP-duros, esto implica que no existen soluciones exactas para conjuntos de datos reales y por tanto, se utilizan técnicas aproximadas como heurísticas y metaheurísticas que han sido objeto de estudio por décadas \cite{1964scheduling,1974networks,1981complexity,1997tabu,2002vehicle}.
 
-El proceso de solución de una instancia arbitraria de VRP es complejo y necesita de una considerable cantidad de tiempo. Siendo un problema de gran importancia tanto académica como industrial, ha inspirado la creación de numerosas herramientas y artículos científicos. Cabe destacar la biblioteca OR-Tools, un software de código abierto útil para resolver problemas de optimización combinatoria entre los que se encuentra VRP.
+En particular, los algoritmos de búsqueda local han mostrado buenos resultados en los últimos tiempos \cite{TODO}.
 
-En la facultad de Matemática y Computación de La Universidad de La Habana este ha sido tema de estudio desde hace unos 6 años y se ha logrado resolver diversas problemáticas. En particular, la metaheurística de búsqueda local infinitamente variable (IVNS) planteada por Camila Pérez en \cite{Camila}, la generación automática de gramáticas para IVNS hecha por Daniela Gonzáles en \cite{Daniela}, la exploración de vecindades a partir de la combinación de distintas estrategias de exploración y selección hecha por Heidy Abreu en \cite{Heidy}, el Árbol de vecindad con generación de soluciones y la exploración de dos fases fueron planteados por Héctor Massón en \cite{Hector} y el Grafo de evaluación para la evaluación automática y eficiente de soluciones creado por Jose Jorge Rodríguez en \cite{JJ}. Cada una resuelve por separado un problema distinto. 
+El proceso de solución de un Problema de Enrutamiento de Vehículos específico es complejo y su solución puede tomar tiempo. Por ejemplo, varios meses en el caso de un trabajo de diploma \cite{TODO}, hasta un año en caso de una maestría \cite{Alina2010} y varios años en caso de una tesis de doctorado \cite{Alina2017}.
 
-Hasta el momento, para resolver una instancia de VRP por búsqueda local se le debe invertir muchísimo tiempo a programar aspectos como la forma de evaluar vecinos o de explorar vecindades. A partir de la unión de las ideas anteriores es posible resolver un VRP únicamente programando la evaluación de una solución y eso es, precisamente, lo que se pretende implementar. 
+%Cabe destacar la biblioteca OR-Tools, un software de código abierto útil para resolver problemas de optimización combinatoria entre los que se encuentra VRP \cite{TODO}.
 
+Desde hace varios años, comenzando por \cite{Camila}, en la facultad de Matemática y Computación de La Universidad de La Habana se han desarrollado varias investigaciones con el objetivo de agilizar el tiempo que toma resolver una variante específica de VRP. Para ello se propone utilizar una metaheurística de búsqueda local (IVNS) que permite considerar infinitos criterios de vecindad para un problema, a partir de gramáticas libres del contexto. Luego, en \cite{Daniela} se propone una forma de obtener automáticamente, a partir de la descripción del problema, la gramática necesitada por IVNS. En \cite{JJ} se propone una manera de calcular el costo de un vecino en casi cualquier variante de VRP y para ello se utiliza un Grafo de Evaluación. En \cite{Hector} se plantean formas automáticas para explorar vecindades de distintas maneras mediante un Árbol de Vecindad. Finalmente, en \cite{Heidy} se propone una vía para combinar estrategias de exploración y selección sin tener que programar todas las combinaciones posibles a través de un generador de funciones de exploración. Cada una de estas herramientas resuelve un problema por separado, pero hasta ahora no era posible su integración. Si se lograran integrar sería posible resolver cualquier problema de VRP utilizando cualquier combinación de estrategias de exploración y criterios de vecindad a partir de \cite{Hector} y \cite{Hector}. Además usando infinitos criterios de vecindad al combinar lo propuesto en \cite{Camila} y \cite{Daniela}. La única restricción estaría en que los vecinos fueran calculables por lo propuesto en \cite{JJ}.
+
+En este trabajo se propone una herramienta que permite integrar el Grafo de Evaluación de \cite{JJ}, con el Árbol de Vecindad de \cite{Hector} y el generador de funciones de exploración de \cite{Heidy}. Por ahora no es objetivo integrar el sistema con IVNS y por tanto se proponen otras metaheurísticas de búsqueda local como VNS \cite{TODO}.
+
+Con el sistema propuesto, resolver una variante de VRP se traduce en definir cómo se evalúa una única solución y definir, en un lenguaje casi natural, qué estrategias de exploración y criterios de vecindad se quieren utilizar.
 
 \subsection*{Objetivos}
-El objetivo general de este trabajo es diseñar e implementar un sistema que permita usar los beneficios de años anteriores de investigación para resolver (casi) cualquier instancia de VRP mediante una búsqueda local, a partir del código de evaluación de una solución.
+El objetivo general de este trabajo es diseñar e implementar un sistema que permita calcular los costos de cualquier vecino usando el Grafo de Evaluación de \cite{JJ}, que las vecindades se exploren usando el Árbol de Vecindad de \cite{Hector}, que las estrategias de exploración y selección se puedan combinar con lo propuesto en \cite{Heidy} y, por tanto, resolver variantes de VRP a partir únicamente del código de evaluación de una solución.
 
-\subsubsection*{Objetivos específicos}
+Para lograr los objetivos generales se han trazado los siguientes objetivos específicos:
 
 \begin{enumerate}
 	\item Consultar literatura especializada sobre el estado del arte de los problemas VRP.
-	\item Entender a profundidad las ideas y códigos propuestos en tesis anteriores.
-	\item Diseñar y programar un sistema que combine estas ideas para resolver cualquier VRP a partir de la evaluación de una solución.	
-	\item Analizar los resultados obtenidos. Se utiliza el sistema para resolver instancias conocidas de problemas de VRP.
+	\item Estudiar las ideas y códigos relacionados con el Grafo de Evaluación \cite{JJ}, el Árbol de Vecindad \cite{Heidy}, y el generador de funciones de exploración \cite{Hector}.
+	\item Diseñar e implementar un sistema que combine estas ideas para resolver distintas variantes de VRP a partir de la evaluación de una solución.
+	\item Analizar los resultados obtenidos. Para ello se utiliza el sistema implementado para resolver, con muy poco esfuerzo humano variantes de VRP.
 \end{enumerate}
+El presente documento está organizado en 5 capítulos.
 
-La propuesta de creación de generadores de código prefabricados planteada por Heidy Abreu facilita la exploración de vecindades combinando diferentes estrategias, con trabajo humano mínimo. Al agregar el árbol de vecindad desarrollado por Héctor Massón se puede generar soluciones vecinas de una solución una inicial de forma simple y eficiente. Utilizando además el grafo de evaluación de Jose Jorge Rodríguez, se optimiza la evaluación y obtención de costo de las soluciones. El grafo de evaluación necesita que el usuario ingrese la forma de evaluar una solución y esto, junto con la descripción del problema, es lo único que el sistema requerirá para ejecutarse.
-
-\subsection*{Organización de la tesis}
-
-El presente documento está organizado en 4 capítulos.
-
-
-En el capítulo 1 \textbf{Preliminares} se describe a profundidad la familia de Problemas de Enrutamiento de Vehículos, se introducen las vías existentes (bibliotecas) para resolverlos, se describen las ideas desarrolladas en cada una de las tesis anteriores y se hace una breve descripción de Coommon Lisp y algunas de las funcionalidades utilizadas.
-
-El capítulo 2 \textbf{Propuesta de Solución} describe el sistema implementado y la forma en que fueron unidas las piezas que lo conforman.
-
-En el capítulo 3 \textbf{Método de uso} se describe paso a paso el método de uso el sistema y cómo describir y resolver instancias de VRP.
-
-El capítulo 4 \textbf{Experimentos y resultados} comprende los experimentos realizados para validar el modelo, así como las métricas destinadas para su evaluación. 
-
-Por último se ofrecen las conclusiones a partir de los objetivos propuestos y los resultados alcanzados. Adicionalmente se brindan algunas ideas y recomendaciones para trabajos futuros.
+TODO:
+En el capítulo \ref{Chapter: Tools} se describen los elementos fundamentales del Problemas de Enrutamiento de Vehículos. En el capítulo \ref{Chapter: Tools} se describen las de las tesis que se combinan en este trabajo \cite{JJ,Heidy,Hector}. El capítulo \ref{chapter:Solution} describe el sistema que se implementó. En el capítulo \ref{chapter:Tutorial} se describe el método de uso el sistema para describir y resolver variantes de VRP. En el capítulo \ref{chapter:Extension} se muestra cómo extender este sistema. En el capítulo \ref{chapter:Results} se exponen los resultados alcanzados. En el capítulo \ref{chapter:conclusions} se ofrecen las conclusiones y se brindan algunas recomendaciones para trabajos futuros.
 
 
 
