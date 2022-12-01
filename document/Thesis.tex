@@ -1,5 +1,5 @@
-%\documentclass[11pt,oneside]{uhthesis}
-\documentclass[11pt,oneside]{report}
+\documentclass[11pt,oneside]{uhthesis}
+%\documentclass[11pt,oneside]{report}
 \usepackage{subfigure}
 \usepackage[linesnumbered,lined,titlenumbered,ruled]{algorithm2e}
 \usepackage{amsmath}
@@ -9,7 +9,7 @@
 \usepackage{float}
 \usepackage{braket}
 \setlength {\marginparwidth }{3cm}
-% \usepackage{todonotes}
+\usepackage{todonotes}
 
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
@@ -20,8 +20,8 @@
 \usepackage{multirow}
 \usepackage{ragged2e}
 
-%\floatstyle{ruled}
-%\restylefloat{table}
+\floatstyle{ruled}
+\restylefloat{table}
 \usepackage{listings}
 \usepackage{color}
 
@@ -46,14 +46,14 @@
 }
 
 \renewcommand{\tablename}{Tabla}
-\title{Un sistema para resolver variantes del Problema de Enrutamiento de Vehículos}
+\title{Sistema para la integración de herramientas para la solución ágil de Problemas de Enrutamiento de Vehículos}
 \author{Rodrigo García Gómez}
-% \advisor{MSc. Fernando Rodríguez Flores}
-% \coadvisor{}
-%\degree{Licenciado en Ciencias de la Computación}
-%\faculty{Facultad de Matemática y Computación}
+\advisor{MSc. Fernando Rodríguez Flores}
+\coadvisor{}
+\degree{Licenciado en Ciencias de la Computación}
+\faculty{Facultad de Matemática y Computación}
 \date{Noviembre de 2022}
-%\logo{Graphics/uhlogo}
+\logo{Graphics/uhlogo}
 
 \renewcommand{\vec}[1]{\boldsymbol{#1}}
 \newcommand{\diff}[1]{\ensuremath{\mathrm{d}#1}}
@@ -61,17 +61,17 @@
 \begin{document}
 \selectlanguage{spanish}
 
-% \frontmatter
-%\maketitle
+%\frontmatter
+\maketitle
 
-%\include{FrontMatter/Dedication}
-%\include{FrontMatter/Thanks}
-%\include{FrontMatter/SupervisorOpinion}
+\include{FrontMatter/Dedication}
+\include{FrontMatter/Thanks}
+\include{FrontMatter/SupervisorOpinion}
 \include{FrontMatter/Abstract}
-%\include{FrontMatter/Contents}
+\include{FrontMatter/Contents}
 
 
-% \mainmatter
+%\mainmatter
 	
 \include{MainMatter/Introduction}
 \include{MainMatter/Background}

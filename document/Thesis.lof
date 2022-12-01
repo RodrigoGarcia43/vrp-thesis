@@ -1,4 +1,14 @@
 \babel@toc {spanish}{}
 \babel@toc {spanish}{}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {1.1}{\ignorespaces Árbol de vecindad asociado a $rarb$}}{12}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Árbol de vecindad asociado a $rarb$.}}{23}{figure.2.1}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Nodos que representan elementos de la solución $s_1$ de VRP básico.}}{26}{figure.2.2}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Grafo de evaluación que representa la solución $s1$ de VRP básico.}}{26}{figure.2.3}%
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Grafo de evaluación que representa la solución $s1$ de VRP básico luego de mover el cliente $c2$}}{28}{figure.2.4}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Grafo de evaluación que representa la solución $s1$ de VRP básico.}}{36}{figure.3.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Grafo de evaluación que representa la solución $s1$ de VRP básico luego de mover el cliente $c2$}}{36}{figure.3.2}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

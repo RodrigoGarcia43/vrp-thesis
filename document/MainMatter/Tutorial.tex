@@ -1,10 +1,12 @@
 \chapter{Método de uso}\label{chapter:Tutorial}
 
-Este capítulo explica los pasos que debe seguir un usuario para resolver variantes de VRP utilizando el sistema que se implementó en este trabajo. Esto se hará a través de un ejemplo de resolución de un problema CVRP arbitrario. Para esto se define el problema en \ref{4-problem}, se define la solución y se construye el grafo de evaluación en \ref{4-solution} y se generan las funciones de exploración en \ref{4-generator}. En \ref{4-union} se presenta el código completo.
+Este capítulo explica los pasos que debe seguir un usuario para resolver variantes de VRP utilizando el sistema que se implementó en este trabajo. Esto se hará a través de un ejemplo de resolución de un problema CVRP arbitrario.
+
+En la sección \ref{4-problem} se define el problema. En la sección \ref{4-solution} se construye el grafo de evaluación y la solución inicial. En la sección \ref{4-generator} se generan las funciones de exploración. En \ref{4-union} se presenta el código completo.
 
 \section{Definición del problema}\label{4-problem}
 
-El primer paso para resolver un VRP usando este sistema, es definirlo usando las clases que lo representan a él y a sus características. Esto se mostrará a través de un ejemplo de resolución de un CVRP con seis clientes. En este caso, se debe crear un objeto de tipo \textbf{basic-cvrp-client} (cliente con demanda) por cada cliente, uno de tipo \textbf{basic-depot} (depósito) y una matriz de distancias de tamaño $6x6$. 
+El primer paso para resolver un VRP usando este sistema, es definirlo usando las clases que lo representan a él y a sus características. Esto se mostrará a través de un ejemplo de resolución de un CVRP con seis clientes. En este caso, se debe crear un objeto de tipo \texttt{basic-cvrp-client} (cliente con demanda) por cada cliente, uno de tipo \texttt{basic-depot} (depósito) y una matriz de distancias de tamaño $6x6$. 
 
 El siguiente código se usa para definir el problema.
 
@@ -40,7 +42,7 @@ Una vez se definió el problema, se debe crear una solución inicial como se mue
 
 \section{Solución inicial y Grafo de Evaluación}\label{4-solution}
 
-La solución inicial se utiliza para construir e inicializar el grafo. En el caso de CVRP una solución está formada por una lista de rutas que son instancias de la clase \textbf{route-for-simulation}. El siguiente código muestra cómo se crea una solución:
+La solución inicial se utiliza para construir e inicializar el grafo. En el caso de CVRP una solución está formada por una lista de rutas que son instancias de la clase \texttt{route-for-simulation}. El siguiente código muestra cómo se crea una solución:
 
 
 \begin{lstlisting}
@@ -62,9 +64,9 @@ La solución inicial se utiliza para construir e inicializar el grafo. En el cas
 							:routes (list r1 r2)))
 \end{lstlisting}
 
-Las rutas se definen como instancias de la clase \textbf{rute-for-simulation} (líneas 1 y 7). Esta clase hereda de la clase \textbf{basic-route} y la extiende con la propiedad \textit{previous-client}. Esta propiedad se inicializa con una referencia al depósito a partir de la cual se crea el primer nodo de la ruta en el grafo de evaluación y simplifica la implementación del código de evaluación de la solución. Nótese que las rutas del grafo de evaluación comienzan y terminan en el depósito que se debe clonar para tener, en cada posición, nodos distintos.
+Las rutas se definen como instancias de la clase \texttt{rute-for-simulation} (líneas 1 y 7). Esta clase hereda de la clase \texttt{basic-route} y la extiende con la propiedad \textit{previous-client}. Esta propiedad se inicializa con una referencia al depósito a partir de la cual se crea el primer nodo de la ruta en el grafo de evaluación y simplifica la implementación del código de evaluación de la solución. Nótese que las rutas del grafo de evaluación comienzan y terminan en el depósito que se debe clonar para tener, en cada posición, nodos distintos.
 
-Luego se debe inicializar el grafo con la función \textbf{init-graph}.
+Luego se debe inicializar el grafo con la función \texttt{init-graph}.
 
 \begin{lstlisting}
 (defparameter graph (init-graph s1))
@@ -86,7 +88,7 @@ Una vez que el grafo está inicializado, se le deben agregar las operaciones y n
 (return-value total-distance graph))
 \end{lstlisting}
 
-En la línea 1 se usa \textbf{def-var} para inicializar la variable que almacena el costo total de la solución. Luego se analizan las rutas de la solución. Por cada ruta se define una variable nueva que almacena su costo (línea 3) y otra que almacena la capacidad restante de su vehículo (línea 4). Entonces se analizan los clientes de la ruta actual. Se incrementa el costo de la ruta en una cantidad igual a la distancia del cliente actual y el cliente previo (el cliente previo inicial de la ruta es el depósito), y se disminuye la capacidad del vehículo en una cantidad igual a la demanda del cliente (líneas 6 y 7 respectivamente). Después de analizar cada ruta se aumenta el costo total de la solución en una cantidad igual a los costos de las mismas y se aplica penalización en caso de que un vehículo haya alcanzado una capacidad restante negativa (líneas 9 y 10). Finalmente se retorna la distancia total.
+En la línea 1 se usa \texttt{def-var} para inicializar la variable que almacena el costo total de la solución. Luego se analizan las rutas de la solución. Por cada ruta se define una variable nueva que almacena su costo (línea 3) y otra que almacena la capacidad restante de su vehículo (línea 4). Entonces se analizan los clientes de la ruta actual. Se incrementa el costo de la ruta en una cantidad igual a la distancia del cliente actual y el cliente previo (el cliente previo inicial de la ruta es el depósito), y se disminuye la capacidad del vehículo en una cantidad igual a la demanda del cliente (líneas 6 y 7 respectivamente). Después de analizar cada ruta se aumenta el costo total de la solución en una cantidad igual a los costos de las mismas y se aplica penalización en caso de que un vehículo haya alcanzado una capacidad restante negativa (líneas 9 y 10). Finalmente se retorna la distancia total.
 
 La siguiente sección ejemplifica cómo se generan las funciones de exploración a partir de criterios de vecindad y estrategias de exploración y selección.
 
@@ -100,19 +102,19 @@ A continuación se presentan algunas clases que representan estrategias de explo
 
 \textit{Exploración:}
 \begin{itemize}
-	\item \textbf{exhaustive-neighborhood-search-strategy}: Exploración exhaustiva.
-	\item \textbf{random-neighborhood-search-strategy}: Exploración aleatoria.
+	\item \texttt{exhaustive-neighborhood-search-strategy}: Exploración exhaustiva.
+	\item \texttt{random-neighborhood-search-strategy}: Exploración aleatoria.
 \end{itemize}
 
 \textit{Selección:}
 \begin{itemize}
-	\item \textbf{best-improvement-search-strategy}: Selección de mejor solución.
-	\item \textbf{first-improvement-search-strategy}: Selección de primera mejora.
-	\item \textbf{random-improvement-with-candidates-selection-strategy}: Selección aleatoria de una mejora entre los elementos de una lista con las mejoras encontradas.
-	\item \textbf{random-improvement-selection-strategy}: Selección aleatoria de una mejora en base a una probabilidad.
+	\item \texttt{best-improvement-search-strategy}: Selección de mejor solución.
+	\item \texttt{first-improvement-search-strategy}: Selección de primera mejora.
+	\item \texttt{random-improvement-with-candidates-selection-strategy}: Selección aleatoria de una mejora entre los elementos de una lista con las mejoras encontradas.
+	\item \texttt{random-improvement-selection-strategy}: Selección aleatoria de una mejora en base a una probabilidad.
 \end{itemize}
 
-Durante la definición de cada clase se crea un parámetro global que almacena una instancia de su respectiva clase. Por ejemplo, el parámetro \textbf{+exhaustive-search-strategy+} tiene como valor asociado una instancia de \textbf{exhaustive-neighborhood-search-strategy}.
+Durante la definición de cada clase se crea un parámetro global que almacena una instancia de su respectiva clase. Por ejemplo, el parámetro \texttt{+exhaustive-search-strategy+} tiene como valor asociado una instancia de \texttt{exhaustive-neighborhood-search-strategy}.
 
 A continuación se define una lista de funciones de exploración para los criterios \textit{mover un cliente dentro de su ruta}, \textit{mover un cliente a cualquier ruta en cualquier posición} e \textit{intercambiar dos clientes de posición}. En todos los casos se hace una búsqueda exhaustiva con selección de mejor vecino.
 

@@ -1,145 +1,121 @@
 \chapter{Experimentos y resultados}\label{chapter:Results}
 
-En este capítulo se presentan las pruebas que se hicieron para evaluar el desempeño del presente sistema. Para esto pruebas se utilizaron datos de CVRP reales conocidos como \textit{A-n33-k5} \cite{TODO}. Se utilizó el algoritmo de búsqueda local \textit{Búsqueda de Vecindad Variable} \cite{TODO} con funciones de exploración generadas a partir \textbf{+exhaustive-search-strategy+}, \textbf{+best-solution-selection-strategy+} y los siguientes criterios de vecindad:
+En este capítulo se presentan las pruebas que se hicieron para evaluar el desempeño del presente sistema. Para estas pruebas se utilizaron datos de CVRP reales conocidos como \textit{A-n33-k5} \cite{Data}. 
+
+El código de evaluación de una solución de CVRP se muestra a continuación.
+
+\begin{lstlisting}
+(def-var total-distance 0 graph)
+(loop for r in (routes s1) do
+	(def-var route-distance 0 graph)
+	(def-var route-demand (capacity (vehicle r)) graph) 
+	(loop for c in (clients r) do
+		(increment-distance (previous-client r) c route-distance dist-mat graph)
+		(decrement-demand c route-demand graph) 
+		(setf (previous-client r) c))
+	(increment-value total-distance route-distance graph)
+	(apply-penalty route-demand total-distance 10 graph) 
+(return-value total-distance graph))
+\end{lstlisting}
+
+Se utilizó el algoritmo de búsqueda local \textit{Búsqueda de Vecindad Variable} \cite{mladenovic1995variable} con funciones de exploración que se generan a partir de \texttt{+exhaustive-\\search-strategy+}, \texttt{+best-solution-selection-strategy+} y los siguientes criterios de vecindad:
 
 \begin{itemize}
-	\item rab.
-	\item rarb.
-	\item rarac.
-	\item ref.
-	\item rerf.
-	\item rereg.
+	\item Mover cliente dentro de su ruta.
+	\item Mover cliente a cualquier ruta en cualquier posicion.
+	\item Intercambiar dos clientes de posición.
 \end{itemize}
 
-
-\textit{A-n33-k5} tiene 32 clientes y se conoce una solución óptima de costo 661.
-
-Luego de aplicar la metaheurística se obtuvo la siguiente solución con costo 675, muy cercano al costo óptimo.
+A continuación se muestra el código que genera las funciones de exploración de cada criterio.
 
 \begin{lstlisting}
-S1: (675)
-routes:
-<r5: <cv:1. 0/100> (<d:0>: (<c2: 23> <c24: 13> <c6: 18> <c23: 14>))>
-<r4: <cv:1. 0/100> (<d:0>: (<c20: 8> <c32: 3> <c13: 23> <c8: 10> <c7: 19>
-<c26: 2> <c4: 13> <c22: 19>))>
-<r3: <cv:1. 0/100> (<d:0>: (<c15: 18> <c17: 24> <c9: 18> <c3: 14> <c16: 10>
-<c29: 8>))>
-<r2: <cv:1. 0/100> (<d:0>: (<c28: 15> <c18: 13> <c31: 24> <c1: 5> <c21: 10>
-<c14: 9> <c19: 14> <c11: 5>))>
-<r1: <cv:1. 0/100> (<d:0>: (<c12: 9> <c5: 8> <c27: 23> <c25: 14> <c30: 20>
-<c10: 20>))>
+(setf rab (make-neighborhood-criterion 
+								`((select-route r1)
+								  (select-client c1 from r1)
+								  (insert-client c1 to r1))
+								+exhaustive-search-strategy+ 
+								+best-improvement+))
+
+(setf rarb (make-neighborhood-criterion 
+								`((select-route r1)
+								  (select-client c1 from r1)
+								  (select-route r2)
+								  (insert-client c1 to r2))
+								+exhaustive-search-strategy+ 
+								+best-improvement+))
+
+(setf rarac (make-neighborhood-criterion 
+								`((select-route r1)
+								  (select-client c1 from r1)
+								  (select-route r2)
+								  (select-client c2 from r2)
+								(swap-clients c1 c2))
+								+exhaustive-search-strategy+ 
+								+best-improvement+))
+
+(setf criteria (list rab rarb rarac))
+
 \end{lstlisting}
 
-Luego, para comprobar las capacidades del sistema para resolver distintas variantes con trabajo humano mínimo se le agregó una restricción al problema anterior. Según la nueva restricción, cada una de las rutas de la solución tiene un límite máximo de 7 clientes. 
+\textit{A-n33-k5} tiene 32 clientes y se conoce una solución óptima de costo 661 \cite{Data}.
 
-El código que se necesitó para resolver el nuevo problema se muestra a continuación. Primero se definen nuevas clases para los nodos que se agregan al grafo.
+Luego de aplicar la metaheurística se obtuvo una solución con costo 675.
+
+Para comprobar las capacidades del sistema para resolver distintas variantes con trabajo humano mínimo se le agregó una restricción al problema anterior que limita cada una de las rutas de la solución a un máximo de 7 clientes. En la sección \ref{4-eval} se explicó cómo extender el sistema para poder resolver este nuevo problema.
+
+Para resolver la nueva variante, sólo se tuvo que modificar el código de evaluación de la solución inicial como se muestra a continuación.
 
 \begin{lstlisting}
-(def-vrp-class limited-client (demand-client)())
-    
-(def-vrp-class size-limited-cvrp-client (limited-client) ()
-	:constructor (size-limited-cvrp-client (id demand)))
-	
-(def-vrp-class input-limited-node (input-node) 
-	((limit-calculator :initform nil))
-	:constructor (new-limited-node (&key content)))
-
- (def-vrp-class input-limited-distance-demand-node (input-distance-node input-demand-node input-limited-node) ()
-	:constructor (new-input-limited-distance-demand-node (&key content)))
-	
- (def-vrp-class decrement-size-node (low-level-node)
-	((input-with-limit))
-	:constructor (new-decrement-size-node (&key previous-node )
+(def-var total-distance 0 graph)
+(loop for r in (routes s1) do
+	(def-var route-distance 0 graph)
+	(def-var route-demand (capacity (vehicle r)) graph) 
+	(def-var route-limit 7 graph)
+	(loop for c in (clients r) do
+		(increment-distance (previous-client r) c route-distance A-n33-k5-distance-matrix graph)
+		(decrement-demand c route-demand graph) 
+		(decrement-size c 'route-limit graph) 
+		(setf (previous-client r) c))
+	(increment-value total-distance route-distance graph)
+	(apply-penalty route-demand total-distance 100 graph) 
+	(apply-penalty route-limit total-distance 1000 graph))) 
+(return-value total-distance graph))
 \end{lstlisting}
 
-Luego se implementan los métodos de construcción y modificación del grafo.
+La diferencia con respecto al código de evaluación de una solución de CVRP está en las líneas 5, 10 y 14.
+
+Además, se cambiaron las estrategias de exploración y selección a exploración aleatoria con primera mejora. Para esto, bastó con cambiar los parámetros de las funciones generadoras (de \texttt{+exhaustive-search-strategy+} a \texttt{+random-search-strategy+}y de \texttt{+best-improvement+ a \texttt{+first-impro-\\vement+}}) como se muestra a continuación.
 
 \begin{lstlisting}
- (defmethod convert-to-node :around ((target limited-client) graph)
-	(let ((new-c (new-input-limited-distance-demand-node :content target)))
-		(progn
-			(setf (inputs graph) (append (inputs graph) `(,new-c)))
-			(setf (gethash target (class-to-io graph)) new-c))))
+(setf rab (make-neighborhood-criterion 
+								`((select-route r1)
+								  (select-client c1 from r1)
+								  (insert-client c1 to r1))
+								+random-search-strategy+ 
+								+first-improvement+))
+
+(setf rarb (make-neighborhood-criterion 
+								`((select-route r1)
+								  (select-client c1 from r1)
+								  (select-route r2)
+								  (insert-client c1 to r2))
+								+random-search-strategy+ 
+								+first-improvement+))
 
 
+(setf rarac (make-neighborhood-criterion 
+								`((select-route r1)
+								  (select-client c1 from r1)
+								  (select-route r2)
+								  (select-client c2 from r2)
+								  (swap-clients c1 c2))
+								+random-search-strategy+ 
+								+first-improvement+))
 
-(defmethod evaluate-low-level-node ((ll-node decrement-size-node))
-	(progn
-		(if (not (typep (content (input-with-limit ll-node)) 'basic-depot))
-			(decf (output-value (output-action ll-node)) 1))
-		(if (updater (output-action ll-node))
-			(undo-low-level-node (updater (output-action ll-node))))))
+(setf criteria (list rab rarb rarac))
 
-
-(defmethod undo-low-level-node ((ll-node decrement-size-node))
-	(progn
-		(if (not (typep (content (input-with-limit ll-node)) 'basic-depot))
-			(incf (output-value (output-action ll-node)) 1))
-			(undo-low-level-node (updater (output-action ll-node)))))
-
-
-(defmethod remove-node append ((t-node input-limited-node))
-	(if (not (typep t-node 'input-depot-node))
-		(progn
-			(undo-low-level-node (limit-calculator t-node))))))
-			
-
-(defmethod insert-node append ((t-node input-limited-node) 
-(i-node input-limited-node))
-	(let* ((new-inc (new-decrement-size-node 
-								:output-action (output-action (limit-calculator t-node))
-								:input-with-limit i-node)))
-	(progn
-		(setf (limit-calculator i-node) new-inc)
-		(evaluate-low-level-node new-inc))))
-
-		
-(defmethod decrement-size (c capacity-slot-accumulator graph)
-	(let* ((l-node (gethash c (class-to-io graph)))
-				(acc (gethash capacity-slot-accumulator (slot-to-output graph)))
-				(l-calc (new-decrement-size-node :output-action acc :input-with-limit l-node)))
-		(progn
-			(setf (limit-calculator l-node) l-calc)
-			(evaluate-low-level-node l-calc))))
 \end{lstlisting}
 
-En este punto sólo resta definir el código de evaluación de una solución para el nuevo problema.
-
-\begin{lstlisting}
-
-(progn
-	(def-var total-distance 0 graph)
-	(loop for r in (routes s1) do 
-		(progn
-			(def-var route-distance 0 graph)
-			(def-var route-demand (capacity (vehicle r)) graph) 
-			(def-var route-limit 7 graph)
-			(loop for c in (clients r) do 
-				(progn
-					(increment-distance (previous-client r) c route-distance A-n33-k5-distance-matrix graph)
-					(decrement-demand c route-demand graph) 
-					(decrement-size c 'route-limit graph) 
-					(setf (previous-client r) c)))
-			(increment-value total-distance route-distance graph)
-			(apply-penalty route-demand total-distance 100 graph) 
-			(apply-penalty route-limit total-distance 1000 graph))) 
-	(return-value total-distance graph)))
-\end{lstlisting}
-
-Luego de ejecutar el sistema con los mismos datos de \textit{A-n33-k5} para el nuevo problema, se obtuvo la siguiente solución de costo 727:
-
-\begin{lstlisting}
-S1: (727)
-routes:
-<r5: <cv:1. 0/100> (<d:0>: (<c22: 19> <c15: 18> <c16: 10> <c3: 14> <c9: 18>
-<c4: 13> <c20: 8>))>
-<r4: <cv:1. 0/100> (<d:0>: (<c2: 23> <c32: 3> <c13: 23> <c8: 10> <c7: 19>
-<c26: 2> <c10: 20>))>
-<r3: <cv:1. 0/100> (<d:0>: (<c23: 14> <c28: 15> <c18: 13> <c11: 5> <c6: 18>
-<c24: 13>))>
-<r2: <cv:1. 0/100> (<d:0>: (<c29: 8> <c31: 24> <c1: 5> <c21: 10> <c14: 9>
-<c19: 14>))>
-<r1: <cv:1. 0/100> (<d:0>: (<c12: 9> <c5: 8> <c27: 23> <c25: 14> <c30: 20>
-\end{lstlisting}
+Luego de ejecutar el sistema con los mismos datos de \textit{A-n33-k5} para el nuevo problema, se obtuvo una solución de costo 727:
 
 El siguiente capítulo presenta las conclusiones y recomendaciones.

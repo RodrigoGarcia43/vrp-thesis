@@ -4,121 +4,204 @@ Con las funcionalidades implementadas hasta el momento, el sistema que se propon
 
 Para extender el sistema a nuevos problemas se debe crear las clases que lo describen y las funciones que permitan construir su grafo de evaluación a partir de una de sus soluciones. También es posible definir nuevas estrategias de exploración y selección.
 
-En \ref{4-description} se explica cómo extender el módulo \textbf{core}. En \ref{4-eval} se explica cómo extender el módulo \textbf{eval}. En el capítulo \ref{4-generator} se explica cómo extender el módulo \textbf{generator}.
+En \ref{4-description} se explica cómo extender el módulo \texttt{core}. En \ref{4-eval} se explica cómo extender el módulo \texttt{eval}. En el capítulo \ref{4-generator} se explica cómo extender el módulo \texttt{generator}.
 
 \section{Descripción del problema}\label{4-description}
-Para extender el sistema a nuevas variantes de VRP puede ser necesario agregar nuevas clases para representar las características del problema. Las características de cada característica del problema depende de las clases de las que heredan. Además, todas las clases que representan características de problemas son descendientes de su clase base correspondiente. Por ejemplo, un cliente de CVRP (clase \textbf{basic-cvrp-client}) hereda de \textbf{demand-client}, clase que indica que el cliente posee una demanda y de \textbf{basic-client}, la clase base para los clientes.
+Para extender el sistema a nuevas variantes de VRP puede ser necesario agregar nuevas clases para representar las características del problema. Cada característica depende de las clases de las que hereda. Además, todas las clases que representan características de problemas son descendientes de su clase base correspondiente. Por ejemplo, un cliente de CVRP (clase \texttt{basic-cvrp-client}) hereda de \texttt{demand-client}, clase que indica que el cliente posee una demanda y de \texttt{basic-client}, la clase base para los clientes (que sólo tiene un identificador).
 
-Definir una clase nueva implica identificar de qué clases debe heredar para satisfacer sus especifiaciones y, en caso de ser necesario, crear nuevas clases. Definir un problema nuevo puede implicar la creación de varias clases para representar sus características.
+Definir una nueva clase implica identificar de qué clases debe heredar para satisfacer sus especificaciones y, en caso de ser necesario, crear nuevas clases. Definir un problema nuevo puede implicar la creación de varias clases para representar sus características.
 
-A continuación se ejemplificará cómo crear la clase \textbf{basic-time-windows-problem} que representa un Problema de Enrutamiento de Vehículos con Vetanas de tiempo (TWVRP) \cite{TODO}. En este problema los clientes, además de sus demandas, tienen un período de tiempo en que pueden se pueden visitar, de lo contrario la solución es penalizada. Además, los vehículos deben esperar ciertas cantidades de tiempo mientras atienden a cada cliente.
+A continuación se ejemplificará cómo crear la clase \texttt{basic-time-windows\\-problem} que representa un Problema de Enrutamiento de Vehículos con vetanas de tiempo (VRPTW) \cite{VRPTW}. En este problema los clientes, además de sus demandas, tienen un período de tiempo en que se pueden visitar, de lo contrario se penaliza la solución. Además, cada vez que un vehículo visita un cliente debe esperar un tiempo determinado (tiempo de servicio).
 
-Para definir el TWVRP es necesario crear clientes que conozcan sus ventanas de tiempo y el tiempo que debe consumir el vehículo atendiéndolos. Se definen las clases estructurales:
+Para definir el VRPTW es necesario definir nuevos clientes, rutas y el problema. 
 
-\begin{itemize}
-	\item \textbf{time-windows-client}: Tiene ventana de tiempo.
-	\item \textbf{service-time-client}: Consume tiempo al ser atendido. 
-\end{itemize}
-
-Una vez definidas estas dos clases se crea \textbf{basic-tw-client} que representa un cliente de TWVRP y hereda de:
+Primero se crean clientes que conozcan sus ventanas de tiempo y cuánto demora su servicio. Se definen dos clases:
 
 \begin{itemize}
-	\item \textbf{basic-client}
-	\item \textbf{demand-client}
-	\item \textbf{time-windows-client}
-	\item \textbf{service-time-client}
+	\item \texttt{time-windows-client}: Tiene ventana de tiempo.
+	\item \texttt{service-time-client}: Consume tiempo al ser atendido. 
 \end{itemize}
 
-Las rutas que existen en el sistema no pueden determinar el momento en que se encuentra su vehículo, por eso se deben definir nuevas rutas que conozcan el tiempo actualmente consumido. Se crea la clase \textbf{route-with-time} y la clase \textbf{basic-tw-route} que hereda de \textbf{route-with-time} y \textbf{basic-route} (o \textbf{route-for-simulation} si se quiere utilizar en el Grafo de Evaluación).
-
-También debe definirse la clase \textbf{time-problem} para indicar que el problema tiene una matriz de $nxn$ cuyas posiciones guardan los tiempos necesarios para viajar entre clientes. Finalmente es posible definir la clase \textbf{basic-time-windows-problem} para el problema con ventanas de tiempo que hereda de las siguientes clases abstractas:
+Una vez definidas estas clases, se crea \texttt{basic-tw-client} que representa un cliente de TWVRP y hereda de:
 
 \begin{itemize}
-	\item \textbf{basic-problem} (tiene clientes, depósitos e identificador)
-	\item \textbf{distance-problem} (tiene matriz de distancias)
-	\item \textbf{capacity-problem} (tiene una capacidad por cada cliente)
-	\item \textbf{time-problem} (tiene matriz de tiempos)
+	\item \texttt{basic-client}
+	\item \texttt{demand-client}
+	\item \texttt{time-windows-client}
+	\item \texttt{service-time-client}
 \end{itemize}
 
-Junto con las nuevas características, definir un nuevo problema implica también definir cómo evaluar sus soluciones. Al evaluar una solución para un problema determinado puede hacer falta operaciones que aún no existen. El siguiente capítulo explica cómo definir nuevas operaciones
+Las rutas que existen en el sistema no pueden determinar el momento en que se encuentra su vehículo, por eso se deben definir nuevas rutas que conozcan el tiempo actualmente consumido. Se crea la clase \texttt{route-with-\\time} y la clase \texttt{basic-tw-route} que hereda de \texttt{route-with-time} y \texttt{route-\\for-simulation}.
+
+También debe definirse la clase \texttt{time-problem} para indicar que el problema tiene una matriz de $nxn$ cuyas posiciones guardan los tiempos necesarios para viajar entre clientes. Finalmente es posible definir la clase \texttt{basic-time-windows-problem} para el problema con ventanas de tiempo que hereda de las siguientes clases abstractas:
+
+\begin{itemize}
+	\item \texttt{basic-problem} (tiene clientes, depósitos e identificador)
+	\item \texttt{distance-problem} (tiene matriz de distancias)
+	\item \texttt{capacity-problem} (tiene una capacidad por cada cliente)
+	\item \texttt{time-problem} (tiene matriz de tiempos)
+\end{itemize}
+
+Junto con las nuevas características, definir problema implica también definir cómo evaluar sus soluciones. Al evaluar una solución para un problema determinado puede hacer falta operaciones que aún no existen. La siguiente sección explica cómo definir nuevas operaciones para el Grafo de Evaluación.
 
 \section{Evaluación}\label{4-eval}
 
-Al definir nuevos problemas, también se debe crear la forma en que sus soluciones se evalúan y, en caso de ser necesario, extender el Grafo de Evaluación para satisfacer nuevas características y restricciones. Extender el grafo se traduce en agregar los nuevos nodos y las funciones que se usarán en el código de evaluación.
+Al definir nuevos problemas, también se debe crear la forma en que sus soluciones se evalúan y, en caso de ser necesario, extender el Grafo de Evaluación para incorporar nuevas características y restricciones. Extender el grafo se traduce en agregar los nuevos nodos y las funciones que se usarán en el código de evaluación.
 
-Por ejemplo, a continuación se muestra cómo extender el Grafo de Evaluación para evaluar soluciones del de CVRP con una restricción extra. Se restringe el problema de capacidad para, además de penalizar la solución por exceso de carga en los vehículos de sus rutas, tambíen se penaliza si la ruta excede un número definido de vecinos $k$. El código completo que extiende el sistema para resolver CVRP con limitación de tamaño de rutas se muestra en el capítulo \ref{chapter:Results}.
+En esta sección se muestra cómo extender el Grafo de Evaluación para obtener el costo de soluciones de CVRP con una restricción extra que consiste en que cada ruta sólo pude tener un número determinado de clientes.
 
-Para evaluar una solución de este poroblema se define una variable por cada ruta que se inicializa con valor $k$ y se decrementa en uno por cada cliente de la ruta. Luego, en caso de tener esta variable valor negativo, se penaliza el costo total de la solución. El código de evaluación de CVRP con rutas limitadas se muestra a continuación:
+A continuación se muestra el código necesario para evaluar una solución de este problema. Teniendo ese código, se identifican las funciones y clases que se necesita implementar.
+
+Para evaluar una solución se define una variable por cada ruta que se inicializa con valor $k$ y se decrementa en uno por cada cliente de la ruta. Luego, en caso de tener esta variable valor negativo, se penaliza el costo total de la solución. El código de evaluación de CVRP con rutas limitadas se muestra a continuación:
 
 \begin{lstlisting}
 
-(progn
-	(def-var total-distance 0 graph)
-	(loop for r in (routes s1) do 
-		(progn
-			(def-var route-distance 0 graph)
-			(def-var route-demand (capacity (vehicle r)) graph) 
-			(def-var route-limit k graph)
-			(loop for c in (clients r) do 
-				(progn
-					(increment-distance (previous-client r) c route-distance A-n33-k5-distance-matrix graph)
-					(decrement-demand c route-demand graph) 
-					(decrement-size c route-limit graph) 
-					(setf (previous-client r) c)))
-		(increment-value total-distance route-distance graph)
-		(apply-penalty route-demand total-distance 100 graph) 
-		(apply-penalty route-limit total-distance 1000 graph))) 
-	(return-value total-distance graph)))
+(def-var total-distance 0 graph)
+(loop for r in (routes s1) do
+	(def-var route-distance 0 graph)
+	(def-var route-demand (capacity (vehicle r)) graph) 
+	(def-var route-limit k graph)
+	(loop for c in (clients r) do
+		(increment-distance (previous-client r) c route-distance A-n33-k5-distance-matrix graph)
+		(decrement-demand c route-demand graph) 
+		(decrement-size c route-limit graph) 
+		(setf (previous-client r) c))
+	(increment-value total-distance route-distance graph)
+	(apply-penalty route-demand total-distance 100 graph) 
+	(apply-penalty route-limit total-distance 1000 graph)) 
+(return-value total-distance graph))
 \end{lstlisting}
 
-En la línea 5 se crea la variable \textbf{route-limit}. En la línea 13 se decrementa en uno el valor de \textbf{route-limit} por cada cliente \textbf{c}. En la línea 17 se penaliza el costo total si \textbf{route-limit} tiene valor negativo. Para que este código funcione debe definirse la función \textbf{decrement-size} que cree un nodo operacional (que también debe definirse) \textbf{decrement-size-node} que recibe un cliente y, al ejecutarse, decrementa en uno el valor del nodo asociado a route-limit. Para definir cómo se ejecuta y cómo se deshace este nodo operacional deben programarse los métodos \textbf{evaluat} y \textbf{undo} correspondientes.
+En la línea 5 se crea la variable \texttt{route-limit}. En la línea 13 se decrementa en uno el valor de \texttt{route-limit} por cada cliente \texttt{c}. En la línea 17 se penaliza el costo total si \texttt{route-limit} tiene valor negativo. 
 
-En este punto es posible construir el grafo con su solución inicial evaluada. Sin embargo, para evaluar soluciones vecinas al los clientes se remueven e insertan. Remover un cliente implica deshacer su \textbf{decrement-size-nodo} y por tanto, cada cliente debe tener una propiedad que referencie este \textbf{decrement-size-node}. Los nodos que se usan para evaluar CVRP no tienen una propiedad para referenciar su \textbf{decrement-size-node} y por tanto deben crearse nuevos tipos de nodo cliente que sí la tengan. Se define la clase \textbf{input-limited-distance-demand-node} que además de la referencia a su nodo operacional de que penzaliza el tamaño de la ruta, mantiene referencias a sus nodos operacionales de penalización por capacidad y de aumento de distancia.
-
-Los nodos que representan elementos de la solución en el grafo se obtienen transformando clases de \textit{core} en clases nodos de \textit{eval} métodos especializaciones de la función genérica \textbf{convert-to-node}. Debe implementarse una especialización de \textbf{convert-to-node} que cree nodos de tipo \textbf{input-limited-distance-demand-node}.
-
-Por último se deben implementar los métodos que inserten y remuevan los nuevos nodos definidos para este problema y ejecuten o deshagan todos los nodos operacionales que dependan de estos nuevos nodos.
+Para que este código de evaluación funcione, primero debe definirse la función \texttt{decrement-size} que recibe un cliente y crea un nodo operacional \texttt{decrement-size-node} para conectar el nodo asociado a este cliente con el nodo acumulador asociado a la variable \texttt{time-limit}. 
 
 
-El sistema también se puede extender implementando nueas estrategias de exploración y selección.
+\begin{lstlisting}
+(defmethod decrement-size (c capacity-slot-accumulator graph)
+	(let* ((l-node (gethash c (class-to-io graph)))
+		(acc (gethash capacity-slot-accumulator (slot-to-output graph)))
+		(l-calc (new-decrement-size-node :output-action acc :input-with-limit l-node)))
+		(progn
+			(setf (limit-calculator l-node) l-calc)
+			(evaluate-low-level-node l-calc))))
 
+\end{lstlisting}
+
+
+\texttt{Decrement-size-node} es un nodo operacional que también debe definirse. Este nodo recibe un cliente y una variable (en este caso \texttt{route-limit}), y cuando se ejecuta decrementa en uno el valor del nodo asociado a la variable.
+
+\begin{lstlisting}
+(def-vrp-class decrement-size-node (low-level-node)
+	((input-with-limit))
+	:constructor (new-decrement-size-node (&key previous-node )
+\end{lstlisting}
+
+
+Para definir cómo se ejecuta y cómo se deshace este nodo operacional deben programarse los métodos \texttt{evaluate} y \texttt{undo} correspondientes.
+
+\begin{lstlisting}
+(defmethod evaluate-low-level-node ((ll-node decrement-size-node))
+	(progn
+		(if (not (typep (content (input-with-limit ll-node)) 'basic-depot))
+			(decf (output-value (output-action ll-node)) 1))
+		(if (updater (output-action ll-node))
+			(undo-low-level-node (updater (output-action ll-node))))))
+
+
+(defmethod undo-low-level-node ((ll-node decrement-size-node))
+	(progn
+		(if (not (typep (content (input-with-limit ll-node)) 'basic-depot))
+			(incf (output-value (output-action ll-node)) 1))
+		(undo-low-level-node (updater (output-action ll-node)))))
+
+\end{lstlisting}
+
+En este punto es posible construir el grafo con su solución inicial evaluada. Sin embargo, para evaluar soluciones vecinas los clientes se eliminan e insertan. Eliminar un cliente implica deshacer su \texttt{decrement-size-node} y por tanto, cada cliente debe tener una propiedad que referencie este nodo. Los nodos que se usan para evaluar CVRP no tienen una propiedad para referenciar su \texttt{decrement-size-node} y por tanto deben crearse nuevos tipos de nodo cliente que sí la tengan. Se define la clase \texttt{input-limited-distance\\$  $-demand-node} que además de la referencia a su nodo operacional para penalizar el tamaño de la ruta (\texttt{Decrement-size-node}), mantiene referencias a sus nodos operacionales de penalización por capacidad y de aumento de distancia. Esto se logra heredando de las clases 
+\texttt{input-limited-node}, \texttt{input-demand-node} y \texttt{input-distance-node} respectivamente. Nótese que la clase \texttt{input-limited-node} también debe ser definida.
+
+\begin{lstlisting}
+(def-vrp-class input-limited-node (input-node) 
+	((limit-calculator :initform nil))
+	:constructor (new-limited-node (&key content)))
+
+(def-vrp-class input-limited-distance-demand-node (input-distance-node input-demand-node input-limited-node) ()
+	:constructor (new-input-limited-distance-demand-node (&key content)))
+\end{lstlisting}
+
+Los nodos que representan elementos de la solución en el grafo se obtienen transformando clases de \textit{core} en clases nodos de \textit{eval} métodos especializaciones de la función genérica \texttt{convert-to-node}. Debe implementarse una especialización de \texttt{convert-to-node} que cree nodos de tipo \texttt{input\\-limited-distance-demand-node}.
+
+\begin{lstlisting}
+(defmethod convert-to-node :around ((target limited-client) graph)
+	(let ((new-c (new-input-limited-distance-demand-node :content target)))
+		(progn
+			(setf (inputs graph) (append (inputs graph) `(,new-c)))
+			(setf (gethash target (class-to-io graph)) new-c))))
+\end{lstlisting}
+
+Por último se deben implementar los métodos que inserten y eliminen los nuevos nodos definidos para este problema y ejecuten o deshagan todos los nodos operacionales que dependan de estos nuevos nodos.
+
+\begin{lstlisting}
+(defmethod remove-node append ((t-node input-limited-node))
+	(if (not (typep t-node 'input-depot-node))
+		(progn
+			(undo-low-level-node (limit-calculator t-node))))))
+
+
+(defmethod insert-node append ((t-node input-limited-node) 
+(i-node input-limited-node))
+	(let* ((new-inc (new-decrement-size-node 
+								:output-action (output-action (limit-calculator t-node))
+								:input-with-limit i-node)))
+	(progn
+		(setf (limit-calculator i-node) new-inc)
+		(evaluate-low-level-node new-inc))))
+\end{lstlisting}
+
+El sistema también se puede extender con la implementación de nuevas estrategias de exploración y selección. Sobre esto trata la siguiente sección.
 
 \section{Estrategias}\label{4-generator}
-Actualmente, el presente sistema cuenta con implementaciones de varias estrategias de exploración y selección, mencionadas en \ref{2-blueprint} que al ser combinadas generan exploraciones distintas. Es posible también extender la generación de funciones de exploración a partir de nuevas estrategias.
+Actualmente, el sistema tiene implementadas estrategias de exploración exhaustiva, exploración aleatoria, selección de mejor vecino, selección de primera mejora y selección de vecino aleatorio. Al combinar estas estrategias se generan exploraciones distintas. Es posible también extender la generación de funciones de exploración a partir de nuevas estrategias.
 
-La definición de estrategias lleva dos pasos. Primero debe crearse la clase que representa esta estrategia. En dependencia del comportamiento que se espera, la nueva clase puede heredar de clases auxiliares ya creadas o de nuevas clases auxiliares que se definen. El segundo paso consiste en implementar las especializaciones de métodos de cada tipo (inicializaciones de variables, código dentro del ciclo, código de retorno, etc) que reciban como parámetros las nuevas clases que se crearon.
+La definición de estrategias se realiza en dos pasos. Primero debe crearse la clase que representa esta estrategia. En dependencia del comportamiento que se espera, la nueva clase puede heredar de clases auxiliares ya creadas o de nuevas clases que se definen. El segundo paso consiste en implementar las especializaciones de métodos de cada tipo (inicializaciones de variables, código dentro del ciclo, código de retorno, etc) que reciban como parámetros las nuevas clases que se crearon.
 
-Opcionalmente se puede asociar una instancia cada estrategia que se implemente a un parámetro global con el siguiente formato: \textbf{+\textit{name}-\textit{type}-strategy+}, donde \textbf{\textit{name}} es el nombre de la estrategia y \textbf{\textit{type}} es \textit{search} o \textit{selection}.
+Opcionalmente se puede asociar una instancia de cada estrategia que se implemente a un parámetro global con el siguiente formato: $$\texttt{+\textit{name}-\textit{type}-strategy+}$$ Donde \texttt{\textit{name}} es el nombre de la estrategia y \texttt{\textit{type}} es \textit{search} o \textit{selection}.
 
 
-Por ejemplo, a continuación se crea una estrategia de selección en la que se retorna vecino aleatorio de entre una lista de mejoras, pero esa lista sólo tendrá soluciones cuya mejora con respecto a la inicial supere cierto margen. se define la clase \textbf{random-improvement-with-restricted-candidates-selection-strategy} y una instancia se asocia al parámetro global \textbf{+random-improvement-with-restricted-candidates-selection-strategy+}.
+Por ejemplo, a continuación se crea una estrategia de selección en la que se retorna vecino aleatorio de entre una lista de mejoras, pero esa lista sólo tendrá soluciones cuya mejora con respecto a la inicial supere cierto margen. se define la clase: $$\texttt{random-improvement-with-restricted-candidates-selection-strategy}$$ Y se asocia una instancia al parámetro global: $$\texttt{+random-improvement-with-restricted-candidates-selection-strategy+}$$
 
-La nueva clase tiene una propiedad \textbf{aceptance} para el margen de aceptación con valor entre 0 y 1. Se aceptan soluciones que cumplen:
+La nueva clase tiene una propiedad \texttt{aceptance} para el margen de aceptación con valor entre 0 y 1. Se aceptan soluciones que cumplen:
 
 $$
-cost_s < cost_{init-s} - cost_{init-s} * \textbf{aceptance} 
+cost_s < cost_{init-s} - cost_{init-s} * \texttt{aceptance} 
 $$
 
-\textbf{Random-improvement-with-restricted-candidates-selection-strategy} debe heredar de las siguientes clases auxiliares que ya están en el sistema:
+\texttt{Random-improvement-with-restricted-candidates-selection-strategy} debe heredar de las siguientes clases auxiliares que ya están en el sistema:
 
 \begin{itemize}
-	\item \textbf{use-eval-graf}: Para generar soluciones con Árbol de vecindad y evaluarlas con grafo de evaluación.
-	\item \textbf{return-best-solution}: Para crear y retornar una variable \textbf{best-solution}
+	\item \texttt{use-eval-graph}: Para generar soluciones con Árbol de Vecindad y evaluarlas con grafo de evaluación.
+	\item \texttt{return-best-solution}: Para crear y retornar una variable \texttt{best-solution}
 \end{itemize}
 
 Además, se debe crear la clase auxiliar:
 
 \begin{itemize}
-	\item \textbf{has-restricted-candidates-for-best-neighbor}: Tiene un comportamiento parecido a \textbf{has-restricted-candidates-best-neighbor} (una clase que ya está en el sistema). Indica que se tiene lista de candidatos con vecinos que cumplen la restricción de aceptación.
+	\item \texttt{has-restricted-candidates-for-best-neighbor}: Tiene un comportamiento parecido a \texttt{has-candidates-for-best-neighbor} (una clase que ya está en el sistema). Indica que se tiene una lista de candidatos con vecinos que cumplen la restricción de aceptación.
 \end{itemize}
 
-Luego deben implementarse las especializaciones de los métodos \textbf{generate-code-inside-let}, \textbf{generate-code-inside-loop} y \textbf{generate-code-outside-loop} tal que reciban como parámetro la nueva clase \textbf{random-improvement-with-restricted-candidates-selection-strategy}.
+Luego deben implementarse las especializaciones de los métodos:
+\begin{itemize}
+	\item \texttt{generate-code-inside-let}
+	\item \texttt{generate-code-inside-loop}
+	\item \texttt{generate-code-outside-loop}
+\end{itemize}
+Tal que reciban como parámetro la nueva clase: \texttt{random-improvement-with\\-restricted-candidates-selection-strategy}
 
-En las inicialicaciones dentro del \textbf{let} se inicializa una variable con nombre \textbf{candidates-for-best-neighbor}.
+En las inicialicaciones dentro del \texttt{let} se inicializa una variable con nombre \texttt{candidates-for-best-neighbor}.
 
-Dentro del ciclo se verifica si el costo de la solución inicial cumple con la restricción establecida y en caso positivo, se agrega esta a la lista \textbf{candidates-for-best-neighbor}.
+Dentro del ciclo se verifica si el costo de la solución inicial cumple con la restricción establecida y en caso positivo, se agrega esta a la lista \texttt{candidates-\\for-best-neighbor}.
 
-Finalmente, fuera del ciclo se escoge aleatoriamente un vecino de \textbf{candidates-for-best-neighbor}, se asocia este a la variable \textbf{best-neighbor} y se asocia su costo a \textbf{best-cost}. Las variables \textbf{best-neighbor} y \textbf{best-cost} se crean dentro del let en la especialización de \textbf{return-best-solution}. En caso de \textbf{candidates-for-best-neighbor} estar vacía, entonces no se hace nada y tanto \textbf{best-neighbor} como \textbf{best-cost} permanecen iguales.
+Finalmente, fuera del ciclo se escoge aleatoriamente un vecino de \texttt{candi-\\dates-for-best-neighbor}, se asocia este a la variable \texttt{best-neighbor} y se asocia su costo a \texttt{best-cost}. Las variables \texttt{best-neighbor} y \texttt{best-cost} se crean dentro del let en la especialización de \texttt{return-best-solution}. En caso de \texttt{candidates-for-best-neighbor} estar vacía, entonces no se hace nada y tanto \texttt{best-neighbor} como \texttt{best-cost} permanecen iguales.
 
 En este capítulo se explicó cómo extender el sistema para resolver variantes de VRP que no estén soportadas actualmente. El siguiente capítulo muestra los resultados que se obtuvieron al utilizar el sistema de este trabajo con datos reales.
 

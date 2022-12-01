@@ -1,5 +1,11 @@
 \begin{thebibliography}{10}
 
+\bibitem{Amous-2017}
+Marwa Amous, Said Toumi, Bassem Jarboui, and Mansour Eddaly.
+\newblock A variable neighborhood search algorithm for the capacitated vehicle
+  routing problem.
+\newblock {\em Electronic Notes in Discrete Mathematics}, 58, 04 2017.
+
 \bibitem{Alina2010}
 Alina~Fern{\'a}ndez Arias.
 \newblock Problema de enrutamiento de veh{\'i}culos con recogida y entrega
@@ -25,6 +31,11 @@ Daniela~González Beltrán.
   infinitos criterios de vecindad en el problema de enrutamiento de vehículos.
 \newblock 2019.
 
+\bibitem{backhauls1998}
+D.O. Casco, L.~Golden, and Bruce Wasil.
+\newblock Vehicle routing with backhauls: Models, algorithms, and case studies.
+\newblock {\em Vehicle Routing: Methods and Studies}, 1998.
+
 \bibitem{1964scheduling}
 Geoff Clarke and John~W Wright.
 \newblock Scheduling of vehicles from a central depot to a number of delivery
@@ -36,6 +47,18 @@ George~B Dantzig and John~H Ramser.
 \newblock The truck dispatching problem.
 \newblock {\em Management science}, 6(1):80--91, 1959.
 
+\bibitem{VRPTW}
+M.~Desrosiers, J.~Desrosiers, and M.M. Solomon.
+\newblock A new optimization algorithm for the vehicle routing problem with
+  time windows.
+\newblock {\em Operations Research}, 992.
+
+\bibitem{Vns-Component-2013}
+John~H. Drake, Nikolaos Kililis, and Ender {\"O}zcan.
+\newblock {\em Generation of VNS Components with Grammatical Evolution for
+  Vehicle Routing}, pages 25--36.
+\newblock Springer Berlin Heidelberg, Berlin, Heidelberg, 2013.
+
 \bibitem{Heidy}
 Heidy~Abreu Fumero.
 \newblock Exploraci\'on de una vecindad para una soluci\'on de vrp combinando
@@ -43,10 +66,46 @@ Heidy~Abreu Fumero.
 \newblock Master's thesis, Facultad de Matem\'atica y Computaci\'on,
   Universidad de La Habana, La Habana, Cuba, May 2019.
 
+\bibitem{FirstVRPAPP}
+Pierre Hansen and Nenad Mladenović.
+\newblock First vs. best improvement: An empirical study.
+\newblock {\em Discrete Applied Mathematics}, 154(5):802 -- 817, 2006.
+\newblock \{IV\} ALIO/EURO Workshop on Applied Combinatorial OptimizationIV
+  ALIO/EURO Workshop on Applied Combinatorial Optimization.
+
+\bibitem{CLOS}
+Sonya~E. Keene.
+\newblock {\em Object-Oriented Programming in COMMON LISP: A Programmer's Guide
+  to CLOS}.
+\newblock Addison-Wesley Professional, 1989.
+
 \bibitem{1981complexity}
 Jan~Karel Lenstra and AHG~Rinnooy Kan.
 \newblock Complexity of vehicle routing and scheduling problems.
 \newblock {\em Networks}, 11(2):221--227, 1981.
+
+\bibitem{Data}
+S.A. MirHassani and N~Abolghasemi.
+\newblock A particle swarm optimization algorithm for open vehicle ruting
+  problem.
+\newblock {\em Vehicle Routing: Methods and Studies}, 2011.
+
+\bibitem{mladenovic1995variable}
+N~Mladenovic.
+\newblock A variable neighborhood algorithm--a new metaheuristic for
+  optimization combinatorial.
+\newblock In {\em Abstract of papers presented at Optimization Days, Montreal},
+  volume~12, 1995.
+
+\bibitem{mladenovic1997variable}
+Nenad Mladenovi{\'c} and Pierre Hansen.
+\newblock Variable neighborhood search.
+\newblock {\em Computers \& operations research}, 24(11):1097--1100, 1997.
+
+\bibitem{VRPPD}
+G.~Mosheiov.
+\newblock he travelling salesman problem with pick-up and delivery.
+\newblock {\em IEuropean Journal of Operational Research, vol. 79}, 1994.
 
 \bibitem{Camila}
 Camila~P\'erez Mosquera.
@@ -55,10 +114,22 @@ Camila~P\'erez Mosquera.
 \newblock Master's thesis, Facultad de Matem\'atica y Computaci\'on,
   Universidad de La Habana, La Habana, Cuba, May 2017.
 
+\bibitem{Osman-1996}
+Ibrahim~H. Osman and James~P. Kelly.
+\newblock {\em Meta-Heuristics || A Parallel Tabu Search Algorithm Using
+  Ejection Chains for the Vehicle Routing Problem}, volume
+  10.1007/978-1-4613-1361-8.
+\newblock 1996.
+
 \bibitem{multi}
 P~Parthanadee.
 \newblock A multi-product. multi-depot periodic distribution problem.
 \newblock 2002.
+
+\bibitem{ALNS-2007}
+David Pisinger and Stefan Ropke.
+\newblock A general heuristic for vehicle routing problems.
+\newblock {\em Computers and Operations Research}, 34(8):2403 -- 2435, 2007.
 
 \bibitem{factoid}
 B.E. Prentice and D.~Prokop.
@@ -78,6 +149,16 @@ José Jorge~Rodríguez Salgado.
   evaluación de una solución.
 \newblock 2020.
 
+\bibitem{Lisp2006}
+Peter Seible.
+\newblock {\em Practical common lisp}.
+\newblock Apress, 2006.
+
+\bibitem{Lisp1990}
+Guy Steele.
+\newblock {\em Common Lisp: the language}.
+\newblock Elsevier, 1990.
+
 \bibitem{1997tabu}
 {\'E}ric Taillard, Philippe Badeau, Michel Gendreau, Fran{\c{c}}ois Guertin,
   and Jean-Yves Potvin.
@@ -86,7 +167,7 @@ José Jorge~Rodríguez Salgado.
 \newblock {\em Transportation science}, 31(2):170--186, 1997.
 
 \bibitem{2002vehicle}
-P~Toth and D~Vigo.
+P.~Toth and D.~Vigo.
 \newblock The vehicle routing problem. monographs.
 \newblock {\em Discrete Mathematics and Applications, Society for Industrial
   and Applied Mathematics, Philadelphia}, 2002.

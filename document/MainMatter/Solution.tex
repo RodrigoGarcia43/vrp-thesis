@@ -3,15 +3,15 @@
 La implementación del sistema está dividida en cuatro módulos: Núcleo, trabajo con vecindades, evaluación de soluciones y generador de funciones de exploración.
 
 \begin{itemize}
-	\item Núcleo (\textbf{Core}): En este módulo se implementan las clases a partir de las cuales se pueden describir las soluciones y criterios de vecindad para Problemas de Enrutamiento de Vehículos.
-	\item Trabajo con vecindades (\textbf{Neigh}): Se implementa el Árbol de Vecindad a partir del cual se genera soluciones con distintas formas de exploración de vecindades.
-	\item Evaluación de soluciones (\textbf{Eval}): Se implementa el grafo de evaluación con el que se obtiene el costo de soluciones vecinas a partir de cómo se evalúa una solución.
-	\item Generador de funciones de exploración (\textbf{Generator}): Este módulo contiene el código que permite generar funciones de exploración para combinar estrategias de exploración y selección.
+	\item Núcleo (\texttt{Core}): En este módulo se implementan las clases a partir de las cuales se pueden describir las soluciones y criterios de vecindad para Problemas de Enrutamiento de Vehículos.
+	\item Trabajo con vecindades (\texttt{Neigh}): Se implementa el Árbol de Vecindad a partir del cual se genera soluciones con distintas formas de exploración de vecindades.
+	\item Evaluación de soluciones (\texttt{Eval}): Se implementa el grafo de evaluación con el que se obtiene el costo de soluciones vecinas a partir de cómo se evalúa una solución.
+	\item Generador de funciones de exploración (\texttt{Generator}): Este módulo contiene el código que permite generar funciones de exploración para combinar estrategias de exploración y selección.
 \end{itemize}
 
-Estos cuatro módulos ya existían antes de que se desarrollara el presente trabajo. En las secciones siguientes se describen los detalles de cada uno de estos módulos, cómo se combinaron y qué modificaciones se le hizo a cada uno para implementar esta tesis. En ela sección \ref{2-core} se describe el módulo \textbf{core}. En la sección \ref{2-neigh} se describe el módulo \textbf{neigh}. En la sección \ref{2-eval} se describe el módulo \textbf{eval}. Por último, en la sección \ref{2-generator} se describe el módulo \textbf{generator}
+Estos cuatro módulos ya existían antes de que se desarrollara el presente trabajo. En las secciones siguientes se describen los detalles de cada uno de estos módulos, cómo se combinaron y qué modificaciones se le hizo a cada uno para implementar esta tesis. En la sección \ref{2-core} se describe el módulo \texttt{core}. En la sección \ref{2-neigh} se describe el módulo \texttt{neigh}. En la sección \ref{2-eval} se describe el módulo \texttt{eval}. Por último, en la sección \ref{2-generator} se describe el módulo \texttt{generator}
 
-\section{Vrp-Core}\label{2-core}
+\section{Vrp-core}\label{2-core}
 
 En el módulo \textit{core} se definen funciones para inicializar el sistema, así como implementaciones de algoritmos de búsqueda local que utilizan funciones del sistema para explorar vecindades.
 
@@ -21,21 +21,21 @@ También se definen clases que permiten definir los datos necesarios para resolv
 
 Además, en este módulo se tiene clases que representan las operaciones que conforman los criterios de vecindad (como seleccionar ruta o insertar cliente).
 
-Para el desarrollo de esta tesis, no se añadió código al módulo \textit{core}. Por el contrario, se desecharon secciones de código que quedaron obsoletas. Por ejemplo, en la versión anterior se utilizaba algo llamado \textit{solución de trabajo}, que era copia de la solución actual sobre la que se realizaban las modificaciones para evaluar vecinos eficientemente. Como esta tesis las evaluaciones se hacen mediante el Grafo de Evaluación, las \textit{soluciones de trabajo} quedan obsoletas. En la versión anterior se tenía también unos mecanismos con los que se exploraba vecindades, que al incorporar el Árbol de vecindad fueron desechados.
+Para el desarrollo de esta tesis, no se añadió código al módulo \textit{core}. Por el contrario, se desecharon secciones de código que quedaron obsoletas. Por ejemplo, en la versión anterior se utilizaba algo llamado \textit{solución de trabajo}, que era una copia de la solución actual sobre la que se realizaban las modificaciones para evaluar vecinos eficientemente. Como en esta tesis las evaluaciones se hacen mediante el Grafo de Evaluación, las \textit{soluciones de trabajo} quedan obsoletas. En la versión anterior se tenía también unos mecanismos con los que se exploraba vecindades, que al incorporar el Árbol de vecindad fueron desechados.
 
-Una vez definidas las clases que permiten crear una solución, definir características de un problema, y definir un problema, es posible construir un Árbol de Vecindad. Esto se hace en el módulo \textbf{neigh}.
+Una vez definidas las clases que permiten crear una solución, definir características de un problema, y definir un problema, es posible construir un Árbol de Vecindad. Esto se hace en el módulo \texttt{neigh}.
 
 \section{Vrp-neigh}\label{2-neigh}
 En este módulo se define el Árbol de Vecindad como una clase que se construye a partir de un problema, una solución y un criterio de vecindad. 
 
-El Árbol de Vecindad permite crear iteradores (o generadores) de soluciones. La función que se usa para crear el iterador depende del tipo de exploración que se desee (como \textbf{exhaustive-exploration} o \textbf{random-exploration}). Cada vez que se ejecuta un iterador, se obtiene la lista de operaciones que se aplican a la solución actual para generar un vecino, o \textbf{nil} en caso de que se no queden vecinos por analizar. Esta condición varía según el tipo de exploración. Por ejemplo, para la exploración exhaustiva se generan todas las soluciones de la vecindad, mientras que en una aleatoria se genera una cantidad predefinida de vecinos. 
+El Árbol de Vecindad permite crear iteradores (o generadores) de soluciones. La función que se usa para crear el iterador depende del tipo de exploración que se desee. Por ejemplo, \texttt{exhaustive-exploration} para la exploración exhaustiva o \texttt{random-exploration} para la exploración aleatoria. Cada vez que se ejecuta un iterador, se obtiene la lista de operaciones que se aplican a la solución actual para generar un vecino, o \texttt{nil} en caso de que no queden vecinos por analizar. Esta condición varía según el tipo de exploración. Por ejemplo, para la exploración exhaustiva se generan todas las soluciones de la vecindad, mientras que en una aleatoria se genera una cantidad predefinida de vecinos. 
 
-En el trabajo original donde se desarrolló este módulo, las clases se definían de manera distinta a como se definen en el módulo \textbf{core}. Por tanto, en el presente trabajo se cambió las definiciones de clases para, en todos los casos, utilizar \textbf{def-vrp-class}. De esta forma, todas las clases de \textbf{neigh} se volvieron consistentes con el resto del sistema. También se agregó la función \textbf{random-exploration} para obtener el iterador de exploración aleatoria.
+En el trabajo original donde se desarrolló este módulo, las clases se definían de manera distinta a como se definen en el módulo \texttt{core}. Por tanto, en el presente trabajo se modificaron las definiciones de clases del módulo \texttt{neigh} para volverlas consistentes con el resto del sistema. También se agregó la función \texttt{random-exploration} para obtener el iterador de exploración aleatoria.
 
-A partir del Árbol de Vecindad se obtienen iteradores que generan vecinos en forma de lista de operaciones de vecindad. Al aplicar estas operaciones sobre la solución actual se forma una solución cuyo costo se puede calcular utilizando el Grafo de Evaluación.
+A partir del Árbol de Vecindad se obtienen iteradores que generan vecinos en forma de lista de operaciones. Al aplicar estas operaciones sobre la solución actual se obtiene una solución cuyo costo se puede calcular utilizando el Grafo de Evaluación.
 
 \section{Vrp-eval}\label{2-eval}
-En esta sección se implementa el Grafo de Evaluación, que como se explicó en la sección \ref{2-eval}, tiene tres tipos de nodos: Nodos que representan los elementos de la solución (clientes, depósitos), nodos acumuladores (como el costo total), y nodos operacionales (aumentar valor, disminuir valor). 
+En esta sección se implementa el Grafo de Evaluación, que como se presentó en la sección \ref{1-JJ}, tiene tres tipos de nodos: Nodos que representan los elementos de la solución (clientes, depósitos), nodos acumuladores (como el costo total), y nodos operacionales (aumentar valor, disminuir valor). 
 
 El grafo contiene los siguientes elementos:
 
@@ -47,19 +47,19 @@ El grafo contiene los siguientes elementos:
 	\item El valor del costo total de la solución.
 \end{itemize}
 
-Para incorporar este módulo al sistema hubo que reimplementarlo prácticamente desde cero. En su versión anterior, el código del grafo de evaluación estaba aislado del módulo \textbf{core} y, por tanto, este grafo no se podía construir a partir de las clases para describir soluciones que utiliza el sistema. Con el desarrollo de este trabajo se crearon métodos y clases de inicialización, construcción y modificación de grafo compatibles con las clases de \textbf{core}.
+Para incorporar este módulo al sistema hubo que reimplementarlo prácticamente desde cero. En su versión anterior, el código del grafo de evaluación estaba aislado del módulo \texttt{core} y, por tanto, este grafo no se podía construir a partir de las clases para describir soluciones que utiliza el sistema. Con el desarrollo de este trabajo se crearon métodos y clases de inicialización, construcción y modificación de grafo compatibles con las clases de \texttt{core}.
 
 Para inicializar un grafo sólo es necesaria la solución actual. La inicialización consiste en convertir los elementos de la solución (clientes, depósitos, vehículos) en los nodos que los representan.
 
 Para terminar de construir el grafo, se debe definir y ejecutar el código de evaluación de la solución inicial a partir de funciones definidas en el sistema. Algunos ejemplos de estas funciones son:
 
 \begin{itemize}
-	\item \textbf{def-var}: Recibe un nombre y un valor inicial. Inicializa un nuevo nodo acumulador y se lo hace corresponder con el nombre recibido.	
-	\item \textbf{increment-distance}: Recibe dos clientes, una variable asociada a un nodo acumulador y la matriz de distancia. Crea y evalúa un nodo operacional que incrementa el valor almacenado en el nodo correspondiente a la variable en una cantidad igual a la distancia entre los clientes.
-	\item \textbf{decrement-demand}: Recibe un cliente y una variable asociada a un nodo acumulador. Crea y evalúa un nodo operacional que recibe el cliente y decrementa el valor del nodo correspondiente a la variable en una cantidad igual a la demanda del cliente.
-	\item \textbf{increment-value}: recibe dos variables. Incrementa el valor del nodo asociado a la segunda variable en una cantidad igual al valor del nodo asociado a la primera variable.
-	\item \textbf{apply-penalty}: Recibe dos variables y un factor de penalización. Crea y evalúa un nodo operacional que recibe el nodo asociado a la primera variable y, en caso de que este tenga valor negativo, aumenta el valor del nodo asociado a la segunda variable en una cantida que depende del factor de penalización.
-	\item \textbf{return-value}: Recibe una variable y marca su nodo asociado como el nodo que contiene el costo total de la solución. A partir del punto en que se invoca, la propiedad \textit{output} (salida o costo total) del grafo referencia a este nodo.
+	\item \texttt{def-var}: Recibe un nombre y un valor inicial. Inicializa un nuevo nodo acumulador y se lo hace corresponder con el nombre recibido.	
+	\item \texttt{increment-distance}: Recibe dos clientes, una variable asociada a un nodo acumulador y la matriz de distancia. Crea y evalúa un nodo operacional que incrementa el valor almacenado en el nodo correspondiente a la variable en una cantidad igual a la distancia entre los clientes.
+	\item \texttt{decrement-demand}: Recibe un cliente y una variable asociada a un nodo acumulador. Crea y evalúa un nodo operacional que recibe el cliente y decrementa el valor del nodo correspondiente a la variable en una cantidad igual a la demanda del cliente.
+	\item \texttt{increment-value}: recibe dos variables. Incrementa el valor del nodo asociado a la segunda variable en una cantidad igual al valor del nodo asociado a la primera variable.
+	\item \texttt{apply-penalty}: Recibe dos variables y un factor de penalización. Crea y evalúa un nodo operacional que recibe el nodo asociado a la primera variable y, en caso de que este tenga valor negativo, aumenta el valor del nodo asociado a la segunda variable en una cantidad que depende del factor de penalización.
+	\item \texttt{return-value}: Recibe una variable y marca su nodo asociado como el nodo que contiene el costo total de la solución. A partir del punto en que se invoca, la propiedad \textit{output} (salida o costo total) del grafo referencia a este nodo.
 \end{itemize}
 
 Todas las funciones de construcción de grafo reciben también como parámetro la instancia del grafo sobre el que se está trabajando. En el capítulo \ref{chapter:Tutorial} se discutirá la ampliación del sistema con nuevos métodos. 
@@ -81,18 +81,13 @@ return-value total-distance
 
 \end{lstlisting}
 
-En las líneas 1 se usa def-var para inicializar, y asociar a su respectivo nodos, la variable que almacenan el costo total de la solución. Luego se analizan las rutas de la solución. Por cada ruta se definen, y asocian a sus respectivos nodos, variables que almacena el costo (línea 3) y la capacidad restante de la ruta (líneas 4). A continuación se analizan los clientes de la ruta actual. Se incrementa el valor del nodo asociado al costo de la ruta en una cantidad igual a la distancia del cliente actual y el cliente previo (el cliente previo inicial de la ruta es el depósito)(línea 6). También se decrementa el valor del nodo asociado a la capacidad de la ruta en una cantidad igual a la demanda del cliente actual (línea 7) Una vez se analiza una ruta, se aumenta el valor del nodo asociado al costo total de la solución en una cantidad igual al costo de esta ruta (línea 8) y se penaliza el nodo de costo total en caso de ser necesario (línea 9). Finalmente se declara como nodo salida al nodo asociado a la variable de distancia total (línea 10).
+En las líneas 1 se usa def-var para inicializar, y asociar a su respectivos nodos, la variable que almacenan el costo total de la solución. Luego se analizan las rutas de la solución. Por cada ruta se definen, y asocian a sus respectivos nodos, variables que almacena el costo (línea 3) y la capacidad restante de la ruta (líneas 4). A continuación se analizan los clientes de la ruta actual. Se incrementa el valor del nodo asociado al costo de la ruta en una cantidad igual a la distancia del cliente actual y el cliente previo (el cliente previo inicial de la ruta es el depósito)(línea 6). También se decrementa el valor del nodo asociado a la capacidad de la ruta en una cantidad igual a la demanda del cliente actual (línea 7) Una vez se analiza una ruta, se aumenta el valor del nodo asociado al costo total de la solución en una cantidad igual al costo de esta ruta (línea 8) y se penaliza el nodo de costo total en caso de ser necesario (línea 9). Finalmente se declara como nodo salida al nodo asociado a la variable de distancia total (línea 10).
 
-En su versión anterior, el módulo \textbf{eval} tampoco era compatible con las clases de \textbf{core} que describen operaciones de vecindad. Para aplicar y deshacer en el grafo las operaciones de vecindad que utiliza el sistema se implementaron las funciones \textbf{do-core-operations} y \textbf{undo-core-operations}.
+En su versión anterior, el módulo \texttt{eval} tampoco era compatible con las clases de \texttt{core} que describen operaciones de vecindad. Para aplicar y deshacer en el grafo las operaciones de vecindad que utiliza el sistema se implementaron las funciones \texttt{do-core-operations} y \texttt{undo-core-operations}.
 
-\textbf{Do-core-operations} recibe una lista de operaciones y el grafo sobre el cual estas se ejecutan. Las operaciones se hacen en orden. Los nodos que representan elementos de la solución se insertan o eliminan del grafo y los nodos operacionales que dependan de ellos se ejecutan o deshacen. Por ejemplo, dado el grafo representado en la figura \ref{fig:eval-graph-2}, al ejecutar el siguiente código:
+\texttt{Do-core-operations} recibe una lista de operaciones y el grafo sobre el cual estas se ejecutan. Las operaciones se hacen en orden. Los nodos que representan elementos de la solución se insertan o eliminan del grafo y los nodos operacionales que dependan de ellos se ejecutan o deshacen. Por ejemplo, dado el grafo representado en la figura \ref{fig:eval-graph-5}, al ejecutar el siguiente código:
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-2}
-	\caption{Grafo de evaluación que representa la solución $s1$ de VRP clásico.}
-	\label{fig:eval-graph-2}
-\end{figure}
+
 
 \begin{lstlisting}
 do-core-operations (graph ((op-select-client 1 from route 1)
@@ -101,14 +96,9 @@ do-core-operations (graph ((op-select-client 1 from route 1)
 
 Se obtiene el grafo representado en \ref{fig:eval-graph-4}. En este punto, la propiedad \textit{output} del grafo (Que en este caso hace referencia al nodo \textit{cost}) tiene el costo total de la nueva solución.
 
-Para deshacer operaciones que se hicieron previamente en un grafo se ejecuta la función \textbf{undo-core-operations}. Por ejemplo, al ejecutar el siguiente código sobre el grafo representado en la figura \ref{fig:eval-graph-4}:
+Para deshacer operaciones que se hicieron previamente en un grafo se ejecuta la función \texttt{undo-core-operations}. Por ejemplo, al ejecutar el siguiente código sobre el grafo representado en la figura \ref{fig:eval-graph-6}:
 
-\begin{figure}
-	\centering
-	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-4}
-	\caption{Grafo de evaluación que representa la solución $s1$ de VRP clásico luego de aplicada una instancia de $rarb$}
-	\label{fig:eval-graph-4}
-\end{figure}
+
 
 \begin{lstlisting}
 undo-core-operations (graph ((op-select-client 1 from route 1)
@@ -117,18 +107,46 @@ undo-core-operations (graph ((op-select-client 1 from route 1)
 
 Se obtiene nuevamente el grafo representado por \ref{fig:eval-graph-2} y el valor almacenado en \textit{cost} vuelve a ser el costo total de la solución original.
 
-Una vez que se definen funciones que generan y evalúan soluciones, sólo resta utilizarlas en exploraciones de vecindades. De eso se habla en la siguiente sección.
+El Grafo de Vecindad en la forma que se implementó, no es capaz de evaluar vecinos de variantes de VRP que tengan ciertas características y sobre esto trata la siguiente sección.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-2}
+	\caption{Grafo de evaluación que representa la solución $s1$ de VRP básico.}
+	\label{fig:eval-graph-5}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{Graphics/eval-graph-4}
+	\caption{Grafo de evaluación que representa la solución $s1$ de VRP básico luego de mover el cliente $c2$}
+	\label{fig:eval-graph-6}
+\end{figure}
+
+\subsection{Limitaciones}
+
+En esta sección se describen las variantes de VRP en las cuales no es posible evaluar vecinos mediante el Grafo de evaluación tal y como se ha implementado en el presente trabajo. Para ello se tomará como ejemplo el Problema de Enrutamiento de Vehículos con recogidas y entregas. 
+
+En el Problema de Enrutamiento de Vehículos con recogidas y entregas a cada cliente se le entrega pero también se le recogen productos. En este caso, además, el cliente es visitado una sola vez, por lo que la recogida y la entrega se realizan al mismo tiempo y con el mismo vehículo. Como consecuencia, es posible que se incumpla la restricción de capacidad sin que la cantidad total de producto que se debe entregar a cada cliente de la ruta exceda la capacidad del vehículo. Por ejemplo, puede que el exceso de carga lo provoque la recogida de productos al atender a un cliente durante el recorrido de la ruta.
+
+En esta variante se penaliza el exceso de carga al visitar cada cliente de la ruta, al contrario de como se hace en la evaluación de una solución de CVRP donde la penalización se realiza al finalizar el recorrido de cada ruta. Las soluciones vecinas de los problemas en los que la función objetivo incluye penalizaciones durante el recorrido de una ruta no se pueden evaluar con el grafo que se implementó en este trabajo \cite{JJ}.
+
+A pesar de que se puede obtener un grafo de evaluación y el resultado de la evaluación de la solución inicial para VRPPD, no sucede lo mismo con las soluciones vecinas de esta. Por ejemplo, al extraer un cliente no se conoce el valor que contenía la capacidad restante de su ruta cuando en la evaluación de la solución inicial se visitó a ese cliente y, por tanto, no se puede revertir la penalización que se pudo haber aplicado en ese momento.
+
+En general no es posible evaluar vecinos en problemas en los que se realicen operaciones durante el recorrido de una ruta que dependan de variables que se modifiquen durante ese recorrido \cite{JJ}.
+
+Una vez que se definen funciones que generan y evalúan soluciones, sólo resta utilizarlas en exploraciones de vecindades. Este tema se aborda en la siguiente sección.
 
 \section{Vrp-generator}\label{2-blueprint}
 Una vecindad se puede analizar con distintas estrategias de exploración y selección. Cada vez que se combina una estrategia de exploración con una de selección se obtiene una manera diferente de analizar la vecindad. A cada una de estas combinaciones, en este trabajo se les llama función exploradora de la vecindad. Programar estas funciones exploradoras es un proceso con alto consumo de tiempo de trabajo humano. En \cite{Heidy} se propone un mecanismo para automatizar la creación de funciones exploradoras a partir de cualesquiera estrategias de exploración y selección, con un esfuerzo mínimo. Esto significa que ya no es necesario programar todas las funciones de exploración diferentes, lo cual agiliza el tiempo de desarrollo. Para esto, se utilizan las ventajas del Sistema de Objetos de Common Lisp (CLOS), en particular las combinaciones de métodos y la facilidad que brinda el lenguaje para generar código fuente en tiempo de ejecución.
 
 Las posibles estrategias de exploración y selección se representan como clases y los criterios de vecindad mediante una lista de operaciones. En \cite{Heidy} se tiene una un mecanismo que recibe una estrategia de exploración, una de selección y un criterio, y devuelve una función que dada una solución explora la vecindad correspondiente a esas entradas.
 
-La versión del módulo \textbf{generator} que se hizo en \cite{Heidy} utilizaba en las funciones de exploración que se generaban, elementos de \textbf{core} que con este trabajo quedaron obsoletos. Por tanto, parte de los mecanismos desarrollados en \cite{Heidy} también quedaron obsoletos.
+La versión del módulo \texttt{generator} que se hizo en \cite{Heidy} utilizaba en las funciones de exploración que se generaban, elementos de \texttt{core} que con este trabajo quedaron obsoletos. Por tanto, parte de los mecanismos desarrollados en \cite{Heidy} también quedaron obsoletos.
 
-En la versión anterior las vecindades se exploraban con cadenas de ciclos que mezclaban las operaciones. En el presente trabajo, esto se hace con un único ciclo que genera soluciones a partir del iterador del Árbol de Vecindad. Por otro lado, los vecinos se evaluaban mediante \textit{soluciones de trabajo} y esto ahora se hace a mediante el Grafo de Evaluación.
+En la versión anterior las vecindades se exploraban con cadenas de ciclos que mezclaban las operaciones. En el presente trabajo, esto se hace con un único ciclo que genera soluciones a partir del iterador del Árbol de Vecindad. Por otro lado, los vecinos se evaluaban mediante \textit{soluciones de trabajo} y esto ahora se hace mediante el Grafo de Evaluación.
 
-En este trabajo se define un nuevo generador de funciones que utiliza un Árbol de Vecindad y que, además, en lugar de ceribir una solución, ahora reciven un Grafo de Evaluación.
+En este trabajo se define un nuevo generador de funciones que utiliza un Árbol de Vecindad y que, además, en lugar de recibir una solución, ahora reciben un Grafo de Evaluación.
 
 En \cite{Heidy} el código de una función de exploración (y por tanto, el código que se genera a partir de la función generadora) está dividido en 5 regiones comunes para cualquier exploración:
 
@@ -140,7 +158,7 @@ En \cite{Heidy} el código de una función de exploración (y por tanto, el cód
 	\item Valores que se retornan.
 \end{itemize}
 
-El siguiente pseudo-código muestra un ejemplo de función exploradora para el criterio \textit{mover cliente en cualquier posición de posición dentro de su ruta} con estrategia de exploración exhaustiva y con selección de mejor vecino. Esta función recibe una solución (\textbf{solution}) como argumento.
+El siguiente pseudo-código muestra un ejemplo de función exploradora para el criterio \textit{mover cliente de posición dentro de su ruta} con estrategia de exploración exhaustiva y con selección de mejor vecino. Esta función recibe una solución (\texttt{solution}) como argumento.
 
 \begin{lstlisting}
 set wc as working-copy of solution
@@ -170,9 +188,9 @@ return result-solution
 
 \end{lstlisting}
 
-En las líneas 1-6 seinicializan las variables variables necesarias. En las líneas 8-10 se crean los ciclos que definen cómo realizar la exploración, por cada operación del criterio se hace un ciclo. Las líneas 12-18 contienen el código dentro de los ciclos, se obtiene el costo actual a partir de la \textit{solución de trabajo} y en caso de ser menor que el actual mejor costo, se actualiza \textbf{best-cost} y \textit{best-neighbor}. Las líneas 20-21 tienen el código fuera de los ciclos, en caso de haberse encontrado un mejor vecino, se aplican sus operaciones sobre la solución actual para obtener la nueva solución. La línea 23 retorna la solución encontrada.
+En las líneas 1-6 seinicializan las variables necesarias. En las líneas 8-10 se crean los ciclos que definen cómo realizar la exploración, por cada operación del criterio se hace un ciclo. Las líneas 12-18 contienen el código dentro de los ciclos, se obtiene el costo actual a partir de la \textit{solución de trabajo} y en caso de ser menor que el actual mejor costo, se actualiza \texttt{best-cost} y \textit{best-neighbor}. Las líneas 20-21 tienen el código fuera de los ciclos, en caso de haberse encontrado un mejor vecino, se aplican sus operaciones sobre la solución actual para obtener la nueva solución. La línea 23 retorna la solución encontrada.
 
-En este trabajo, la sección de los ciclos que definen cómo realizar la exploración se cambia por un único ciclo cuya condicional depende de la estrategia. El sigiente pseudo-código muestra la implementación del ejemplo anterior generado por el sistema desarrollado en esta tesis. Esta función recibe un grafo (\textbf{graph}) como parámetro.
+En este trabajo, la sección de los ciclos que definen cómo realizar la exploración se cambia por un único ciclo cuya condicional depende de la estrategia. El sigiente pseudo-código muestra la implementación del ejemplo anterior generado por el sistema desarrollado en esta tesis. Esta función recibe un grafo (\texttt{graph}) como parámetro.
 
 \begin{lstlisting}
 set neigh-tree as build-neigh-tree with criteria and graph-solution
@@ -200,7 +218,7 @@ return graph-current-solution
 
 En la línea 8 se sustituye el código de la región de los ciclos por un único ciclo que se ejecutará mientras se cumpla su condición (en este caso, que el generador retorne un vecino). Además, la función ahora genera los vecinos a partir de un Árbol de Vecindad y en lugar de recibir una solución como argumento, recibe el grafo asociado a esa solución mediante el cual se obtiene el costo de los vecinos.
 
-En este capítulo se exlicaron las características de cada módulo de este trabajo. El siguiente capítulo explica paso a paso cómo utilizar el sistema para resolver variantes de VRP. 
+En este capítulo se explicaron las características de cada módulo de este trabajo. El siguiente capítulo explica paso a paso cómo utilizar el sistema para resolver variantes de VRP. 
 
 
 
